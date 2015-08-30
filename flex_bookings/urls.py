@@ -2,8 +2,8 @@ from django.conf.urls import patterns, url
 from django.views.generic import RedirectView
 from flex_bookings.views import EventListView, EventDetailView, \
     BookingListView, BookingHistoryListView, BookingCreateView, \
-    BookingUpdateView
-    # BookingDeleteView, BlockCreateView, BlockListView
+    BookingUpdateView, BookingDeleteView
+    # BlockCreateView, BlockListView
 
 
 urlpatterns = patterns('',
@@ -15,8 +15,8 @@ urlpatterns = patterns('',
     # url(r'^booking/update/(?P<pk>\d+)/cancelled/$',
     #     'flex_bookings.views.update_booking_cancelled',
     #     name='update_booking_cancelled'),
-    # url(r'^booking/cancel/(?P<pk>\d+)/$', BookingDeleteView.as_view(),
-    #     name='delete_booking'),
+    url(r'^booking/cancel/(?P<pk>\d+)/$', BookingDeleteView.as_view(),
+        name='delete_booking'),
     # url(r'^events/(?P<event_slug>[\w-]+)/cancellation-period-past/$',
     #     'flex_bookings.views.cancellation_period_past', name='cancellation_period_past'),
     url(r'^booking/(?P<event_slug>[\w-]+)/duplicate/$',
@@ -39,6 +39,10 @@ urlpatterns = patterns('',
     url(
         r'^classes/$', EventListView.as_view(), {'ev_type': 'lessons'},
         name='lessons'
+    ),
+    url(
+        r'^book-block/$', 'flex_bookings.views.book_block_view',
+        name='book_block'
     ),
     # url(r'^permission-denied/$', 'flex_bookings.views.permission_denied',
     #     name='permission_denied'),

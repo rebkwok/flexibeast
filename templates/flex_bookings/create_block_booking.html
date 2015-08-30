@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+{% load bookingtags %}
+
+{% block content %}
+
+<div class="extra-top-margin container-fluid row">
+    <div class="col-sm-12">
+       <div class="panel panel-success">
+            <div class="panel-heading">
+                <h2 class="panel-title">Block booking</h2>
+            </div>
+            <div class="panel-body">
+                <form action="" method="post">{% csrf_token %}
+                    <div class="form-group">
+
+                    The following blocks are available for booking:
+
+                    {% for block in event.blocks.all %}
+                        <h4>{{ block.name }}</h4>
+
+                        <p>Booking this block will book you in to the following classes:</p>
+
+                        <ul>
+                        {% for event in block.events.all %}
+                            <li>{{ event }}</li>
+                        {% endfor %}
+                        </ul>
+                        <button class="btn btn-success update-btn"
+                                type="submit" name="book_block" value={{ block.id }}>Book block
+                        </button>
+
+                    {% endfor %}
+
+                    </div>
+                </form>
+            </div>
+       </div>
+
+</div>
+</div>
+
+
+{% endblock %}

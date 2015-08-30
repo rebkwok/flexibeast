@@ -2,6 +2,114 @@
 {% load static %}
 
 {% block content %}
-    Update booking placeholder
+
+<div class="container-fluid row">
+    {% if history %}
+        <h1>Your past bookings</h1>
+    {% else %}
+        <h1>Your bookings</h1>
+    {% endif %}
+
+    {% if bookingformlist %}
+    <p>Click on booking title for more class/workshop details.</p>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-success">
+                <div class="table-responsive">
+                    <table class="table">
+                        <tr class="success">
+                            {% if not history %}
+                            <th> </th>
+                            {% endif %}
+                            <th>Date</th>
+                            <th>Booking</th>
+                            <th>Status</th>
+                            <th class="hidden-sm hidden-xs table-center">Cost</th>
+                            <th class="table-center">Paid</th>
+                            <th class="table-center">Block</th>
+                            <th class="hidden-sm hidden-xs table-center">Place confirmed</th>
+                        </tr>
+                        {% for bookingform in bookingformlist %}
+                            <tr {% if bookingform.booking.status == 'CANCELLED' %}class='expired'{% endif %}>
+
+                                {% if not history %}
+                                    <td>
+                                        {% if bookingform.booking.event.cost > 0 and not bookingform.booking.paid %}
+                                        <div class="inc-btm-space">
+                                            {% if bookingform.booking.status == 'OPEN' %}
+                                             <a {% if not bookingform.booking.event.payment_open %}class="disabled"{% endif %}href="{% url 'flexbookings:update_booking' bookingform.booking.pk %}">
+                                                 <div type="button" {% if not bookingform.booking.event.payment_open %}disabled{% endif %} id="payment_options_button" class="btn btn-success table-btn booking-btn">Payment options</div>
+                                             </a>
+                                            {% endif %}
+
+                                        </div>
+                                        {% endif %}
+                                        {% if bookingform.booking.status == 'OPEN' %}
+                                        <a {% if not bookingform.can_cancel %}class="disabled"{% endif %}
+                                             href="{% url 'flexbookings:delete_booking' bookingform.booking.pk %}">
+                                            <div {% if not bookingform.can_cancel %}disabled{% endif %}
+                                                 class="btn btn-danger table-btn booking-btn">Cancel booking</div></a>
+                                        {% elif not bookingform.booking.event.bookable %}
+                                            {% if not bookingform.on_waiting_list %}
+                                                <form class="wl-table-form" action="{% url 'flexbookings:book_event' bookingform.booking.event.slug %}" method="get">
+                                                    <input id='join_waiting_list_button' class="btn btn-success table-btn booking-btn" type="submit" value="Join waiting list" name="join waiting list"/>
+                                                    <input class="hide" type="text" name="bookings" value="bookings" />
+                                                </form>
+                                            {% else %}
+                                                <form class="wl-table-form" action="{% url 'flexbookings:book_event' bookingform.booking.event.slug %}" method="get">
+                                                    <input id='leave_waiting_list_button' class="btn btn-warning table-btn booking-btn" type="submit" value="Leave waiting list" name="leave waiting list"/>
+                                                    <input class="hide" type="text" name="bookings" value="bookings" />
+                                                </form>
+                                            {% endif %}
+                                        {% else %}
+                                            <a href="{% url 'flexbookings:book_event' bookingform.booking.event.slug %}">
+                                                <div type="button" id="rebook_button" class="btn btn-success table-btn booking-btn">Rebook</div></a>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+
+                                <td>{{ bookingform.booking.event.date |  date:"D d M H:i" }}</td>
+                                <td>
+                                    {% if bookingform.ev_type == 'EV' %}
+                                    <a href="{% url 'flexbookings:event_detail' bookingform.booking.event.slug %}">
+                                        {{ bookingform.booking.event.name }}</a>
+                                    {% else %}
+                                    <a href="{% url 'flexbookings:lesson_detail' bookingform.booking.event.slug %}">
+                                        {{ bookingform.booking.event.name }}</a>
+                                    {% endif %}
+                                    </td>
+                                <td>{{ bookingform.booking.status }}</td>
+                                <td class="hidden-sm hidden-xs table-center">£{{ bookingform.booking.event.cost }}</td>
+                                <td class="table-center">
+                                    {% if bookingform.booking.event.cost and bookingform.booking.paid %}<span class="confirmed fa fa-check"></span>
+                                    {% elif bookingform.booking.event.cost and not bookingform.booking.paid %}<span class="not-confirmed fa fa-close"></span>
+                                    {% else %}<strong>N/A</strong>{% endif %}</td>
+                                <td class="table-center">{% if bookingform.booking.block %}{{ bookingform.booking.block.name }}{% else %}Single class booking{% endif %}</td>
+                                {% if bookingform.booking.space_confirmed %}
+                                    <td class="hidden-sm hidden-xs table-center confirmed fa fa-check"></td>
+                                    {% elif bookingform.booking.status == 'CANCELLED' %}
+                                    <td class="hidden-sm hidden-xs table-center not-confirmed fa fa-close"></td>
+                                    {% else %}
+                                    <td class="hidden-sm hidden-xs table-center not-confirmed"> Pending</td>
+                                {% endif %}
+
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+
+        </div>
+        </div>
+    </div>
+    {% else %}
+        {% if history %}
+            <p>You do not have any past class or event bookings.</p>
+        {% else %}
+            <p>You are not booked into any upcoming classes or events.</p>
+        {% endif %}
+    {% endif %}
+
+</div>
 
 {% endblock content %}

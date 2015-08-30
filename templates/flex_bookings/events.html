@@ -5,7 +5,7 @@
 
     <div class="container-fluid row">
 
-        <h1>Flexibeast {% if type == 'events' %}Workshops{% elif type == 'lessons' %}Classes{% endif %}</h1>
+        <h1>{% if type == 'events' %}Workshops{% elif type == 'lessons' %}Classes{% endif %}</h1>
         {% if events %}
         <div class="row">
             <div class="col-sm-12">
@@ -49,8 +49,9 @@
                                         {% elif event not in booked_events %}
                                             {% if event.bookable %}
                                                 <a href="{% url 'flexbookings:book_event' event.slug %}"><div id="book_button" class="btn btn-success table-btn">Book single class</div></a></br>
-                                                <a href="#"><div id="book_block_button" class="btn btn-success table-btn">Placeholder - Book block</div></a>
-
+                                                {% if event.blocks.count > 0 %}
+                                                <a href="{% url 'flexbookings:book_block' %}?event={{event.slug}}   "><div id="book_block_button" class="btn btn-success table-btn">Book block</div></a>
+                                                {% endif %}
 
                                             {% elif event.booking_open %}
                                                 {% if event in waiting_list_events %}

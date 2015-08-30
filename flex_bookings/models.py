@@ -18,6 +18,9 @@ logger = logging.getLogger(__name__)
 class BookingError(Exception):
     pass
 
+class BlockBookingError(Exception):
+    pass
+
 
 class EventType(models.Model):
     TYPE_CHOICE = (
@@ -186,8 +189,10 @@ class Booking(models.Model):
     # cost will be set to either event cost or block item_cost
     cost = models.DecimalField(default=7, max_digits=8, decimal_places=2)
 
+    block = models.ForeignKey(Block, null=True, related_name='bookings')
+
     class Meta:
-        unique_together = ('user', 'event')
+        unique_together = (('user', 'event'))
 
     def __str__(self):
         return "{} - {}".format(str(self.event.name), str(self.user.username))
@@ -223,13 +228,16 @@ class Booking(models.Model):
                     'Attempting to reopen booking for full '
                     'event %s' % self.event.id
                 )
-        else:
-            if self.status != "CANCELLED" and \
+        elif self.status != "CANCELLED" and \
             self.event.spaces_left() == 0:
                 raise BookingError(
                     'Attempting to create booking for full '
                     'event %s' % self.event.id
                 )
+        elif self.block and self.event not in self.block.events.all():
+            raise BlockBookingError(
+                'Event is not in the block being assigned to this booking'
+            )
 
         if self.payment_confirmed and not self.date_payment_confirmed:
             self.date_payment_confirmed = timezone.now()
