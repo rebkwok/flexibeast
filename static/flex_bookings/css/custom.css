@@ -181,12 +181,12 @@ border-bottom: 1px solid black;
 
 /* unvisited link */
 a:link {
-color: #FF6666;
+color: blueviolet;
 }
 
 /* visited link */
 a:visited {
-color: #FF6666;
+color: blueviolet;
 }
 
 /* mouse over link */
@@ -218,7 +218,7 @@ color: #000;
   overflow-y: auto;
   z-index: 1000;
   transition: all 0.4s ease 0s;
-  border-right: 1px solid #FF6666;
+  border-right: 1px solid #088A08;
 }
 
 #page-content-wrapper {
@@ -381,13 +381,13 @@ color: #000;
     padding-top: 30px;
 }
 
-.navbar { background-color: #fff; border-color: #FF6666}
+.navbar { background-color: #fff; border-color: #088A08}
 .navbar .container-fluid { background-color: #fff}
 .navbar .navbar-nav { background-color: #fff}
 .navbar .navbar-brand { background-color: #fff}
 .navbar .navbar-collapse { background-color: #fff}
-.navbar .navbar-nav>.active-nav>a:hover {background-color: #FF6666; color: #fff}
-.navbar .navbar-nav>li>a:hover {background-color: #FF6666; color: #fff}
+.navbar .navbar-nav>.active-nav>a:hover {background-color: #088A08; color: #fff}
+.navbar .navbar-nav>li>a:hover {background-color: #088A08; color: #fff}
 
 .nav-user {
     padding-top: 15px;

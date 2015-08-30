@@ -43,11 +43,17 @@
                             <p>This class can be booked as part of a block.  Available blocks are:</p>
                             <ul>
                                 {% for block in event.blocks.all %}
-                                    <li>{{ block.name }}</li>
+                                    <li>{{ block.name }} - total cost £{{ block|block_cost }}</li>
+                                    <ul>
+                                        {% for event in block.events.all %}
+                                            <li>{{ event }}</li>
+                                        {% endfor %}
+                                    </ul>
+
                                 {% endfor %}
                             </ul>
 
-                            <p>Click the Book button below for booking options.</p>
+                            {% if not booked %}</br><p>Click the Book button below for booking options.</p>{% endif %}
                         </li>
                     {% endif %}
 

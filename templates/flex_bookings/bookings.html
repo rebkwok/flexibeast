@@ -79,7 +79,7 @@
                                     {% endif %}
                                     </td>
                                 <td>{{ bookingform.booking.status }}</td>
-                                <td class="hidden-sm hidden-xs table-center">£{{ bookingform.booking.event.cost }}</td>
+                                <td class="hidden-sm hidden-xs table-center">£{{ bookingform.booking.cost }}</td>
                                 <td class="table-center">
                                     {% if bookingform.booking.event.cost and bookingform.booking.paid %}<span class="confirmed fa fa-check"></span>
                                     {% elif bookingform.booking.event.cost and not bookingform.booking.paid %}<span class="not-confirmed fa fa-close"></span>
