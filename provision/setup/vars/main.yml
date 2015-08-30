@@ -1,0 +1,5 @@
+---
+db_name: flexibeast
+db_user: flexibeast
+db_password: sdjgh34iutwefhfgbqkj3
+log_path: /var/log/flexibeast/

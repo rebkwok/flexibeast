@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+{% load bookingtags %}
+
+{% block content %}
+
+<div class="extra-top-margin container-fluid row">
+    <div class="col-sm-12">
+       <div class="panel panel-success">
+            <div class="panel-heading">
+                <h2 class="panel-title">You are now booking for
+                    {% if ev_type == 'event' %}
+                    <a href="{% url 'flexbookings:event_detail' event.slug %}">{{ event.name }}</a>
+                    {% else %}
+                    <a href="{% url 'flexbookings:lesson_detail' event.slug %}">{{ event.name }}</a>
+                    {% endif %}
+                    on {{ event.date | date:"D d F, g:i a" }}</h2>
+            </div>
+            <div class="panel-body">
+                <form action="" method="post">{% csrf_token %}
+                    <div class="form-group">
+
+                        {% if not event.can_cancel %}
+                            <p class="cancel-warning">Please note that the cancellation period for this {{ ev_type }} has passed.</p>
+                            {% if event.cost %}
+                                If you continue with the booking, you will not have the option to cancel it yourself.
+                                {% if not event.advance_payment_required%}
+                                    <p class="cancel-warning">Your payment will still be due even if you do not attend the {{ ev_type }}.</p>
+                                {% else %}
+                                    <p class="cancel-warning">If payment has not been received within approximately
+                                        4 hours of booking, your booking will be automatically cancelled.</p>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <p>Cancellation is only allowed up to {{ event.cancellation_period | format_cancellation }}
+                            before the {{ ev_type }} date.  {% if event.advance_payment_required %}If payment has not been
+                            received by the cancellation period, your booking will be automatically cancelled. {% endif %}</p>
+                        {% endif %}
+
+
+                        <span class="hide">{{ form.event }}</span>
+                        <span class="hide">{{ form.user }}</span>
+                        {% if event.blocks %}
+                            <p>NOTE: Add link to block book, if available</p>
+                            <input class="btn btn-success update-btn" type="submit" name="book_one_off" value="Book single class" />
+                        {% else %}
+                            <input class="btn btn-success update-btn" type="submit" name="book_one_off" value="Book" />
+                        {% endif %}
+
+                    </div>
+                </form>
+            </div>
+       </div>
+
+</div>
+</div>
+
+
+{% endblock %}

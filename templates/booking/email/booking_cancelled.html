@@ -1,0 +1,31 @@
+{% extends 'email_base.html' %}
+
+{% block messagecontent %}
+<div style="font-family: sans-serif;">
+
+<p>Your booking for {{ event }} has been cancelled.</p>
+
+<p>
+{% if booking.block %}
+    You used a block to make this booking; your block has been updated.
+{% endif %}
+</p>
+
+<p>
+{% if not booking.block %}
+    {% if not booking.free_class and booking.paid %}
+        Please note that payments are not automatically refunded. The organiser has been informed of your cancellation and
+        will be in contact soon.
+    {% else %}
+        This booking was marked as a free class. If you decide to reopen this
+        booking you will need to resubmit a free class request for approval.
+    {% endif %}
+{% endif %}
+</p>
+
+<p>
+    For further information please contact {{ booking.event.contact_person }} at
+    <a href="mailto:{{ booking.event.contact_email }}">{{ booking.event.contact_email }}</a>
+</p>
+</div>
+{% endblock %}

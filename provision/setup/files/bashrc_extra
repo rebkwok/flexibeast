@@ -1,0 +1,13 @@
+export SRV_IP="$(ip -o -f inet addr show eth1 | awk -F ' +|/' '{print $4}')"
+cd /src/flexibeast
+. /src/flexibeast/venv/bin/activate
+
+echo "Application is running at 127.0.0.1:7100"
+
+alias go="cd /src/flexibeast"
+alias venv=". /src/flexibeast/venv/bin/activate"
+alias runserver="cd /src/flexibeast
+venv
+echo 'Application is running at 127.0.0.1:7100'
+./manage.py runserver 0.0.0.0:16000"
+

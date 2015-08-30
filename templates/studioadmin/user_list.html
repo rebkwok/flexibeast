@@ -1,0 +1,55 @@
+{% extends "studioadmin/base.html" %}
+{% load static %}
+{% load bookingtags %}
+
+{% block studioadmincontent %}
+
+    <div class="container-fluid row">
+
+        <h2>Registered Users</h2>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-success">
+
+                    <div class="table-responsive">
+                        <table class="table tablesorter" id="sortTable">
+                            <thead>
+                            <tr class="success">
+                                <th class="table-center">Username <span class="fa fa-sort"></span></th>
+                                <th class="table-center">First Name <span class="fa fa-sort"></span></th>
+                                <th class="table-center">Last Name <span class="fa fa-sort"></span></th>
+                                <th class="table-center">Regular student</th>
+                                <th class="table-center">Bookings</th>
+                                <th class="table-center">Blocks</th>
+                                <th class="table-center">Email</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td class="table-center studioadmin-tbl">{{ user.username }}</td>
+                                <td class="table-center studioadmin-tbl">{{ user.first_name }}</td>
+                                <td class="table-center studioadmin-tbl">{{ user.last_name }}</td>
+                                <td class="table-center studioadmin-tbl">
+                                    <form class="wl-table-form" method="get">
+                                                <button class="btn table-btn perm-btn {% if user|is_regular_student %}btn-success{% else %}btn-default{% endif %}"
+                                                        type="submit" name="change_user" id="regular_student_button" value="{{ user.id }}">{% if user|is_regular_student %}Yes{% else %}No{% endif %}</button>
+                                    </form>
+                                </td>
+                                <td class="table-center studioadmin-tbl">
+                                    <a href="{% url 'studioadmin:user_bookings_list' user.id 'future_open' %}"><span class="fa fa-external-link fa-lg"></span></a></td>
+                                <td class="table-center studioadmin-tbl">
+                                    <a href="{% url 'studioadmin:user_blocks_list' user.id %}"><span class="fa fa-external-link fa-lg"></span></a></td>
+                                <td class="table-center studioadmin-tbl"><a href="mailto:{{ user.email }}" target="_blank">{{ user.email }}</a></td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+         </div>
+
+    </div>
+
+{% endblock studioadmincontent %}
