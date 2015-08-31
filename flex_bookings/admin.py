@@ -139,7 +139,7 @@ class EventForm(forms.ModelForm):
 # TODO validation on event fields - e.g. payment due date can't be after event
 # TODO date, event date can't be in past, cost must be >= 0
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('name', 'date', 'location', 'get_spaces_left')
+    list_display = ('name', 'date', 'location', 'get_spaces_left', 'booking_open')
     list_filter = (EventDateListFilter, 'name', EventTypeListFilter)
     actions_on_top = True
     form = EventForm
@@ -161,7 +161,7 @@ class EventAdmin(admin.ModelAdmin):
         }),
         ('Payment Information', {
             'fields': ('cost', 'advance_payment_required', 'booking_open',
-            'payment_open', 'payment_info',  'payment_due_date')
+            'payment_info',  'payment_due_date')
         }),
         ('Cancellation Period', {
             'fields': ('cancellation_period',),

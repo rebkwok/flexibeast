@@ -8,6 +8,10 @@ from flex_bookings.views import EventListView, EventDetailView, \
 
 urlpatterns = patterns('',
     url(r'^bookings/$', BookingListView.as_view(), name='bookings'),
+    url(
+        r'^bookings/payments-pending/$',
+        'flex_bookings.views.payments_pending', name='payments_pending'
+    ),
     url(r'^booking-history/$', BookingHistoryListView.as_view(),
         name='booking_history'),
     url(r'^booking/update/(?P<pk>\d+)/$', BookingUpdateView.as_view(),
@@ -47,6 +51,6 @@ urlpatterns = patterns('',
     # url(r'^permission-denied/$', 'flex_bookings.views.permission_denied',
     #     name='permission_denied'),
    url(r'^booking/(?P<event_slug>[\w-]+)/not-open/$',
-        'flex_bookings.views.not_open', name='not_open'),
+        'flex_bookings.views.booking_not_open', name='not_open'),
     url(r'^$', RedirectView.as_view(url='/classes/', permanent=True)),
     )

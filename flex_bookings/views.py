@@ -51,10 +51,10 @@ class EventListView(ListView):
         if name:
             return Event.objects.filter(
                 Q(event_type__event_type=ev_abbr) & Q(date__gte=timezone.now())
-                & Q(name=name) & Q(event__booking_open=True)).order_by('date')
+                & Q(name=name) & Q(booking_open=True)).order_by('date')
         return Event.objects.filter(
             Q(event_type__event_type=ev_abbr) & Q(date__gte=timezone.now()) &
-            Q(event__booking_open=True)
+            Q(booking_open=True)
             ).order_by('date')
 
     def get_context_data(self, **kwargs):
@@ -87,6 +87,20 @@ class EventDetailView(DetailView):
     context_object_name = 'event'
     template_name = 'flex_bookings/event.html'
 
+    def get(self, *args, **kwargs):
+        if self.kwargs['ev_type'] == 'event':
+            ev_abbr = 'EV'
+        else:
+            ev_abbr = 'CL'
+
+        queryset = Event.objects.filter(event_type__event_type=ev_abbr)
+        obj = get_object_or_404(queryset, slug=self.kwargs['slug'])
+
+        if not obj.booking_open:
+            return HttpResponseRedirect(
+                reverse('flexbookings:not_open', args=[obj.slug])
+            )
+
     def get_object(self):
         if self.kwargs['ev_type'] == 'event':
             ev_abbr = 'EV'
@@ -94,13 +108,8 @@ class EventDetailView(DetailView):
             ev_abbr = 'CL'
         queryset = Event.objects.filter(event_type__event_type=ev_abbr)
 
-        obj = get_object_or_404(queryset, slug=self.kwargs['slug'])
+        return get_object_or_404(queryset, slug=self.kwargs['slug'])
 
-        if not obj.booking_open:
-            return HttpResponseRedirect(
-                reverse('flexbookings:not_open', args=[obj.slug])
-            )
-        return obj
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -458,6 +467,35 @@ class BookingUpdateView(LoginRequiredMixin, UpdateView):
 
 
 @login_required
+def payments_pending(request):
+    unpaid_bookings = Booking.objects.filter(
+        user=request.user, status='OPEN', paid=False
+    )
+    unpaid_booked_events = [booking.event for booking in unpaid_bookings]
+
+    blocks = []
+    unpaid_single_bookings = []
+
+    for booking in unpaid_bookings:
+        if booking.event in unpaid_booked_events:
+            blocks.append(booking.block)
+        else:
+            unpaid_single_bookings.append(booking)
+
+    unpaid_blocks = set(blocks)
+
+    context = {
+        'unpaid_blocks': unpaid_blocks,
+        'unpaid_bookings': unpaid_single_bookings
+    }
+
+    return TemplateResponse(
+        request, 'flex_bookings/payments_pending.html', context
+    )
+
+
+
+@login_required
 def book_block_view(request):
 
     event_slug = request.GET.get('event')
@@ -644,10 +682,11 @@ def fully_booked(request, event_slug):
     context = {'event': event, 'ev_type': ev_type}
     return render(request, 'flex_bookings/fully_booked.html', context)
 
+
 def booking_not_open(request, event_slug):
     event = get_object_or_404(Event, slug=event_slug)
     ev_type = 'class' if event.event_type.event_type == 'CL' else 'workshop'
     return render(
         request, 'flex_bookings/booking_not_open.html',
-        {{ 'ev_type': ev_type }}
+        {'ev_type': ev_type}
     )

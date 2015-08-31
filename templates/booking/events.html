@@ -22,10 +22,8 @@
                                     <th class="table-center">Booked</th>
                                 {% endif %}
                                 <th>Date</th>
-                                <th>{% if type == 'events' %}Event{% elif type == 'lessons' %}Class{% endif %}</th>
-                                {% if type == 'events' %}
-                                    <th class="hidden-sm hidden-xs">Location</th>
-                                {% endif %}
+                                <th>{% if type == 'events' %}Workshop{% elif type == 'lessons' %}Class{% endif %}</th>
+                                <th class="hidden-sm hidden-xs">Location</th>
                                 <th class="hidden-sm hidden-xs table-center">Cost</th>
                                 <th class="hidden-xs table-center">Spaces</th>
                                 <th class="hidden-xs table-center">Spaces left</th>
@@ -51,10 +49,10 @@
                                             {% if event.event_type.subtype == "Pole practice" and not is_regular_student %}
                                                 {% if type == 'events' %}
                                                         <a class="ext-instructor" href="{% url 'booking:event_detail' event.slug %}">
-                                                    {% elif type == 'lessons' %}
-                                                        <a class="ext-instructor" href="{% url 'booking:lesson_detail' event.slug %}">
-                                                    {% endif %}
-                                                    N/A - see details</a>
+                                                {% elif type == 'lessons' %}
+                                                    <a class="ext-instructor" href="{% url 'booking:lesson_detail' event.slug %}">
+                                                {% endif %}
+                                                N/A - see details</a>
 
                                             {% elif event.bookable %}
                                                     <a href="{% url 'booking:book_event' event.slug %}"><div id="book_button" class="btn btn-success table-btn">Book</div></a>

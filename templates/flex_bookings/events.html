@@ -24,10 +24,10 @@
                                 {% endif %}
                                 <th>Date</th>
                                 <th>{% if type == 'events' %}Workshop{% elif type == 'lessons' %}Class{% endif %}</th>
-                                <th class="hidden-xs">Location</th>
+                                <th>Location</th>
                                 <th class="hidden-sm hidden-xs table-center">Drop-in Cost</th>
                                 <th class="hidden-xs table-center">Spaces left</th>
-                                <th class="tbale-center">Block available</th>
+                                <th class="table-center">Block available</th>
                             </tr>
                             <tr class="filter-row">
                                 <td class="filter-row" colspan=9>
@@ -50,6 +50,7 @@
                                                 {% if event.blocks.count > 0 %}
                                                 <a href="{% url 'flexbookings:book_block' %}?event={{event.slug}}   "><div id="book_block_button" class="btn btn-success table-btn">Book block</div></a>
                                                 {% endif %}
+                                            {% else %}
 
                                                 {% if event in waiting_list_events %}
                                                     <form class="wl-table-form" action="{% url 'flexbookings:book_event' event.slug %}" method="get">
@@ -60,7 +61,9 @@
                                                         <input class="btn btn-success table-btn" id="join_waiting_list_button" type="submit" value="Join waiting list" name="join waiting list"/>
                                                     </form>
                                                 {% endif %}
-                                        {% endif %}</td>
+                                            {% endif %}
+                                        {% endif %}
+                                            </td>
                                     {% endif %}
                                     <td>{{ event.date | date:"D d M H:i" }}</td>
                                     <td>{% if type == 'events' %}
