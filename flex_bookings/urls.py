@@ -46,5 +46,7 @@ urlpatterns = patterns('',
     ),
     # url(r'^permission-denied/$', 'flex_bookings.views.permission_denied',
     #     name='permission_denied'),
+   url(r'^booking/(?P<event_slug>[\w-]+)/not-open/$',
+        'flex_bookings.views.not_open', name='not_open'),
     url(r'^$', RedirectView.as_view(url='/classes/', permanent=True)),
     )

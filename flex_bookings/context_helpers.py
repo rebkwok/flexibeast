@@ -24,12 +24,7 @@ def get_event_context(context, event, user):
         payment_text = "There is no cost associated with this {}.".format(
             event_type_str
         )
-    else:
-        if not event.payment_open:
-            payment_text = "Online payments are not open. " + event.payment_info
-        else:
-            payment_text = "Online payments are open. " + event.payment_info
-    context['payment_text'] = payment_text
+    context['payment_text'] = event.payment_info
 
     # booked flag
     if user.is_authenticated():
@@ -62,10 +57,6 @@ def get_event_context(context, event, user):
                                         " cancelled.".format(event_type_str)
                 context['booking_info_text_cancelled'] = booking_info_text_cancelled
 
-            if not event.booking_open:
-                booking_info_text = "Bookings are not open for this {}.".format(
-                    event_type_str
-                )
             if event.spaces_left() <= 0:
                 booking_info_text = "This {} is now full.".format(event_type_str)
             if event.payment_due_date:

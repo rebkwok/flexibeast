@@ -28,8 +28,6 @@
                                 <th class="hidden-sm hidden-xs table-center">Drop-in Cost</th>
                                 <th class="hidden-xs table-center">Spaces left</th>
                                 <th class="tbale-center">Block available</th>
-                                <th class="hidden-sm hidden-xs table-center">Booking open</th>
-                                <th class="hidden-sm hidden-xs table-center">Payment open</th>
                             </tr>
                             <tr class="filter-row">
                                 <td class="filter-row" colspan=9>
@@ -53,7 +51,6 @@
                                                 <a href="{% url 'flexbookings:book_block' %}?event={{event.slug}}   "><div id="book_block_button" class="btn btn-success table-btn">Book block</div></a>
                                                 {% endif %}
 
-                                            {% elif event.booking_open %}
                                                 {% if event in waiting_list_events %}
                                                     <form class="wl-table-form" action="{% url 'flexbookings:book_event' event.slug %}" method="get">
                                                         <input class="btn btn-warning table-btn" id="leave_waiting_list_button" type="submit" value="Leave waiting list" name="leave waiting list"/>
@@ -63,9 +60,6 @@
                                                         <input class="btn btn-success table-btn" id="join_waiting_list_button" type="submit" value="Join waiting list" name="join waiting list"/>
                                                     </form>
                                                 {% endif %}
-                                            {% else %}
-                                                <div class="disabled btn btn-success table-btn">Book</div>
-                                            {% endif %}
                                         {% endif %}</td>
                                     {% endif %}
                                     <td>{{ event.date | date:"D d M H:i" }}</td>
@@ -80,10 +74,6 @@
                                         {% if event.max_participants %}{{ event.spaces_left }}
                                         {% else %}N/A{% endif %}</td>
                                     <td class="table-center">{% for block in event.blocks.all %}<div>{{ block.name }}</div>{% endfor %}</td>
-                                    <td class="hidden-sm hidden-xs table-center">{% if event.booking_open %}<span class="fa fa-check"></span>{% else %}<span class="fa fa-times"></span>{% endif %}</td>
-                                    <td class="hidden-sm hidden-xs table-center">{% if event.cost %}
-                                        {% if event.payment_open %}<span class="fa fa-check"></span>{% else %}<span class="fa fa-times"></span>{% endif %}
-                                        {% else %}N/A{% endif %}</td>
                                 </tr>
                             {% endfor %}
                         </table>

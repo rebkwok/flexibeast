@@ -66,8 +66,10 @@ class Event(models.Model):
     cost = models.DecimalField(default=7, max_digits=8, decimal_places=2)
 
     advance_payment_required = models.BooleanField(default=True)
-    booking_open = models.BooleanField(default=True)
-    payment_open = models.BooleanField(default=True)
+    booking_open = models.BooleanField(
+        default=False, help_text="Determines whether this class/workshop is "
+                                 "visible on the site and available to book"
+    )
     payment_info = models.TextField(blank=True)
     payment_due_date = models.DateTimeField(
         null=True, blank=True,
@@ -120,7 +122,6 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         if not self.cost:
             self.advance_payment_required = False
-            self.payment_open = False
             self.payment_due_date = None
         if self.payment_due_date:
             # replace time with very end of day
@@ -146,6 +147,13 @@ class Block(models.Model):
     name = models.CharField(max_length=255)
     item_cost = models.DecimalField(default=6, max_digits=8, decimal_places=2)
     events = models.ManyToManyField(Event, related_name='blocks')
+    booking_open = models.BooleanField(
+        default=False, help_text="If this box is checked, all classes in the "
+                                 "block will be available for booking.  Single "
+                                 "class booking will only be available from the "
+                                 "date you have selected.  Note that unchecking "
+                                 "the box does NOT close booking for individual "
+                                 "classes.")
 
     individual_booking_date = models.DateTimeField(
         default=timezone.now,
@@ -157,6 +165,16 @@ class Block(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        # setting a block to booking_open makes booking open on each of it's
+        # classes
+        if self.booking_open:
+            for event in self.events.all():
+                event.booking_open = True
+                event.save()
+        super(Block, self).save(*args, **kwargs)
+
 
 class Booking(models.Model):
     STATUS_CHOICES = (

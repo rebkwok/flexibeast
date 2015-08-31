@@ -51,9 +51,10 @@ class EventListView(ListView):
         if name:
             return Event.objects.filter(
                 Q(event_type__event_type=ev_abbr) & Q(date__gte=timezone.now())
-                & Q(name=name)).order_by('date')
+                & Q(name=name) & Q(event__booking_open=True)).order_by('date')
         return Event.objects.filter(
-            (Q(event_type__event_type=ev_abbr) & Q(date__gte=timezone.now()))
+            Q(event_type__event_type=ev_abbr) & Q(date__gte=timezone.now()) &
+            Q(event__booking_open=True)
             ).order_by('date')
 
     def get_context_data(self, **kwargs):
@@ -93,7 +94,13 @@ class EventDetailView(DetailView):
             ev_abbr = 'CL'
         queryset = Event.objects.filter(event_type__event_type=ev_abbr)
 
-        return get_object_or_404(queryset, slug=self.kwargs['slug'])
+        obj = get_object_or_404(queryset, slug=self.kwargs['slug'])
+
+        if not obj.booking_open:
+            return HttpResponseRedirect(
+                reverse('flexbookings:not_open', args=[obj.slug])
+            )
+        return obj
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -633,6 +640,14 @@ def duplicate_booking(request, event_slug):
 
 def fully_booked(request, event_slug):
     event = get_object_or_404(Event, slug=event_slug)
-    ev_type = 'class' if event.event_type.event_type == 'CL' else 'event'
+    ev_type = 'class' if event.event_type.event_type == 'CL' else 'workshop'
     context = {'event': event, 'ev_type': ev_type}
     return render(request, 'flex_bookings/fully_booked.html', context)
+
+def booking_not_open(request, event_slug):
+    event = get_object_or_404(Event, slug=event_slug)
+    ev_type = 'class' if event.event_type.event_type == 'CL' else 'workshop'
+    return render(
+        request, 'flex_bookings/booking_not_open.html',
+        {{ 'ev_type': ev_type }}
+    )
