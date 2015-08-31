@@ -12,43 +12,31 @@
             <div class="col-sm-12">
                 <div class="panel panel-success">
                     {% if unpaid_blocks %}
-                    <div class="panel-heading"><h4>Blocks</h4></div>
+{#                    <div class="panel-heading"><h4>Blocks</h4></div>#}
                     <div class="panel-body">
                         <div class="table-responsive">
                             <table class="table">
-                                <tr>
-                                    <th class="table-center">Name</th>
-                                    <th class="table-center">Cost</th>
+                                <tr class="success">
+                                    <th>Block/Class/Workshop Name</th>
+                                    <th>Cost</th>
                                 </tr>
                                 {% for block in unpaid_blocks %}
                                     <tr>
-                                        <td class="table-center">{{ block.name }}</td>
-                                        <td class="table-center">£ {{ block|block_cost }}</td>
+                                        <td>{{ block.name }}</td>
+                                        <td>£ {{ block|block_cost }}</td>
                                     </tr>
                                 {% endfor %}
-                            </table>
-                        </div>
-                    </div>
-                    {% endif %}
-                    {% if unpaid_bookings %}
-                    <div class="panel-heading">One-off Bookings</div>
-                    <div class="panel-body">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <tr>
-                                    <th class="table-center">Name</th>
-                                    <th class="table-center">Cost</th>
-                                </tr>
                                 {% for booking in unpaid_bookings %}
                                     <tr>
-                                        <td class="table-center">{{ booking.event }}</td>
-                                        <td class="table-center">£ {{ booking.cost }}</td>
+                                        <td>{{ booking.event }}</td>
+                                        <td>£ {{ booking.cost }}</td>
                                     </tr>
                                 {% endfor %}
                             </table>
                         </div>
                     </div>
                     {% endif %}
+
                 </div>
             </div>
         </div>

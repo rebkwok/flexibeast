@@ -71,6 +71,7 @@ INSTALLED_APPS = (
     # 'paypal.standard.ipn',
     # 'payments',
     'activitylog',
+    'website'
 )
 
 SITE_ID = 1
@@ -250,6 +251,11 @@ ALLOWED_HOSTS = ['*']
 SUIT_CONFIG = {
     'ADMIN_NAME': "Flexibeast",
     'MENU': (
+        {
+            'app': 'website',
+            'label': 'General Site Content',
+
+        },
         {
             'label': 'Events and Classes',
             'app' : 'flex_bookings',

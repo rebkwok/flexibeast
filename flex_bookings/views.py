@@ -100,6 +100,7 @@ class EventDetailView(DetailView):
             return HttpResponseRedirect(
                 reverse('flexbookings:not_open', args=[obj.slug])
             )
+        return super(EventDetailView, self).get(self, *args, **kwargs)
 
     def get_object(self):
         if self.kwargs['ev_type'] == 'event':
@@ -477,7 +478,7 @@ def payments_pending(request):
     unpaid_single_bookings = []
 
     for booking in unpaid_bookings:
-        if booking.event in unpaid_booked_events:
+        if booking.event in unpaid_booked_events and booking.block:
             blocks.append(booking.block)
         else:
             unpaid_single_bookings.append(booking)

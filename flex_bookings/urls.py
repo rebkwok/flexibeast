@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import include, patterns, url
 from django.views.generic import RedirectView
 from flex_bookings.views import EventListView, EventDetailView, \
     BookingListView, BookingHistoryListView, BookingCreateView, \
@@ -50,7 +50,6 @@ urlpatterns = patterns('',
     ),
     # url(r'^permission-denied/$', 'flex_bookings.views.permission_denied',
     #     name='permission_denied'),
-   url(r'^booking/(?P<event_slug>[\w-]+)/not-open/$',
+    url(r'^booking/(?P<event_slug>[\w-]+)/not-open/$',
         'flex_bookings.views.booking_not_open', name='not_open'),
-    url(r'^$', RedirectView.as_view(url='/classes/', permanent=True)),
     )
