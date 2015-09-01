@@ -71,7 +71,7 @@
                                         {% elif type == 'lessons' %}
                                         <a href="{% url 'flexbookings:lesson_detail' event.slug %}">{{ event.name }}</a>
                                         {% endif %}</td>
-                                    <td class="hidden-xs">{{ event.location }}</td>
+                                    <td>{{ event.location }}</td>
                                     <td class="hidden-sm hidden-xs table-center">£{{ event.cost }}</td>
                                     <td class="hidden-xs table-center">
                                         {% if event.max_participants %}{{ event.spaces_left }}

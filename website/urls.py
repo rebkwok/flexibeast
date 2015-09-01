@@ -8,5 +8,5 @@ urlpatterns = patterns('',
     url(r'^private-instruction/$',
         'website.views.private', name='private'
     ),
-    url(r'', 'website.views.about', name='about'),
+    url(r'^$', 'website.views.about', name='about'),
 )

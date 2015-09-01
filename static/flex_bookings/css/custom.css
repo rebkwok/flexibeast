@@ -1,6 +1,14 @@
 
 .plain_bg {
-	background-color: #F2F2F2;
+    background: rgba(8, 138, 8, 0.05) no-repeat center center fixed;
+    background: -webkit-linear-gradient(rgba(8, 138, 8, 0.01), rgba(8, 138, 8, 0.15)) no-repeat center center fixed;
+    background:    -moz-linear-gradient(rgba(8, 138, 8, 0.01), rgba(8, 138, 8, 0.15)) no-repeat center center fixed;
+    background:      -o-linear-gradient(rgba(8, 138, 8, 0.01), rgba(8, 138, 8, 0.15)) no-repeat center center fixed;
+    background:         linear-gradient(rgba(8, 138, 8, 0.01), rgba(8, 138, 8, 0.15)) no-repeat center center fixed;
+    -webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
 }
 
 body {
@@ -875,4 +883,8 @@ a > span.fa.fa-print {
   10% { opacity: 1;}
   50% { opacity: 1;}
   100% { opacity: 0; z-index: 1;}
+}
+
+.panel, .panel .list-group-item {
+    background-color: rgba(255, 255, 255, 0.3);
 }

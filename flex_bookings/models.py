@@ -169,11 +169,11 @@ class Block(models.Model):
     def save(self, *args, **kwargs):
         # setting a block to booking_open makes booking open on each of it's
         # classes
+        super(Block, self).save(*args, **kwargs)
         if self.booking_open:
             for event in self.events.all():
                 event.booking_open = True
                 event.save()
-        super(Block, self).save(*args, **kwargs)
 
 
 class Booking(models.Model):

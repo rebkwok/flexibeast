@@ -19,6 +19,8 @@
                     {% for block in event.blocks.all %}
                         <h4>{{ block.name }}</h4>
 
+                        <p>Total block cost: £{{ block|block_cost }} (per class cost £{{ block.item_cost }})</p>
+
                         <p>Booking this block will book you in to the following classes:</p>
 
                         <ul>
