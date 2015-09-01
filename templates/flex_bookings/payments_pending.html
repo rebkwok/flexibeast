@@ -11,8 +11,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-success">
-                    {% if unpaid_blocks %}
-{#                    <div class="panel-heading"><h4>Blocks</h4></div>#}
+                    {% if unpaid_blocks or unpaid_bookings %}
                     <div class="panel-body">
                         <div class="table-responsive">
                             <table class="table">
@@ -21,26 +20,28 @@
                                     <th>Block/Class/Workshop Name</th>
                                     <th>Cost</th>
                                 </tr>
-                                {% for block in unpaid_blocks %}
+                                {% for blockform in unpaid_blocks %}
                                     <tr>
                                         <td>
-                                            <a href="{% url 'flexbookings:update_block' block.pk %}">
+                                            <a href="{% url 'flexbookings:update_block' blockform.block.pk %}">
                                                  <div type="button" id="payment_options_button" class="btn btn-success table-btn booking-btn">Confirm payment</div>
                                              </a>
+                                            {% include 'payments/blocklistpayment.html' %}
                                         </td>
-                                        <td>{{ block.name }}</td>
-                                        <td>£ {{ block|block_cost }}</td>
+                                        <td>{{ blockform.block.name }}</td>
+                                        <td>£ {{ blockform.block|block_cost }}</td>
                                     </tr>
                                 {% endfor %}
-                                {% for booking in unpaid_bookings %}
+                                {% for bookingform in unpaid_bookings %}
                                     <tr>
                                         <td>
-                                            <a href="{% url 'flexbookings:update_booking' booking.pk %}">
+                                            <a href="{% url 'flexbookings:update_booking' bookingform.booking.pk %}">
                                                  <div type="button" id="payment_options_button" class="btn btn-success table-btn booking-btn">Confirm payment</div>
                                              </a>
+                                            {% include 'payments/bookinglistpayment.html' %}
                                         </td>
-                                        <td>{{ booking.event }}</td>
-                                        <td>£ {{ booking.cost }}</td>
+                                        <td>{{ bookingform.booking.event }}</td>
+                                        <td>£ {{ bookingform.booking.cost }}</td>
                                     </tr>
                                 {% endfor %}
                             </table>

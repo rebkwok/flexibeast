@@ -27,7 +27,7 @@
                                 <th>Location</th>
                                 <th class="hidden-sm hidden-xs table-center">Drop-in Cost</th>
                                 <th class="hidden-xs table-center">Spaces left</th>
-                                <th class="table-center">Block available</th>
+                                <th class="table-center">Block(s) available</th>
                             </tr>
                             <tr class="filter-row">
                                 <td class="filter-row" colspan=9>
@@ -48,7 +48,7 @@
                                             {% if event.bookable %}
                                                 <a href="{% url 'flexbookings:book_event' event.slug %}"><div id="book_button" class="btn btn-success table-btn">Book single class</div></a></br>
                                                 {% if event.blocks.count > 0 %}
-                                                <a href="{% url 'flexbookings:book_block' %}?event={{event.slug}}   "><div id="book_block_button" class="btn btn-success table-btn">Book block</div></a>
+                                                <a href="{% url 'flexbookings:book_block' %}?event={{event.slug}}"><div id="book_block_button" class="btn btn-success table-btn">Book block</div></a>
                                                 {% endif %}
                                             {% else %}
 

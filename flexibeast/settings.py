@@ -68,8 +68,8 @@ INSTALLED_APPS = (
     'timetable',
     #'studioadmin',
     'ckeditor',
-    # 'paypal.standard.ipn',
-    # 'payments',
+    'paypal.standard.ipn',
+    'payments',
     'activitylog',
     'website'
 )

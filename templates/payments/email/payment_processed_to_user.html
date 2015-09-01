@@ -7,7 +7,7 @@
 
 <p>Your payment has now been processed.</p>
 
-<p>{{ obj_type }}: {% if obj_type == "Booking" %}{{ obj.event }}{% else %}{{ obj.block_type }}{% endif %}</p>
+<p>{{ obj_type }}: {% if obj_type == "Booking" %}{{ obj.event }}{% else %}{{ obj.name }}{% endif %}</p>
 <p>Invoice number: {{ invoice_id }}</p>
 
 </div>

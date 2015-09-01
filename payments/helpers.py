@@ -43,9 +43,7 @@ def create_block_paypal_transaction(user, block):
 
     id_string = "-".join([user.username] +
                          ["".join([word[0] for word in
-                          block.block_type.event_type.subtype.split()])] +
-                         [str(block.block_type.size)] +
-                         [block.start_date.strftime("%d%m%y%H%M")] + ['inv#'])
+                          block.name.split()])] + ['inv#'])
 
     existing = PaypalBlockTransaction.objects.filter(
         invoice_id__contains=id_string, block=block).order_by('-invoice_id')

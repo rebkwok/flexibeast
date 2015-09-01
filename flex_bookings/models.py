@@ -84,7 +84,7 @@ class Event(models.Model):
     slug = AutoSlugField(populate_from='name', max_length=40, unique=True)
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['date']
 
     def spaces_left(self):
         if self.max_participants:

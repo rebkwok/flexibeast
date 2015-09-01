@@ -12,6 +12,10 @@
 
     {% if bookingformlist %}
     <p>Click on booking title for more class/workshop details.</p>
+        <a href="{% url 'flexbookings:payments_pending'%}">
+            <div type="button" id="payment_options_button" class="btn btn-success">View and Confirm Payments</div>
+        </a>
+        </br></br>
     <div class="row">
         <div class="col-sm-12">
             <div class="panel panel-success">
@@ -34,21 +38,11 @@
 
                                 {% if not history %}
                                     <td>
-                                        {% if bookingform.booking.event.cost > 0 and not bookingform.booking.paid %}
-                                        <div class="inc-btm-space">
-                                            {% if bookingform.booking.status == 'OPEN' %}
-                                             <a href="{% url 'flexbookings:payments_pending'%}">
-                                                 <div type="button" id="payment_options_button" class="btn btn-success table-btn booking-btn">Payments</div>
-                                             </a>
-                                            {% endif %}
-
-                                        </div>
-                                        {% endif %}
                                         {% if bookingform.booking.status == 'OPEN' %}
-                                        <a {% if not bookingform.can_cancel %}class="disabled"{% endif %}
-                                             href="{% url 'flexbookings:delete_booking' bookingform.booking.pk %}">
-                                            <div {% if not bookingform.can_cancel %}disabled{% endif %}
-                                                 class="btn btn-danger table-btn booking-btn">Cancel booking</div></a>
+                                            <a {% if not bookingform.can_cancel %}class="disabled"{% endif %}
+                                                 href="{% url 'flexbookings:delete_booking' bookingform.booking.pk %}">
+                                                <div {% if not bookingform.can_cancel %}disabled{% endif %}
+                                                     class="btn btn-danger table-btn booking-btn">Cancel booking</div></a>
                                         {% elif not bookingform.booking.event.bookable %}
                                             {% if not bookingform.on_waiting_list %}
                                                 <form class="wl-table-form" action="{% url 'flexbookings:book_event' bookingform.booking.event.slug %}" method="get">

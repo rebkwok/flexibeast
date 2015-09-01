@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 
 from flex_bookings.models import WaitingListUser
 
+
 def get_event_context(context, event, user):
 
     if event.event_type.event_type == 'CL':
@@ -84,3 +85,20 @@ def get_booking_create_context(event, request, context):
         context['event_full'] = event_full
 
     return context
+
+
+def get_paypal_dict(host, cost, item_name, invoice_id, custom):
+
+    paypal_dict = {
+        "business": settings.PAYPAL_RECEIVER_EMAIL,
+        "amount": cost,
+        "item_name": item_name,
+        "custom": custom,
+        "invoice": invoice_id,
+        "currency_code": "GBP",
+        "notify_url": host + reverse('paypal-ipn'),
+        "return_url": host + reverse('payments:paypal_confirm'),
+        "cancel_return": host + reverse('payments:paypal_cancel'),
+
+    }
+    return paypal_dict

@@ -3,6 +3,7 @@ import logging
 from django.db import models
 from django.conf import settings
 from django.core.mail import send_mail
+from django.contrib.auth.models import User
 from django.utils import timezone
 from django.template.loader import get_template
 from django.template import Context
@@ -92,14 +93,15 @@ def payment_received(sender, **kwargs):
         # encrypted), mc_gross, mc_currency, item_name and item_number are all
         # correct
         custom = ipn_obj.custom.split()
-        obj_type = custom[0]
+        userid = custom[-3]
+        obj_type = custom[-2]
         obj_id = int(custom[-1])
         if obj_type == 'booking':
             obj = Booking.objects.get(id=obj_id)
             purchase = obj.event
         elif obj_type == 'block':
             obj = Block.objects.get(id=obj_id)
-            purchase = obj.block_type
+            purchase = obj.name
         else:
             logger.error('PaypalTransactionError: unknown object type for '
                          'payment (ipn_obj transaction_id: {}, obj_type: {}'.format(
@@ -146,8 +148,20 @@ def payment_received(sender, **kwargs):
                 if obj_type == 'booking':
                     obj.payment_confirmed = True
                     obj.date_payment_confirmed = timezone.now()
-                obj.paid = True
-                obj.save()
+                    obj.paid = True
+                    obj.save()
+                elif obj_type == 'block':
+                    user = User.objects.get(id=userid)
+                    bookings = [booking for booking in \
+                                Booking.objects.filter(
+                                    event__in=obj.events.all(),
+                                    user=user
+                                )]
+                    for booking in bookings:
+                        booking.payment_confirmed = True
+                        booking.date_payment_confirmed = timezone.now()
+                        booking.paid = True
+                        booking.save()
 
                 ActivityLog.objects.create(log='{} id {} for user {} has been paid by PayPal; '
                             'paypal {} id {}'.format(

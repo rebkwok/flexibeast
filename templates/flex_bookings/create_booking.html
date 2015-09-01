@@ -41,8 +41,9 @@
                         <span class="hide">{{ form.event }}</span>
                         <span class="hide">{{ form.user }}</span>
                         {% if event.blocks %}
-                            <p>NOTE: Add link to block book, if available</p>
+                            <p>This class is part of a block; click below to view block options.</p>
                             <input class="btn btn-success update-btn" type="submit" name="book_one_off" value="Book single class" />
+                            <a href="{% url 'flexbookings:book_block' %}?event={{event.slug}}"><div class="btn btn-success update-btn">Block options</div></a>
                         {% else %}
                             <input class="btn btn-success update-btn" type="submit" name="book_one_off" value="Book" />
                         {% endif %}

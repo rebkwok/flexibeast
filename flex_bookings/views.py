@@ -29,6 +29,9 @@ from flex_bookings.email_helpers import send_support_email, \
     send_waiting_list_email
 import flex_bookings.context_helpers as context_helpers
 
+from payments.forms import PayPalPaymentsListForm
+from payments.helpers import create_booking_paypal_transaction, \
+    create_block_paypal_transaction
 
 from activitylog.models import ActivityLog
 
@@ -479,7 +482,7 @@ def update_booking(request, pk):
     booking = get_object_or_404(Booking, id=pk)
 
     messages.success(
-        request, "Payment for booking {} confirmed".format(booking)
+        request, "Payment for {} confirmed".format(booking.event)
     )
 
     return HttpResponseRedirect(reverse('flexbookings:bookings'))
@@ -500,9 +503,44 @@ def payments_pending(request):
         if booking.event in unpaid_booked_events and booking.block:
             blocks.append(booking.block)
         else:
-            unpaid_single_bookings.append(booking)
+            invoice_id = create_booking_paypal_transaction(
+            request.user, booking).invoice_id
+            host = 'http://{}'.format(request.META.get('HTTP_HOST'))
+            paypal_form = PayPalPaymentsListForm(
+                initial=context_helpers.get_paypal_dict(
+                    host,
+                    booking.cost,
+                    booking.event,
+                    invoice_id,
+                    '{} {}'.format('booking', booking.id)
+                )
+            )
+            unpaid_booking = {
+                'booking': booking,
+                'paypalform': paypal_form
+                }
+            unpaid_single_bookings.append(unpaid_booking)
 
-    unpaid_blocks = set(blocks)
+    unpaid_blocks = []
+    for block in set(blocks):
+        invoice_id = create_block_paypal_transaction(
+            request.user, block).invoice_id
+        host = 'http://{}'.format(request.META.get('HTTP_HOST'))
+        paypal_form = PayPalPaymentsListForm(
+            initial=context_helpers.get_paypal_dict(
+                host,
+                block.item_cost * block.events.count(),
+                block.name,
+                invoice_id,
+                'userid {} {} {}'.format(request.user.id, 'block', block.id)
+            )
+        )
+        unpaid_block = {
+            'block': block,
+            'paypalform': paypal_form
+            }
+        unpaid_blocks.append(unpaid_block)
+
 
     context = {
         'unpaid_blocks': unpaid_blocks,
@@ -512,7 +550,6 @@ def payments_pending(request):
     return TemplateResponse(
         request, 'flex_bookings/payments_pending.html', context
     )
-
 
 
 @login_required

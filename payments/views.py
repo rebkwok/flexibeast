@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from booking.models import Block, Booking
+from flex_bookings.models import Block, Booking
 
 """
 def view_that_asks_for_money(request):
