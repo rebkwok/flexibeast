@@ -2,5 +2,13 @@
 {% load static %}
 
 {% block content %}
-    Update booking placeholder
+
+    {% if classblock %}
+        {{ classblock }}
+
+    {% elif booking %}
+        {{ booking }}
+
+    {% endif %}
+
 {% endblock content %}

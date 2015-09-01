@@ -17,17 +17,28 @@
                         <div class="table-responsive">
                             <table class="table">
                                 <tr class="success">
+                                    <th></th>
                                     <th>Block/Class/Workshop Name</th>
                                     <th>Cost</th>
                                 </tr>
                                 {% for block in unpaid_blocks %}
                                     <tr>
+                                        <td>
+                                            <a href="{% url 'flexbookings:update_block' block.pk %}">
+                                                 <div type="button" id="payment_options_button" class="btn btn-success table-btn booking-btn">Confirm payment</div>
+                                             </a>
+                                        </td>
                                         <td>{{ block.name }}</td>
                                         <td>£ {{ block|block_cost }}</td>
                                     </tr>
                                 {% endfor %}
                                 {% for booking in unpaid_bookings %}
                                     <tr>
+                                        <td>
+                                            <a href="{% url 'flexbookings:update_booking' booking.pk %}">
+                                                 <div type="button" id="payment_options_button" class="btn btn-success table-btn booking-btn">Confirm payment</div>
+                                             </a>
+                                        </td>
                                         <td>{{ booking.event }}</td>
                                         <td>£ {{ booking.cost }}</td>
                                     </tr>

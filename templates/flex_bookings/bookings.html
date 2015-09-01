@@ -37,8 +37,8 @@
                                         {% if bookingform.booking.event.cost > 0 and not bookingform.booking.paid %}
                                         <div class="inc-btm-space">
                                             {% if bookingform.booking.status == 'OPEN' %}
-                                             <a href="{% url 'flexbookings:update_booking' bookingform.booking.pk %}">
-                                                 <div type="button" id="payment_options_button" class="btn btn-success table-btn booking-btn">Payment options</div>
+                                             <a href="{% url 'flexbookings:payments_pending'%}">
+                                                 <div type="button" id="payment_options_button" class="btn btn-success table-btn booking-btn">Payments</div>
                                              </a>
                                             {% endif %}
 

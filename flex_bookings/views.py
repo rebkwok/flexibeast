@@ -461,10 +461,29 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
         return HttpResponseRedirect(reverse('flexbookings:bookings'))
 
 
-class BookingUpdateView(LoginRequiredMixin, UpdateView):
-    model = Booking
-    template_name = 'flex_bookings/update_booking.html'
-    fields = ['paid']
+@login_required
+def update_block(request, pk):
+
+    block = get_object_or_404(Block, id=pk)
+
+    messages.success(
+        request, "Payment for block {} confirmed".format(block)
+    )
+
+    return HttpResponseRedirect(reverse('flexbookings:bookings'))
+
+
+@login_required
+def update_booking(request, pk):
+
+    booking = get_object_or_404(Booking, id=pk)
+
+    messages.success(
+        request, "Payment for booking {} confirmed".format(booking)
+    )
+
+    return HttpResponseRedirect(reverse('flexbookings:bookings'))
+
 
 
 @login_required

@@ -1,9 +1,7 @@
 from django.conf.urls import include, patterns, url
-from django.views.generic import RedirectView
 from flex_bookings.views import EventListView, EventDetailView, \
     BookingListView, BookingHistoryListView, BookingCreateView, \
-    BookingUpdateView, BookingDeleteView
-    # BlockCreateView, BlockListView
+    BookingDeleteView
 
 
 urlpatterns = patterns('',
@@ -14,7 +12,9 @@ urlpatterns = patterns('',
     ),
     url(r'^booking-history/$', BookingHistoryListView.as_view(),
         name='booking_history'),
-    url(r'^booking/update/(?P<pk>\d+)/$', BookingUpdateView.as_view(),
+    url(r'^block/(?P<pk>\d+)/update/$', 'flex_bookings.views.update_block',
+        name='update_block'),
+   url(r'^booking/(?P<pk>\d+)/update/$', 'flex_bookings.views.update_booking',
         name='update_booking'),
     # url(r'^booking/update/(?P<pk>\d+)/cancelled/$',
     #     'flex_bookings.views.update_booking_cancelled',
