@@ -71,6 +71,14 @@ class EventListView(ListView):
             user_waiting_lists = WaitingListUser.objects.filter(user=self.request.user)
             waiting_list_events = [wluser.event for wluser in user_waiting_lists]
             context['booked_events'] = booked_events
+
+            related_block_events = []
+            for event in booked_events:
+                events = [block.events.all() for block in event.blocks.all()]
+                if events:
+                    related_block_events += events[0]
+            context['related_block_events'] = related_block_events
+
             context['waiting_list_events'] = waiting_list_events
 
         context['type'] = self.kwargs['ev_type']
@@ -316,152 +324,233 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
 
         booking = form.save(commit=False)
-        try:
-            cancelled_booking = Booking.objects.get(
-                user=self.request.user,
-                event=booking.event,
-                status='CANCELLED'
-                )
-            booking = cancelled_booking
-            booking.status = 'OPEN'
-            previously_cancelled = True
-        except Booking.DoesNotExist:
-            previously_cancelled = False
 
-        # transaction_id = None
-        # invoice_id = None
-        #
-        # if previously_cancelled and booking.paid:
-            # pptrans = PaypalBookingTransaction.objects.filter(booking=booking)\
-            #     .exclude(transaction_id__isnull=True)
-            # if pptrans:
-            #     transaction_id = pptrans[0].transaction_id
-            #     invoice_id = pptrans[0].invoice_id
+        open_user_booked_events = [
+                bk.event for bk in self.request.user.bookings.all()
+                if bk.status == 'OPEN'
+            ]
 
-        booking.user = self.request.user
-        booking.cost = booking.event.cost
-        try:
-            booking.save()
-            ActivityLog.objects.create(
-                log='Booking {} {} for "{}" by user {}'.format(
-                    booking.id,
-                    'created' if not previously_cancelled else 'rebooked',
-                    booking.event, booking.user.username)
-            )
-        except IntegrityError:
-            logger.warning(
-                'Integrity error; redirected to duplicate booking page'
-            )
-            return HttpResponseRedirect(reverse('flexbookings:duplicate_booking',
-                                                args=[self.event.slug]))
-        except BookingError:
-            return HttpResponseRedirect(reverse('flexbookings:fully_booked',
-                                                args=[self.event.slug]))
-
-        host = 'http://{}'.format(self.request.META.get('HTTP_HOST'))
-        # send email to user
-        ctx = Context({
-              'host': host,
-              'booking': booking,
-              'event': booking.event,
-              'date': booking.event.date.strftime('%A %d %B'),
-              'time': booking.event.date.strftime('%H:%M'),
-              'prev_cancelled_and_direct_paid':
-              previously_cancelled and booking.paid,
-              'ev_type': 'workshop' if
-              self.event.event_type.event_type == 'EV' else 'class'
-        })
-        try:
-            send_mail('{} Booking for {}'.format(
-                settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, booking.event.name),
-                get_template('flex_bookings/email/booking_received.txt').render(ctx),
-                settings.DEFAULT_FROM_EMAIL,
-                [booking.user.email],
-                html_message=get_template(
-                    'flex_bookings/email/booking_received.html'
-                    ).render(ctx),
-                fail_silently=False)
-            ActivityLog.objects.create(
-                log='Email sent to user {} regarding {}booking id {} '
-                '(for {})'.format(
-                    booking.user.username,
-                    're' if previously_cancelled else '', booking.id, booking.event
-                )
-            )
-        except Exception as e:
-            # send mail to tech support with Exception
-            send_support_email(e, __name__, "BookingCreateView")
-            messages.error(self.request, "An error occurred, please contact "
-                "the studio for information")
-        # send email to studio if flagged for the event or if previously
-        # cancelled and direct paid
-        if booking.event.email_studio_when_booked or \
-                (previously_cancelled and booking.paid):
-            additional_subject = ""
-            if previously_cancelled and booking.paid:
-                additional_subject = "ACTION REQUIRED!"
-            send_mail('{} {} {} {} has just booked for {}'.format(
-                settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, additional_subject,
-                booking.user.first_name, booking.user.last_name, booking.event.name),
-                      get_template(
-                        'flex_bookings/email/to_studio_booking.txt'
-                        ).render(
-                          Context({
-                              'host': host,
-                              'booking': booking,
-                              'event': booking.event,
-                              'date': booking.event.date.strftime('%A %d %B'),
-                              'time': booking.event.date.strftime('%H:%M'),
-                              'prev_cancelled_and_direct_paid':
-                              previously_cancelled and booking.paid,
-                              # 'transaction_id': transaction_id,
-                              # 'invoice_id': invoice_id
-                          })
-                      ),
-                      settings.DEFAULT_FROM_EMAIL,
-                      [settings.DEFAULT_STUDIO_EMAIL],
-                      fail_silently=False)
-
-            ActivityLog.objects.create(
-                log= 'Email sent to studio ({}) regarding {}booking id {} '
-                '(for {})'.format(
-                    settings.DEFAULT_STUDIO_EMAIL,
-                    're' if previously_cancelled else '', booking.id,
-                    booking.event
-                )
-            )
-
-        messages.success(
-            self.request,
-            self.success_message.format(booking.event)
-        )
-
-        if previously_cancelled and booking.paid:
+        if booking.event in open_user_booked_events:
             messages.info(
-                self.request, 'You previously paid for this booking; your '
-                              'booking will remain as pending until the '
-                              'organiser has reviewed your payment status.'
+                self.request, 'Already booked for {}'.format(booking.event)
             )
+            return HttpResponseRedirect(reverse('flexbookings:lessons'))
 
-        try:
-            waiting_list_user = WaitingListUser.objects.get(
-                user=booking.user, event=booking.event
-            )
-            waiting_list_user.delete()
-            ActivityLog.objects.create(
-                log='User {} has been removed from the waiting list '
-                'for {}'.format(
-                    booking.user.username, booking.event
+        if 'book_block' in self.request.POST:
+
+            block_id = int(self.request.POST['book_block'])
+            block = Block.objects.get(id=block_id)
+
+            # check that the user is not already booked into any of these events
+            for event in block.events.all():
+                if event in open_user_booked_events:
+                    messages.error(
+                        self.request, 'You cannot book this block as you already have '
+                                 'a booking for one or more classes in the block')
+                    return HttpResponseRedirect(reverse('flexbookings:lessons'))
+                else:
+                    try:
+                        booking = Booking.objects.get(
+                            event=event, user=self.request.user, status='CANCELLED'
+                        )
+                        # reopen booking
+                        booking.status = 'OPEN'
+                        booking.block = block
+                        cost=block.item_cost
+                        booking.save()
+                    except Booking.DoesNotExist:
+                        Booking.objects.create(
+                            event=event, block=block, user=self.request.user,
+                            cost=block.item_cost
+                        )
+
+            messages.success(
+                self.request, mark_safe(
+                    'You have been booked in to the following classes:</br>'
+                    '{}'.format('</br>'.join([str(event) for event in block.events.all()]))
                 )
             )
-        except WaitingListUser.DoesNotExist:
-            pass
 
-        if "book_one_off" in form.data and booking.event.cost:
-            return HttpResponseRedirect(
-                reverse('flexbookings:update_booking', args=[booking.id])
+            host = 'http://{}'.format(self.request.META.get('HTTP_HOST'))
+            # send email to user
+            ctx = Context(
+                {
+                    'host': host, 'block': block, 'block_name': block.name,
+                    'block_events': block.events.all()
+                }
             )
-        return HttpResponseRedirect(reverse('flexbookings:bookings'))
+            try:
+                send_mail('{} Booking for {}'.format(
+                    settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, block.name),
+                    get_template('flex_bookings/email/booking_received.txt').render(ctx),
+                    settings.DEFAULT_FROM_EMAIL,
+                    [booking.user.email],
+                    html_message=get_template(
+                        'flex_bookings/email/booking_received.html'
+                        ).render(ctx),
+                    fail_silently=False)
+                ActivityLog.objects.create(
+                    log='Email sent to user {} regarding booking for '
+                        'block {}'.format(
+                        booking.user.username,
+                        block.name
+                    )
+                )
+            except Exception as e:
+                # send mail to tech support with Exception
+                send_support_email(e, __name__, "BookingCreateView")
+                messages.error(self.request, "An error occurred, please contact "
+                    "the studio for information")
+
+            return HttpResponseRedirect(reverse('flexbookings:bookings'))
+
+        else:
+            try:
+                cancelled_booking = Booking.objects.get(
+                    user=self.request.user,
+                    event=booking.event,
+                    status='CANCELLED'
+                    )
+                booking = cancelled_booking
+                booking.status = 'OPEN'
+                previously_cancelled = True
+            except Booking.DoesNotExist:
+                previously_cancelled = False
+
+            # transaction_id = None
+            # invoice_id = None
+            #
+            # if previously_cancelled and booking.paid:
+                # pptrans = PaypalBookingTransaction.objects.filter(booking=booking)\
+                #     .exclude(transaction_id__isnull=True)
+                # if pptrans:
+                #     transaction_id = pptrans[0].transaction_id
+                #     invoice_id = pptrans[0].invoice_id
+
+            booking.user = self.request.user
+            booking.cost = booking.event.cost
+            try:
+                booking.save()
+                ActivityLog.objects.create(
+                    log='Booking {} {} for "{}" by user {}'.format(
+                        booking.id,
+                        'created' if not previously_cancelled else 'rebooked',
+                        booking.event, booking.user.username)
+                )
+            except IntegrityError:
+                logger.warning(
+                    'Integrity error; redirected to duplicate booking page'
+                )
+                return HttpResponseRedirect(reverse('flexbookings:duplicate_booking',
+                                                    args=[self.event.slug]))
+            except BookingError:
+                return HttpResponseRedirect(reverse('flexbookings:fully_booked',
+                                                    args=[self.event.slug]))
+
+            host = 'http://{}'.format(self.request.META.get('HTTP_HOST'))
+            # send email to user
+            ctx = Context({
+                  'host': host,
+                  'booking': booking,
+                  'event': booking.event,
+                  'date': booking.event.date.strftime('%A %d %B'),
+                  'time': booking.event.date.strftime('%H:%M'),
+                  'prev_cancelled_and_direct_paid':
+                  previously_cancelled and booking.paid,
+                  'ev_type': 'workshop' if
+                  self.event.event_type.event_type == 'EV' else 'class'
+            })
+            try:
+                send_mail('{} Booking for {}'.format(
+                    settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, booking.event.name),
+                    get_template('flex_bookings/email/booking_received.txt').render(ctx),
+                    settings.DEFAULT_FROM_EMAIL,
+                    [booking.user.email],
+                    html_message=get_template(
+                        'flex_bookings/email/booking_received.html'
+                        ).render(ctx),
+                    fail_silently=False)
+                ActivityLog.objects.create(
+                    log='Email sent to user {} regarding {}booking id {} '
+                    '(for {})'.format(
+                        booking.user.username,
+                        're' if previously_cancelled else '', booking.id, booking.event
+                    )
+                )
+            except Exception as e:
+                # send mail to tech support with Exception
+                send_support_email(e, __name__, "BookingCreateView")
+                messages.error(self.request, "An error occurred, please contact "
+                    "the studio for information")
+            # send email to studio if flagged for the event or if previously
+            # cancelled and direct paid
+            if booking.event.email_studio_when_booked or \
+                    (previously_cancelled and booking.paid):
+                additional_subject = ""
+                if previously_cancelled and booking.paid:
+                    additional_subject = "ACTION REQUIRED!"
+                send_mail('{} {} {} {} has just booked for {}'.format(
+                    settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, additional_subject,
+                    booking.user.first_name, booking.user.last_name, booking.event.name),
+                          get_template(
+                            'flex_bookings/email/to_studio_booking.txt'
+                            ).render(
+                              Context({
+                                  'host': host,
+                                  'booking': booking,
+                                  'event': booking.event,
+                                  'date': booking.event.date.strftime('%A %d %B'),
+                                  'time': booking.event.date.strftime('%H:%M'),
+                                  'prev_cancelled_and_direct_paid':
+                                  previously_cancelled and booking.paid,
+                                  # 'transaction_id': transaction_id,
+                                  # 'invoice_id': invoice_id
+                              })
+                          ),
+                          settings.DEFAULT_FROM_EMAIL,
+                          [settings.DEFAULT_STUDIO_EMAIL],
+                          fail_silently=False)
+
+                ActivityLog.objects.create(
+                    log= 'Email sent to studio ({}) regarding {}booking id {} '
+                    '(for {})'.format(
+                        settings.DEFAULT_STUDIO_EMAIL,
+                        're' if previously_cancelled else '', booking.id,
+                        booking.event
+                    )
+                )
+
+            messages.success(
+                self.request,
+                self.success_message.format(booking.event)
+            )
+
+            if previously_cancelled and booking.paid:
+                messages.info(
+                    self.request, 'You previously paid for this booking; your '
+                                  'booking will remain as pending until the '
+                                  'organiser has reviewed your payment status.'
+                )
+
+            try:
+                waiting_list_user = WaitingListUser.objects.get(
+                    user=booking.user, event=booking.event
+                )
+                waiting_list_user.delete()
+                ActivityLog.objects.create(
+                    log='User {} has been removed from the waiting list '
+                    'for {}'.format(
+                        booking.user.username, booking.event
+                    )
+                )
+            except WaitingListUser.DoesNotExist:
+                pass
+
+            if "book_one_off" in form.data and booking.event.cost:
+                return HttpResponseRedirect(
+                    reverse('flexbookings:update_booking', args=[booking.id])
+                )
+            return HttpResponseRedirect(reverse('flexbookings:bookings'))
 
 
 @login_required
@@ -549,62 +638,6 @@ def payments_pending(request):
 
     return TemplateResponse(
         request, 'flex_bookings/payments_pending.html', context
-    )
-
-
-@login_required
-def book_block_view(request):
-
-    event_slug = request.GET.get('event')
-
-    if not event_slug:
-        messages.error(request, 'No class specified; block cannot be identified')
-        return HttpResponseRedirect('flexbookings:lessons')
-
-    event = Event.objects.get(slug=event_slug)
-
-    if request.method == 'POST':
-
-        block_id = int(request.POST['book_block'])
-        block = Block.objects.get(id=block_id)
-
-        user_booked_events = [
-            booking.event for booking in Booking.objects.all()
-            if booking.user == request.user and booking.status == 'OPEN']
-
-        # check that the user is not already booked into any of these events
-        for event in block.events.all():
-            if event in user_booked_events:
-                messages.error(
-                    request, 'You cannot book this block as you already have '
-                             'a booking for one or more classes in the block')
-                return HttpResponseRedirect(reverse('flexbookings:lessons'))
-            else:
-                try:
-                    booking = Booking.objects.get(
-                        event=event, user=request.user, status='CANCELLED'
-                    )
-                    # reopen booking
-                    booking.status = 'OPEN'
-                    booking.block = block
-                    cost=block.item_cost
-                    booking.save()
-                except Booking.DoesNotExist:
-                    Booking.objects.create(
-                        event=event, block=block, user=request.user,
-                        cost=block.item_cost
-                    )
-
-        messages.success(
-            request, mark_safe(
-                'You have been booked in to the following classes:</br>'
-                '{}'.format('</br>'.join([str(event) for event in block.events.all()]))
-            )
-        )
-        return HttpResponseRedirect(reverse('flexbookings:bookings'))
-
-    return TemplateResponse(
-        request, 'flex_bookings/create_block_booking.html', {'event': event}
     )
 
 

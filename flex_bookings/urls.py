@@ -44,10 +44,6 @@ urlpatterns = patterns('',
         r'^classes/$', EventListView.as_view(), {'ev_type': 'lessons'},
         name='lessons'
     ),
-    url(
-        r'^book-block/$', 'flex_bookings.views.book_block_view',
-        name='book_block'
-    ),
     # url(r'^permission-denied/$', 'flex_bookings.views.permission_denied',
     #     name='permission_denied'),
     url(r'^booking/(?P<event_slug>[\w-]+)/not-open/$',

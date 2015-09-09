@@ -40,35 +40,49 @@
                         {% endif %}</li>
                     {% if event.blocks %}
                         <li class="list-group-item"><p><strong>Block information</strong></p>
-                            <p>This class can be booked as part of a block.  Available blocks are:</p>
-                            <ul>
-                                {% for block in event.blocks.all %}
-                                    <li>{{ block.name }} - total cost £{{ block|block_cost }}</li>
-                                    <ul>
-                                        {% for event in block.events.all %}
-                                            <li>{{ event }}</li>
-                                        {% endfor %}
-                                    </ul>
+                                <ul>
+                                    {% for block in event.blocks.all %}
+                                        <li>{{ block.name }} - total cost £{{ block|block_cost }}</li>
+                                        <ul>
+                                            {% for block_event in block.events.all %}
+                                                <li>{% if block_event == event %}<strong>{{ block_event }}</strong>{% else %}{{ block_event }}{% endif %}</li>
+                                            {% endfor %}
+                                        </ul>
 
-                                {% endfor %}
-                            </ul>
-
-                            {% if not booked %}</br><p>Click the Book button below for booking options.</p>{% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         </li>
-                    {% endif %}
+                        {% if not booked %}
+                            <li class="list-group-item"><p><strong>Block availability</strong></p>
+                                {% if available_blocks %}
+                                    <p>This class can be booked as part of a block.  Click the Book button below for booking options.</p>
+                                {% else %}
+                                    <p>Block booking is not available for the following reasons:</p>
+                                    <ul>
+                                    {% for block in unavailable_reasons %}
+                                        <li><strong>{{ block.block }}:</strong> {{ block.reason }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </li>
+                        {% endif %}
 
                     {% if event.cancellation_period %}
                         <li class="list-group-item"><strong>Cancellation information</strong>
                             <p>Cancellation is allowed up to {{ event.cancellation_period | format_cancellation }} prior to the
                             {% if type == "event" %}event{% elif type == "lesson" %}class{% endif %}</p></li>
                     {% endif %}
-                    </ul>
+                    <li class="list-group-item">
                     {% if event.max_participants %}
+
                         <h5>There are a maximum {{ event.max_participants }} spaces for this
                             {% if type == "event" %}event{% elif type == "lesson" %}class{% endif %}.</h5>
                     {% endif %}
+                    </li>
 
                     {% if request.user.is_authenticated %}
+                        <li class="list-group-item">
                           {% if booked %}
                             <h5>{{ booking_info_text }}</h5>
                             <h5>See <a href="{% url 'flexbookings:bookings' %}">your bookings</a> for details{% if event.cost %}, to
@@ -91,11 +105,16 @@
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
+
+
                     {% else %}
                         <a href="{% url 'account_login' %}?next={{request.get_full_path}}">
                                         <div id='sign_in_button' class="btn btn-success table-btn">
                                         Sign in to book</div></a>
+                        </li>
                     {% endif %}
+
+                    </ul>
                 {% endif %}
             </div>
         </div>

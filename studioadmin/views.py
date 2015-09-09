@@ -146,6 +146,7 @@ class ConfirmPaymentView(LoginRequiredMixin, StaffUserMixin, UpdateView):
     def get_success_url(self):
         return reverse('studioadmin:users')
 
+
 class ConfirmRefundView(LoginRequiredMixin, StaffUserMixin, UpdateView):
 
     model = Booking

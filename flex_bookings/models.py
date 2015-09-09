@@ -169,6 +169,9 @@ class Block(models.Model):
     def save(self, *args, **kwargs):
         # setting a block to booking_open makes booking open on each of it's
         # classes
+        self.individual_booking_date = self.individual_booking_date.replace(
+            hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc
+        )
         super(Block, self).save(*args, **kwargs)
         if self.booking_open:
             for event in self.events.all():
@@ -207,7 +210,7 @@ class Booking(models.Model):
     # cost will be set to either event cost or block item_cost
     cost = models.DecimalField(default=7, max_digits=8, decimal_places=2)
 
-    block = models.ForeignKey(Block, null=True, related_name='bookings')
+    block = models.ForeignKey(Block, blank=True, null=True, related_name='bookings')
 
     class Meta:
         unique_together = (('user', 'event'))

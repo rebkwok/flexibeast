@@ -65,6 +65,54 @@ def get_event_context(context, event, user):
                     booking_info_text = "Bookings for this event are now closed."
 
         context['booking_info_text'] = booking_info_text
+
+        # cannot book block if has already booked a single class in the block
+        open_user_booked_events = [
+            booking.event for booking in user.bookings.all()
+            if booking.status == 'OPEN'
+        ]
+        available_blocks = []
+        unavailable_reasons = []
+        for block in event.blocks.all():
+            available_blocks.append(block)
+            related_events = block.events.all()
+            for ev in related_events:
+                if ev in open_user_booked_events:
+                    available_blocks.remove(block)
+                    unavailable_block = {
+                        'block': block,
+                        'reason':  "You have already booked at least "
+                                   "one other class in this block"
+                    }
+                    unavailable_reasons.append(unavailable_block)
+                    break
+
+        # cannot book block if classes already started
+        for block in list(available_blocks):
+            first = block.events.first()
+            first_date = first.date
+            if first_date < timezone.now():
+                available_blocks.remove(block)
+                unavailable_block = {
+                    'block': block, 'reason': "This block has already started"
+                }
+                unavailable_reasons.append(unavailable_block)
+
+        # cannot book block if any class in the block is full
+        for block in list(available_blocks):
+            for event in block.events.all():
+                if event.spaces_left() <= 0:
+                    available_blocks.remove(block)
+                    unavailable_block = {
+                        'block': block,
+                        'reason': "One or more classes in this block is full"
+                    }
+                    unavailable_reasons.append(unavailable_block)
+                    break
+
+        context['available_blocks'] = available_blocks
+        context['unavailable_reasons'] = unavailable_reasons
+
     return context
 
 
@@ -84,6 +132,69 @@ def get_booking_create_context(event, request, context):
             (event.max_participants - bookings_count) <= 0 else False
         context['event_full'] = event_full
 
+    # cannot book block if has already booked a single class in the block
+    open_user_booked_events = [
+        booking.event for booking in request.user.bookings.all()
+        if booking.status == 'OPEN'
+    ]
+    available_blocks = []
+    unavailable_reasons = []
+    for block in event.blocks.all():
+        available_blocks.append(block)
+        related_events = block.events.all()
+        for ev in related_events:
+            if ev in open_user_booked_events:
+                available_blocks.remove(block)
+                unavailable_block = {
+                    'block': block,
+                    'reason': "You have already booked at least one other "
+                              "class in this block"
+                }
+                unavailable_reasons.append(unavailable_block)
+                break
+
+    # cannot book block if classes already started
+    for block in list(available_blocks):
+        first = block.events.first()
+        first_date = first.date
+        if first_date < timezone.now():
+            available_blocks.remove(block)
+            unavailable_block = {
+                'block': block, 'reason':  "This block has already started"
+            }
+            unavailable_reasons.append(unavailable_block)
+
+    # cannot book block if any class in the block is full
+    for block in list(available_blocks):
+        for event in block.events.all():
+            if event.spaces_left() <= 0:
+                available_blocks.remove(block)
+                unavailable_block = {
+                    'block': block,
+                    'reason': "One or more classes in this block is full"
+                }
+                unavailable_reasons.append(unavailable_block)
+                break
+
+    context['available_blocks'] = available_blocks
+    context['unavailable_reasons'] = unavailable_reasons
+
+    context['individual_booking_allowed'] = True
+    date_individual_booking_allowed = None
+    for block in event.blocks.all():
+        if block.individual_booking_date > timezone.now():
+            context['individual_booking_allowed'] = False
+            # set individual booking date to the latest date according to
+            # the available block settings (in case an event is in multiple
+            # blocks and different dates are set)
+            if date_individual_booking_allowed and \
+                            block.individual_booking_date > \
+                            date_individual_booking_allowed:
+                date_individual_booking_allowed = block.individual_booking_date
+            else:
+                date_individual_booking_allowed = block.individual_booking_date
+
+    context['date_individual_booking_allowed'] = date_individual_booking_allowed
     return context
 
 

@@ -22,11 +22,20 @@ def get_event_names(event_type):
 
 
 class EventFilter(forms.Form):
-    name = forms.ChoiceField(choices=get_event_names('EV'))
-
+    name = forms.ChoiceField(
+        choices=get_event_names('EV'),
+        widget=forms.Select(attrs={
+            "onchange": "form.submit()"
+        })
+    )
 
 class LessonFilter(forms.Form):
-    name = forms.ChoiceField(choices=get_event_names('CL'))
+    name = forms.ChoiceField(
+        choices=get_event_names('CL'),
+        widget=forms.Select(attrs={
+            "onchange": "form.submit()"
+        })
+    )
 
 
 class BookingCreateForm(forms.ModelForm):

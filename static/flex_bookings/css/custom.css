@@ -503,7 +503,7 @@ a.disabled {
 }
 
 .filter-row {
-    padding: 0;
+    padding-bottom: 4px;
     margin: 0;
 }
 
@@ -534,7 +534,7 @@ a.disabled {
   display:block; /* for use on default inline elements like span */
   margin: 9px 0;
   overflow: hidden;
-  background-color: #e5e5e5;
+  background-color: rgba(8, 138, 8, 1);
 }
 
 .selectpicker {

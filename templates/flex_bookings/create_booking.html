@@ -31,23 +31,61 @@
                                         4 hours of booking, your booking will be automatically cancelled.</p>
                                 {% endif %}
                             {% endif %}
+                            <span class="divider"></span>
                         {% else %}
                             <p>Cancellation is only allowed up to {{ event.cancellation_period | format_cancellation }}
                             before the {{ ev_type }} date.  {% if event.advance_payment_required %}If payment has not been
                             received by the cancellation period, your booking will be automatically cancelled. {% endif %}</p>
+                            <span class="divider"></span>
                         {% endif %}
 
 
                         <span class="hide">{{ form.event }}</span>
                         <span class="hide">{{ form.user }}</span>
                         {% if event.blocks %}
-                            <p>This class is part of a block; click below to view block options.</p>
-                            <input class="btn btn-success update-btn" type="submit" name="book_one_off" value="Book single class" />
-                            <a href="{% url 'flexbookings:book_block' %}?event={{event.slug}}"><div class="btn btn-success update-btn">Block options</div></a>
+                            <h4>Single class booking</h4>
+                            {% if individual_booking_allowed %}
+                                <input class="btn btn-success update-btn" type="submit" name="book_one_off" value="Book single class" />
+                            {% else %}
+                                <p>Single class booking is not yet available for this {{ ev_type }}.  Single class booking opens on {{ date_individual_booking_allowed|date:"D d F Y" }}.</p>
+                            {% endif %}
+                                <span class="divider"></span>
+                            <h4>Block booking</h4>
+                            {% for block in event.blocks.all %}
+
+                                <h5>{{ block.name }}</h5>
+                                <p>Total block cost: £{{ block|block_cost }} (per class cost £{{ block.item_cost }})</p>
+
+                                <p>Booking this block will book you in to the following classes:</p>
+
+                                <ul>
+                                {% for block_event in block.events.all %}
+                                    <li>{% if block_event == event %}<strong>{{ block_event }}</strong>{% else %}{{ block_event }}{% endif %}</li>
+                                {% endfor %}
+                                </ul>
+                                {% if block in available_blocks %}
+                                    <button class="btn btn-success update-btn"
+                                            type="submit" name="book_block" value={{ block.id }}>Book block
+                                    </button>
+                                {% else %}
+                                    <p><strong>Booking is unavailable because
+                                    {% for unavailable_block in unavailable_reasons %}
+                                        {% if unavailable_block.block == block %}
+                                            {{ unavailable_block.reason|lower }}
+                                        {% endif %}
+                                    {% endfor %}
+                                    </strong></p>
+                                    <button class="btn btn-success update-btn" disabled
+                                                type="submit" name="book_block" value={{ block.id }}>Book block
+                                    </button>
+                                {% endif %}
+                                <span class="divider"></span>
+                            {% endfor %}
+
                         {% else %}
                             <input class="btn btn-success update-btn" type="submit" name="book_one_off" value="Book" />
                         {% endif %}
-
+                        </br>
                     </div>
                 </form>
             </div>

@@ -1,4 +1,11 @@
 {% include "account/email/do_not_reply.txt" %}
+{% if block %}
+Your booking has been received for {{ block.name }}.
+Advance payment is required for block bookings.  Your space will be confirmed for the relevant classes once the organiser has received your payment.
+
+Classes in this block:
+<ul>{% for blevent in block.events.all %}<li>{{ blevent }}</li>{% endfor %}</ul>
+{% else %}
 Your booking has been received for {{ event }}.
 {% if not event.cost %}
     There is no cost for this {{ ev_type }}.  Your space is now confirmed.  If you no longer wish to attend, please cancel your booking by visiting visiting your bookings page at {{ host }}{% url 'flexbookings:bookings' %}.
@@ -23,4 +30,4 @@ Your booking has been received for {{ event }}.
     View your bookings at {{ host }}{% url 'flexbookings:bookings' %}
 {% endif %}
 {% endif %}
-
+{% endif %}

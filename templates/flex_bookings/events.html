@@ -9,11 +9,15 @@
         {% if events %}
         <div class="row">
             <div class="col-sm-12">
-                <p>Click on {% if type == 'events' %}workshop{% elif type == 'lessons' %}class{% endif %} name for more details</p>
+                <p>Click on {% if type == 'events' %}workshop{% elif type == 'lessons' %}class{% endif %} name for more details</br>
+                Click on book button for single and/or block booking options</p>
                 {% if not user.is_authenticated %}
                     <p><a class="btn btn-success table-btn" href="{% url 'account_login' %}?next={{request.get_full_path}}">
                         Sign in</a> to book</p>
                 {% endif %}
+                <form class="filter-row" action="" method="get">
+                    <strong>Filter by: {{ form.name }}</strong>
+                </form>
                 <div class="panel panel-success">
 
                     <div class="table-responsive">
@@ -29,15 +33,7 @@
                                 <th class="hidden-xs table-center">Spaces left</th>
                                 <th class="table-center">Block(s) available</th>
                             </tr>
-                            <tr class="filter-row">
-                                <td class="filter-row" colspan=9>
-                                <form class="filter-row" action="" method="get">
-                                    <strong>
-                                        <input class="btn btn-info table-btn" type="submit" value="Filter" /> {{ form.name }}</strong>
 
-                                </form>
-                                </td>
-                            </tr>
                             {% for event in events %}
                                 <tr {% if event.bookable %}class="active_block"{% else %}class="inactive_block"{% endif %}>
                                 {% if user.is_authenticated %}
@@ -46,10 +42,7 @@
                                             <span class="fa fa-check"></span>
                                         {% elif event not in booked_events %}
                                             {% if event.bookable %}
-                                                <a href="{% url 'flexbookings:book_event' event.slug %}"><div id="book_button" class="btn btn-success table-btn">Book single class</div></a></br>
-                                                {% if event.blocks.count > 0 %}
-                                                <a href="{% url 'flexbookings:book_block' %}?event={{event.slug}}"><div id="book_block_button" class="btn btn-success table-btn">Book block</div></a>
-                                                {% endif %}
+                                                <a href="{% url 'flexbookings:book_event' event.slug %}"><div id="book_button" class="btn btn-success table-btn">Book</div></a></br>
                                             {% else %}
 
                                                 {% if event in waiting_list_events %}
