@@ -21,8 +21,13 @@
 
             <form action="" method="post">{% csrf_token %}
                 {{ form.as_p }}
-                <input class="btn btn-danger" type="submit" value="Confirm cancel" />
+                <input class="btn btn-danger" type="submit" name="cancel" value="Cancel this {% if event.event_type.event_type == 'EV' %}workshop{% else %}class{% endif %}" />
+                {% if block %}
+                    <input class="btn btn-danger" type="submit" name="cancel_block" value="Cancel block **" />
+                {% endif %}
                 <a href="{% url 'flexbookings:bookings' %}"><div class="btn btn-warning">Back</div></a>
+                <p class="studioadmin-help">** This will cancel all remaining classes in the block.  Please note that refunds are not
+                given for individual class cancellations from block bookings.</p>
             </form>
             </br>
         </div>

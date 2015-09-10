@@ -1,7 +1,13 @@
 {% include "account/email/do_not_reply.txt" %}
 
-Your booking for {{ event }} has been cancelled.
-{% if not booking.block %}{% if booking.paid %}
+The following bookings have been cancelled:
+{% for booking in bookings %}
+- {{ booking.event }}
+{% endfor %}
+
+{% if not block %}
 Please note that payments are not automatically refunded. The organiser has been informed of your cancellation and will be in contact soon.
-{% endif %}{% endif %}
-For further information please contact {{ booking.event.contact_person }} at {{ booking.event.contact_email }}
+{% else %}
+Please note that refunds are not given for individual class cancellations from block bookings.
+{% endif %}
+For further information please contact {{ contact_person }} at {{ contact_email }}

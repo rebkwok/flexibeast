@@ -3,20 +3,25 @@
 {% block messagecontent %}
 <div style="font-family: sans-serif;">
 
-<p>Your booking for {{ event }} has been cancelled.</p>
+<p>The following bookings have been cancelled:</p>
+<ul>
+    {% for booking in bookings %}
+    <li>{{ booking.event }}</li>
+    {% endfor %}
+</ul>
 
 <p>
-{% if not booking.block %}
-    {% if booking.paid %}
-        Please note that payments are not automatically refunded. The organiser has been informed of your cancellation and
-        will be in contact soon.
-    {% endif %}
+{% if not block %}
+    Please note that payments are not automatically refunded. The organiser has been informed of your cancellation and
+    will be in contact soon.
+{% else %}
+    Please note that refunds are not given for individual class cancellations from block bookings.
 {% endif %}
 </p>
 
 <p>
-    For further information please contact {{ booking.event.contact_person }} at
-    <a href="mailto:{{ booking.event.contact_email }}">{{ booking.event.contact_email }}</a>
+    For further information please contact {{ contact_person }} at
+    <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
 </p>
 </div>
 {% endblock %}

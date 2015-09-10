@@ -644,7 +644,7 @@ def payments_pending(request):
 class BookingDeleteView(LoginRequiredMixin, DeleteView):
     model = Booking
     template_name = 'flex_bookings/delete_booking.html'
-    success_message = 'Booking cancelled for {}'
+    success_message = 'Booking cancelled for:</br> {}'
 
     def get(self, request, *args, **kwargs):
         # redirect if cancellation period past
@@ -660,27 +660,109 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
         # Call the base implementation first to get a context
         context = super(BookingDeleteView, self).get_context_data(**kwargs)
         booking = get_object_or_404(Booking, pk=self.kwargs['pk'])
+        if booking.block:
+            context['block'] = True
         event = Event.objects.get(id=booking.event.id)
         context['event'] = event
+
         return context
 
     def delete(self, request, *args, **kwargs):
         booking = self.get_object()
-        event_was_full = booking.event.spaces_left() == 0
+        block = booking.block
 
+        if 'cancel_block' in request.POST:
+            cancel_type = 'block'
+            bookings = [
+                bk for bk in request.user.bookings.all() if
+                bk.block == block and bk.event.date > timezone.now() and
+                booking.status == 'OPEN'
+                ]
+        else:
+            cancel_type = 'single'
+            bookings = [booking]
+
+        for booking in bookings:
+            event_was_full = booking.event.spaces_left() == 0
+            booking.status = 'CANCELLED'
+            booking.save()
+
+            # if applicable, email users on waiting list
+            if event_was_full:
+                waiting_list_users = WaitingListUser.objects.filter(
+                    event=booking.event
+                )
+                if waiting_list_users:
+                    try:
+                        send_waiting_list_email(
+                            booking.event,
+                            [wluser.user for wluser in waiting_list_users],
+                            host='http://{}'.format(request.META.get('HTTP_HOST'))
+                        )
+                        ActivityLog.objects.create(
+                            log='Waiting list email sent to user(s) {} for '
+                            'event {}'.format(
+                                ', '.join(
+                                    [wluser.user.username for \
+                                    wluser in waiting_list_users]
+                                ),
+                                booking.event
+                            )
+                        )
+                    except Exception as e:
+                        # send mail to tech support with Exception
+                        send_support_email(e, __name__, "DeleteBookingView - waiting list email")
+                        messages.error(self.request, "An error occured, please contact "
+                            "the studio for information")
+        # messages
+        # logs
+        if cancel_type == 'single':
+            ActivityLog.objects.create(
+                log='Booking id {} for event {}, user {}, was '
+                    'cancelled'.format(
+                    bookings[0].id, bookings[0].event, request.user.username
+                )
+            )
+            messages.success(
+                self.request,
+                mark_safe(self.success_message.format(bookings[0].event))
+            )
+        else:
+            ActivityLog.objects.create(
+                log='User {} cancelled bookings from block {}: Booking '
+                    'ids {}'.format(
+                        request.user.username, block.name,
+                        ', '.join(['{} ({})'.format(booking.id, booking.event)
+                                   for booking in bookings])
+                )
+            )
+            messages.success(
+                self.request,
+                mark_safe(self.success_message.format(
+                    '</br>'.join(['{}'.format(booking.event)
+                                   for booking in bookings])
+                    )
+                )
+            )
+
+        # send emails
         host = 'http://{}'.format(self.request.META.get('HTTP_HOST'))
         # send email to user
 
         ctx = Context({
                       'host': host,
-                      'booking': booking,
-                      'event': booking.event,
-                      'date': booking.event.date.strftime('%A %d %B'),
-                      'time': booking.event.date.strftime('%I:%M %p'),
+                      'bookings': bookings,
+                      'block': block,
+                      'user': request.user,
+                      'contact_person': bookings[0].event.contact_person,
+                      'contact_email': bookings[0].event.contact_email,
                       })
+        subject = "Block {} cancelled".format(block.name) \
+            if cancel_type == 'block' \
+            else "Booking for {} cancelled".format(bookings[0].event)
         try:
-            send_mail('{} Booking for {} cancelled'.format(
-                settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, booking.event.name),
+            send_mail('{} {}'.format(
+                settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, subject),
                 get_template('flex_bookings/email/booking_cancelled.txt').render(ctx),
                 settings.DEFAULT_FROM_EMAIL,
                 [booking.user.email],
@@ -693,66 +775,25 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
             messages.error(self.request, "An error occured, please contact "
                 "the studio for information")
 
-        if not booking.block and booking.paid and not booking.free_class:
+        try:
+            subject = "block {}".format(block) if cancel_type == 'block' else \
+                "a booking for {}".format(bookings[0].event)
             # send email to studio
-            send_mail('{} {} {} has just cancelled a booking for {}'.format(
+            send_mail('{} {} {} has just cancelled {}'.format(
                 settings.ACCOUNT_EMAIL_SUBJECT_PREFIX,
-                'ACTION REQUIRED!' if not booking.block else '',
-                booking.user.username,
-                booking.event.name),
-                      get_template('flex_bookings/email/to_studio_booking_cancelled.txt').render(
-                          Context({
-                              'host': host,
-                              'booking': booking,
-                              'event': booking.event,
-                              'date': booking.event.date.strftime('%A %d %B'),
-                              'time': booking.event.date.strftime('%I:%M %p'),
-                          })
-                      ),
+                'ACTION REQUIRED!' if not block else '',
+                request.user.username, subject),
+                get_template(
+                  'flex_bookings/email/to_studio_booking_cancelled.txt'
+                ).render(ctx),
                 settings.DEFAULT_FROM_EMAIL,
                 [settings.DEFAULT_STUDIO_EMAIL],
                 fail_silently=False)
-
-        booking.status = 'CANCELLED'
-        booking.save()
-
-        messages.success(
-            self.request,
-            self.success_message.format(booking.event)
-        )
-        ActivityLog.objects.create(
-            log='Booking id {} for event {}, user {}, was cancelled'.format(
-                booking.id, booking.event, booking.user.username
+        except Exception as e:
+            # send mail to tech support with Exception
+            send_support_email(
+                e, __name__, "DeleteBookingView - cancelled email to studio"
             )
-        )
-
-        # if applicable, email users on waiting list
-        if event_was_full:
-            waiting_list_users = WaitingListUser.objects.filter(
-                event=booking.event
-            )
-            if waiting_list_users:
-                try:
-                    send_waiting_list_email(
-                        booking.event,
-                        [wluser.user for wluser in waiting_list_users],
-                        host='http://{}'.format(request.META.get('HTTP_HOST'))
-                    )
-                    ActivityLog.objects.create(
-                        log='Waiting list email sent to user(s) {} for '
-                        'event {}'.format(
-                            ', '.join(
-                                [wluser.user.username for \
-                                wluser in waiting_list_users]
-                            ),
-                            booking.event
-                        )
-                    )
-                except Exception as e:
-                    # send mail to tech support with Exception
-                    send_support_email(e, __name__, "DeleteBookingView - waiting list email")
-                    messages.error(self.request, "An error occured, please contact "
-                        "the studio for information")
 
         return HttpResponseRedirect(self.get_success_url())
 
