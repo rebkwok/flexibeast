@@ -197,8 +197,7 @@ class BookingHistoryListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Booking.objects.filter(
-            (Q(event__date__lte=timezone.now()) | Q(status='CANCELLED')) &
-            Q(user=self.request.user)
+            event__date__lte=timezone.now(), user=self.request.user
         ).order_by('-event__date')
 
     def get_context_data(self, **kwargs):
@@ -376,7 +375,7 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
             ctx = Context(
                 {
                     'host': host, 'block': block, 'block_name': block.name,
-                    'block_events': block.events.all()
+                    'block_events': block.events.all(), 'user': self.request.user
                 }
             )
             try:
@@ -384,7 +383,7 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
                     settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, block.name),
                     get_template('flex_bookings/email/booking_received.txt').render(ctx),
                     settings.DEFAULT_FROM_EMAIL,
-                    [booking.user.email],
+                    [self.request.user.email],
                     html_message=get_template(
                         'flex_bookings/email/booking_received.html'
                         ).render(ctx),
@@ -392,17 +391,40 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
                 ActivityLog.objects.create(
                     log='Email sent to user {} regarding booking for '
                         'block {}'.format(
-                        booking.user.username,
+                        self.request.user.username,
                         block.name
                     )
                 )
             except Exception as e:
                 # send mail to tech support with Exception
                 send_support_email(e, __name__, "BookingCreateView")
-                messages.error(self.request, "An error occurred, please contact "
-                    "the studio for information")
 
-            return HttpResponseRedirect(reverse('flexbookings:bookings'))
+            try:
+                send_mail('{} {} {} has just booked block {}'.format(
+                    settings.ACCOUNT_EMAIL_SUBJECT_PREFIX,
+                    self.request.user.first_name,
+                    self.request.user.last_name, block.name),
+                          get_template(
+                            'flex_bookings/email/to_studio_booking.txt'
+                            ).render(ctx),
+                          settings.DEFAULT_FROM_EMAIL,
+                          [settings.DEFAULT_STUDIO_EMAIL],
+                          fail_silently=False)
+
+                ActivityLog.objects.create(
+                    log='Email sent to studio ({}) regarding booking for '
+                        'block {} (for {})'.format(
+                            settings.DEFAULT_STUDIO_EMAIL, block.name,
+                            self.request.user.username,
+                        )
+                )
+            except Exception as e:
+                # send mail to tech support with Exception
+                send_support_email(
+                    e, __name__, "BookingCreateView - sending studio email"
+                )
+
+            return HttpResponseRedirect(reverse('flexbookings:payments_pending'))
 
         else:
             try:
@@ -480,8 +502,7 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
             except Exception as e:
                 # send mail to tech support with Exception
                 send_support_email(e, __name__, "BookingCreateView")
-                messages.error(self.request, "An error occurred, please contact "
-                    "the studio for information")
+
             # send email to studio if flagged for the event or if previously
             # cancelled and direct paid
             if booking.event.email_studio_when_booked or \
@@ -489,36 +510,40 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
                 additional_subject = ""
                 if previously_cancelled and booking.paid:
                     additional_subject = "ACTION REQUIRED!"
-                send_mail('{} {} {} {} has just booked for {}'.format(
-                    settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, additional_subject,
-                    booking.user.first_name, booking.user.last_name, booking.event.name),
-                          get_template(
-                            'flex_bookings/email/to_studio_booking.txt'
-                            ).render(
-                              Context({
-                                  'host': host,
-                                  'booking': booking,
-                                  'event': booking.event,
-                                  'date': booking.event.date.strftime('%A %d %B'),
-                                  'time': booking.event.date.strftime('%H:%M'),
-                                  'prev_cancelled_and_direct_paid':
-                                  previously_cancelled and booking.paid,
-                                  # 'transaction_id': transaction_id,
-                                  # 'invoice_id': invoice_id
-                              })
-                          ),
-                          settings.DEFAULT_FROM_EMAIL,
-                          [settings.DEFAULT_STUDIO_EMAIL],
-                          fail_silently=False)
+                try:
+                    send_mail('{} {} {} {} has just booked for {}'.format(
+                        settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, additional_subject,
+                        booking.user.first_name, booking.user.last_name, booking.event.name),
+                              get_template(
+                                'flex_bookings/email/to_studio_booking.txt'
+                                ).render(
+                                  Context({
+                                      'host': host,
+                                      'booking': booking,
+                                      'event': booking.event,
+                                      'date': booking.event.date.strftime('%A %d %B'),
+                                      'time': booking.event.date.strftime('%H:%M'),
+                                      'prev_cancelled_and_direct_paid':
+                                      previously_cancelled and booking.paid,
+                                      # 'transaction_id': transaction_id,
+                                      # 'invoice_id': invoice_id
+                                  })
+                              ),
+                              settings.DEFAULT_FROM_EMAIL,
+                              [settings.DEFAULT_STUDIO_EMAIL],
+                              fail_silently=False)
 
-                ActivityLog.objects.create(
-                    log= 'Email sent to studio ({}) regarding {}booking id {} '
-                    '(for {})'.format(
-                        settings.DEFAULT_STUDIO_EMAIL,
-                        're' if previously_cancelled else '', booking.id,
-                        booking.event
+                    ActivityLog.objects.create(
+                        log = 'Email sent to studio ({}) regarding {}booking id {} '
+                        '(for {})'.format(
+                            settings.DEFAULT_STUDIO_EMAIL,
+                            're' if previously_cancelled else '', booking.id,
+                            booking.event
+                        )
                     )
-                )
+                except Exception as e:
+                    # send mail to tech support with Exception
+                    send_support_email(e, __name__, "BookingCreateView - sending studio email")
 
             messages.success(
                 self.request,
@@ -546,9 +571,9 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
             except WaitingListUser.DoesNotExist:
                 pass
 
-            if "book_one_off" in form.data and booking.event.cost:
+            if "book_one_off" in form.data and booking.event.cost > 0:
                 return HttpResponseRedirect(
-                    reverse('flexbookings:update_booking', args=[booking.id])
+                    reverse('flexbookings:payments_pending')
                 )
             return HttpResponseRedirect(reverse('flexbookings:bookings'))
 
@@ -557,9 +582,44 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
 def update_block(request, pk):
 
     block = get_object_or_404(Block, id=pk)
+    user = request.user
+    user_bookings = [
+        bk for bk in block.bookings.all() if bk.user == user and
+                        bk.status == 'OPEN'
+        ]
+    for booking in user_bookings:
+        # mark all the user's bookings for this block as paid;
+        # payment_confirmed will be done by the organiser
+        booking.paid = True
+        booking.save()
+
+    # send email to studio
+    host = 'http://{}'.format(request.META.get('HTTP_HOST'))
+    ctx = Context({
+        'host': host,
+        'user': request.user,
+        'block': block
+    })
+    try:
+        send_mail('{} Payment confirmed for {} by {} {}'.format(
+            settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, block.name,
+            request.user.first_name, request.user.last_name
+        ),
+            get_template(
+                'flex_bookings/email/to_studio_payment_confirmed.txt'
+            ).render(ctx),
+            settings.DEFAULT_FROM_EMAIL,
+            [request.user.email],
+            fail_silently=False)
+    except Exception as e:
+        # send mail to tech support with Exception
+        send_support_email(e, __name__, "update_block - email to studio")
 
     messages.success(
-        request, "Payment for block {} confirmed".format(block)
+        request, "Thank you for confirming you have made Payment for "
+                 "block {}.  The studio has been informed and your space "
+                 "will be secured for the relevant classes once payment has "
+                 "been reviewed and confirmed.".format(block)
     )
 
     return HttpResponseRedirect(reverse('flexbookings:bookings'))
@@ -569,13 +629,39 @@ def update_block(request, pk):
 def update_booking(request, pk):
 
     booking = get_object_or_404(Booking, id=pk)
+    booking.paid = True
+    booking.save()
 
     messages.success(
-        request, "Payment for {} confirmed".format(booking.event)
+        request, "Thank you for confirming you have made Payment for "
+                 "{}.  The studio has been informed and your space "
+                 "will be secured once payment has "
+                 "been reviewed and confirmed.".format(booking.event)
     )
 
-    return HttpResponseRedirect(reverse('flexbookings:bookings'))
+    # send email to studio
+    host = 'http://{}'.format(request.META.get('HTTP_HOST'))
+    ctx = Context({
+        'host': host,
+        'user': request.user,
+        'booking': booking
+    })
+    try:
+        send_mail('{} Payment confirmed for {} by {} {}'.format(
+            settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, booking.event,
+            request.user.first_name, request.user.last_name
+        ),
+            get_template(
+                'flex_bookings/email/to_studio_payment_confirmed.txt'
+            ).render(ctx),
+            settings.DEFAULT_FROM_EMAIL,
+            [request.user.email],
+            fail_silently=False)
+    except Exception as e:
+        # send mail to tech support with Exception
+        send_support_email(e, __name__, "update_booking - email to studio")
 
+    return HttpResponseRedirect(reverse('flexbookings:bookings'))
 
 
 @login_required
@@ -685,6 +771,10 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
         for booking in bookings:
             event_was_full = booking.event.spaces_left() == 0
             booking.status = 'CANCELLED'
+            # set block back to None.  If user decides to rebook later, they
+            # can either rebook the entire block if it hasn't started yet, or
+            # book single class at the individual rate
+            booking.block = None
             booking.save()
 
             # if applicable, email users on waiting list

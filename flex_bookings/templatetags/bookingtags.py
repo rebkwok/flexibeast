@@ -1,6 +1,7 @@
 import pytz
 
 from django import template
+from django.conf import settings
 
 from flex_bookings.models import Booking
 
@@ -97,3 +98,8 @@ def is_regular_student(user):
 @register.filter
 def block_cost(block):
     return block.item_cost * block.events.count()
+
+
+@register.assignment_tag
+def check_debug():
+    return settings.DEBUG

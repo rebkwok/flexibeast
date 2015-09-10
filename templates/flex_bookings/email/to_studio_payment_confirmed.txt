@@ -1,0 +1,13 @@
+{% if block %}
+{{ user.first_name }} {{ user.last_name }} ({{ user.username }}) has confirmed payment for block {{ block.name }}.
+
+Click the link below to review and confirm that payment has been made for this block.  This will mark {{ user.first_name }}'s space on all block classes as confirmed.
+{{ host }}/studioadmin/confirm-payment/block/{{ block.id }}
+
+{% else %}
+{{ booking.user.first_name }} {{ booking.user.last_name }} ({{ booking.user.username }}) has confirmed payment for {{ booking.event }}.
+
+Click the link below to review and confirm that payment has been made for this booking.  This will mark {{ booking.user.first_name }}'s space as confirmed.
+{{ host }}/studioadmin/confirm-payment/{{ booking.id }}
+
+{% endif %}

@@ -74,6 +74,8 @@ INSTALLED_APPS = (
     'website'
 )
 
+INTERNAL_IPS = ('127.0.0.1', '0.0.0.0')
+
 SITE_ID = 1
 
 MIDDLEWARE_CLASSES = (
@@ -90,7 +92,7 @@ MIDDLEWARE_CLASSES = (
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     # Required by allauth template tags
-    "django.core.context_processors.request",
+    "django.template.context_processors.request",
     # allauth specific context processors
     "allauth.account.context_processors.account",
     "allauth.socialaccount.context_processors.socialaccount",
@@ -298,9 +300,6 @@ SUIT_CONFIG = {
         },
     )
 }
-
-INTERNAL_IPS = '127.0.0.1'
-
 
 # CKEDITOR
 CKEDITOR_UPLOAD_PATH = "uploads/"

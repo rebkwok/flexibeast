@@ -78,7 +78,7 @@
                                     {% if bookingform.booking.event.cost and bookingform.booking.paid %}<span class="confirmed fa fa-check"></span>
                                     {% elif bookingform.booking.event.cost and not bookingform.booking.paid %}<span class="not-confirmed fa fa-close"></span>
                                     {% else %}<strong>N/A</strong>{% endif %}</td>
-                                <td class="table-center">{% if bookingform.booking.block %}{{ bookingform.booking.block.name }}{% else %}Single class booking{% endif %}</td>
+                                <td class="table-center">{% if bookingform.booking.block %}{{ bookingform.booking.block.name }}{% endif %}</td>
                                 {% if bookingform.booking.space_confirmed %}
                                     <td class="hidden-sm hidden-xs table-center confirmed fa fa-check"></td>
                                     {% elif bookingform.booking.status == 'CANCELLED' %}

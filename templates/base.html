@@ -2,6 +2,7 @@
 {% load url from future %}
 {% load socialaccount %}
 {% providers_media_js %}
+{% load bookingtags %}
 
 <!DOCTYPE html>
 <html lang="en" class="{% block bg_class %}plain_bg{%  endblock %}">
@@ -15,14 +16,22 @@
         {% endblock %}
 
         <link rel="shortcut icon" href="{{ STATIC_URL }}/favicon.ico">
+        {% check_debug as is_debug_on %}
 
-        <!-- Bootstrap core CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        <!-- Bootstrap theme -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-        <!-- Font awesome -->
-       <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-        <!-- Custom styles --->
+        {% if is_debug_on %}
+            <link rel="stylesheet" href="{% static 'flex_bookings/bootstrap/bootstrap.min.css' %}">
+            <link rel="stylesheet" href="{% static 'flex_bookings/bootstrap/bootstrap-theme.min.css' %}">
+            <link rel="stylesheet" href="{% static 'flex_bookings/bootstrap/font-awesome.min.css' %}">
+        {% else %}
+            <!-- Bootstrap core CSS -->
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+            <!-- Bootstrap theme -->
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        {% endif %}
+            <!-- Font awesome -->
+           <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+      <!-- Custom styles --->
         <link href="{% static 'flex_bookings/css/custom.css' %}" rel="stylesheet">
          <link rel="stylesheet" href="{% static 'flex_bookings/css/print.css' %}"  type="text/css" media="print" />
       <link rel="stylesheet" type="text/css" href="{% static 'flex_bookings/css/jquery.datetimepicker.css' %}"/ >
@@ -37,7 +46,6 @@
     </head>
 
   <body>
-
 
       <div class="wrap">
         <!-- Fixed navbar -->
@@ -57,14 +65,23 @@
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav pull-left">
                         {% block left-nav-items %}
-                        <li class="active-nav"><a href="{% url 'flexbookings:lessons' %}">Classes</a></li>
-                        <li class="active-nav"><a href="{% url 'flexbookings:events' %}">Workshops</a></li>
-                        <li class="active-nav"><a href="{% url 'website:private' %}">Private instruction</a></li>
+                        <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'flexbookings:lessons' %}">Classes</a></li>
+                        <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'flexbookings:events' %}">Workshops</a></li>
+                        <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'website:private' %}">Private instruction</a></li>
+
+                        <li class="dropdown visible-sm visible-xs">
+                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+                          <ul class="dropdown-menu">
+                            <li class="active-nav"><a href="{% url 'flexbookings:lessons' %}">Classes</a></li>
+                            <li class="active-nav"><a href="{% url 'flexbookings:events' %}">Workshops</a></li>
+                            <li class="active-nav"><a href="{% url 'website:private' %}">Private instruction</a></li>
+                          </ul>
+                        </li>
 
                         {% if request.user.is_authenticated %}
 
                         <li class="dropdown">
-                              <a href="{% url 'website:about' %}" class="dropdown-toggle" data-toggle="dropdown">Your bookings<b class="caret"></b></a>
+                              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Your bookings<b class="caret"></b></a>
                               <ul class="dropdown-menu">
                                 <li class="active-nav"><a href="{% url 'flexbookings:bookings' %}">Your bookings</a></li>
                                 <li class="active-nav"><a href="{% url 'flexbookings:booking_history' %}">Booking history</a></li>
@@ -84,8 +101,8 @@
                             {% endif %}
                         {% endblock admin-nav %}
                         {% if request.user.is_authenticated %}
-                            <li class="dropdown">
-                              <a href="{% url 'website:about' %}" class="dropdown-toggle" data-toggle="dropdown">Your Account<b class="caret"></b></a>
+                            <li class="dropdown hidden-sm hidden-xs">
+                              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Your Account<b class="caret"></b></a>
                               <ul class="dropdown-menu">
                                 <li class="active-nav-login"><a href="{% url 'account_change_password' %}">Change password</a></li>
                                 <li class="active-nav-login"><a href="{% url 'account_email' %}">Change E-mail</a></li>
@@ -96,6 +113,10 @@
                         <li class="dropdown">
                           <a href="#" class="dropdown-toggle active-nav-login" data-toggle="dropdown" role="button" aria-expanded="false">Signed in as {{request.user}}<span class="caret"></span></a>
                           <ul class="dropdown-menu" role="menu">
+                            <li class="active-nav-login visible-sm visible-xs"><a href="{% url 'account_change_password' %}">Change password</a></li>
+                            <li class="active-nav-login visible-sm visible-xs"><a href="{% url 'account_email' %}">Change E-mail</a></li>
+                            <li class="active-nav-login visible-sm visible-xs"><a href="{% url 'profile:update_profile' %}">Change profile</a></li>
+                            <li class="active-nav-login visible-sm visible-xs"><a href="{% url 'profile:profile' %}">Profile</a></li>
                             <li class="active-nav-login"><a href="{% url 'account_logout' %}">Sign Out</a></li>
                           </ul>
                         </li>
@@ -175,11 +196,15 @@
         </div>
     </div>
 
-
-
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-<script src="http://momentjs.com/downloads/moment.min.js"></script>
+{% if is_debug_on %}
+    <script src="{% static 'flex_bookings/bootstrap/jquery.min.js' %}"></script>
+    <script src="{% static 'flex_bookings/bootstrap/bootstrap.min.js' %}"></script>
+    <script src="{% static 'flex_bookings/bootstrap/moment.min.js' %}"></script>
+{% else %}
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="http://momentjs.com/downloads/moment.min.js"></script>
+{% endif %}
 <script src="{% static 'flex_bookings/js/jquery.datetimepicker.js' %}"></script>
 <script src="{% static 'flex_bookings/js/jquery.maskedinput.min.js' %}"></script>
 <script src="{% static 'flex_bookings/js/jquery.tablesorter.min.js' %}"></script>
