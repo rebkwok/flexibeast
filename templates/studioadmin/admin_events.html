@@ -6,8 +6,8 @@
 
     <div class="container-fluid row">
 
-        <h2>{% if show_past %}Past{% else %}Scheduled{% endif %} {% if type == 'events' %}Events{% elif type == 'lessons' %}Classes{% endif %}</h2>
-        <p class="studioadmin-help">Note: only {% if type == 'events' %}events{% elif type == 'lessons' %}
+        <h2>{% if show_past %}Past{% else %}Scheduled{% endif %} {% if type == 'events' %}Workshops{% elif type == 'lessons' %}Classes{% endif %}</h2>
+        <p class="studioadmin-help">Note: only {% if type == 'events' %}workshops{% elif type == 'lessons' %}
             classes{% endif %} that have not yet been booked can be deleted. </p>
         <div class="row">
             <div class="col-xs-12">
@@ -17,9 +17,9 @@
                     <div class="top-button-row">
                         <input class="btn btn-success table-btn" name="formset_submitted" type="submit" value="Save changes" />
                         {% if show_past %}
-                        <input class="btn btn-info table-btn pull-right" name="upcoming" type="submit" value="Show upcoming {% if type == 'events' %}events{% else %}classes{% endif %}" />
+                        <input class="btn btn-info table-btn filter-btn pull-right" name="upcoming" type="submit" value="Show upcoming {% if type == 'events' %}workshops{% else %}classes{% endif %}" />
                         {% else %}
-                        <input class="btn btn-info table-btn pull-right" name="past" type="submit" value="Show past {% if type == 'events' %}events{% else %}classes{% endif %}" />
+                        <input class="btn btn-info table-btn filter-btn pull-right" name="past" type="submit" value="Show past {% if type == 'events' %}workshops{% else %}classes{% endif %}" />
                         {% endif %}
                     </div>
                 {% if events %}
@@ -28,14 +28,12 @@
                         <table class="table">
                             <tr class="success">
                                 <th>Date</th>
-                                <th>{% if type == 'events' %}Event{% elif type == 'lessons' %}Class{% endif %}</br>
-                                    <span class="studioadmin-help">Click for register</span></th>
+                                <th>{% if type == 'events' %}Workshop{% elif type == 'lessons' %}Class{% endif %}</th>
                                 <th class="table-center">Edit</th>
                                 <th class="table-center">Max spaces</th>
                                 <th class="table-center">Bookings</br>
-                                    <span class="studioadmin-help">Click for waiting list</span></th>
+                                    <span class="studioadmin-help">Click for bookings and waiting list</span></th>
                                 <th class="table-center">Booking open</th>
-                                <th class="table-center">Payment open</th>
                                 <th class="table-center">Advance payment required</th>
                                 <th class="table-center">Delete</th>
                             </tr>
@@ -44,12 +42,7 @@
                             <tr>
                                 <span class="hide">{{ event.id }}</span>
                                 <td class="studioadmin-tbl">{{ event.instance.date | date:"D d M, H:i" }}</td>
-                                <td class="studioadmin-tbl">{% if type == 'events' %}
-                                    <a href="{% url 'studioadmin:class_register' event.instance.slug 'OPEN' %}">{{ event.instance.name }}</a>
-                                    {% elif type == 'lessons' %}
-                                    <a href="{% url 'studioadmin:class_register' event.instance.slug 'OPEN' %}">{{ event.instance.name }}</a>
-                                    {% endif %}
-                                </td>
+                                <td class="studioadmin-tbl">{{ event.instance.name }}</td>
                                 <td class="table-center studioadmin-tbl">
                                     {% if type == 'events' %}
                                     <a href="{% url 'studioadmin:edit_event' event.instance.slug %}"><span class="fa fa-pencil-square-o fa-lg"></span>
@@ -60,14 +53,9 @@
                                 <td class="table-center studioadmin-tbl">
                                     {% if event.instance.max_participants %}{{ event.instance.max_participants }}{% else %}N/A{% endif %}</td>
                                 <td class="table-center studioadmin-tbl">
-                                    {% if event.instance.waitinglistusers.count > 0 %}
                                         <a href="{% url 'studioadmin:event_waiting_list' event.instance.id %}">{{ event.instance|bookings_count }}</a>
-                                    {% else %}
-                                        {{ event.instance|bookings_count }}
-                                    {% endif %}
                                 </td>
                                 <td class="table-center studioadmin-tbl">{{ event.booking_open }}<label for={{ event.booking_open_id }}></label></td>
-                                <td class="table-center studioadmin-tbl">{{ event.payment_open }}<label for={{ event.payment_open_id }}></label></td>
                                 <td class="table-center studioadmin-tbl">{{ event.advance_payment_required }}<label for={{ event.advance_payment_required_id }}></label></td>
                                 <td class="table-center studioadmin-tbl">{{ event.DELETE }}<label for={{ event.DELETE_id }}></label></td>
                             </tr>

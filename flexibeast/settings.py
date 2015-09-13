@@ -66,7 +66,7 @@ INSTALLED_APPS = (
     'accounts',
     'flex_bookings',
     'timetable',
-    #'studioadmin',
+    'studioadmin',
     'ckeditor',
     'paypal.standard.ipn',
     'payments',
@@ -96,7 +96,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # allauth specific context processors
     "allauth.account.context_processors.account",
     "allauth.socialaccount.context_processors.socialaccount",
-    "django.contrib.messages.context_processors.messages"
+    "django.contrib.messages.context_processors.messages",
+    "django.core.context_processors.media",
+    "website.context_processors.website_pages",
+    "website.context_processors.more_menu_options",
+    "website.context_processors.menu_options",
+
 )
 
 AUTHENTICATION_BACKENDS = (

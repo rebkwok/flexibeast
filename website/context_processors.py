@@ -14,9 +14,11 @@ def more_menu_options(request):
     """
     pages = Page.objects.all()
     more_menu_options = [
-        True for page in pages if page.menu_location == 'dropdown'
+        True for page in pages if page.menu_name and
+        page.menu_location == 'dropdown'
         ]
     return {'more_menu_options': True if more_menu_options else False}
+
 
 def menu_options(request):
     """

@@ -36,13 +36,11 @@ class Session(models.Model):
     contact_email = models.EmailField(default="thewatermelonstudio@hotmail.com")
     cost = models.DecimalField(default=7.00, max_digits=8, decimal_places=2)
     booking_open = models.BooleanField(default=True)
-    payment_open = models.BooleanField(default=True)
     advance_payment_required = models.BooleanField(default=True)
     payment_info = models.TextField(blank=True)
     cancellation_period = models.PositiveIntegerField(
         default=24
     )
-    external_instructor = models.BooleanField(default=False)
     email_studio_when_booked = models.BooleanField(default=False)
 
     def __str__(self):
@@ -53,10 +51,5 @@ class Session(models.Model):
 def session_pre_save(sender, instance, *args, **kwargs):
     if not instance.cost:
         instance.advance_payment_required = False
-        instance.payment_open = False
         instance.payment_due_date = None
-    if instance.external_instructor:
-        # if external_instructor, make sure payment_open and booking_open
-        # are False
-        instance.payment_open = False
-        instance.booking_open = False
+

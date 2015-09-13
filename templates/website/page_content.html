@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
-
-</body>
-</html>
+{% for subsection in page.subsections.all %}
+    {% if subsection.subheading %}
+        <h3>{{ subsection.subheading }}</h3>
+        {% endif %}
+    <p>{{ subsection.content|linebreaks }}</p>
+{% endfor %}

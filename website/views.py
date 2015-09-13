@@ -1,29 +1,44 @@
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect, \
+    get_object_or_404
 from django.template.response import TemplateResponse
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.core.mail.message import EmailMessage, EmailMultiAlternatives
-from django.template.loader import get_template
-from django.template import Context
+from django.template.loader import get_template, select_template
+from django.template import Context, RequestContext, TemplateDoesNotExist
 from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.core.mail import send_mail
 
-from website.models import AboutInfo, PrivateInfo
+from website.models import Page
 from website.forms import ContactForm
 
 
-def about(request):
-    about_text = AboutInfo.objects.all()
-    return TemplateResponse(
-        request, 'website/about.html', {'about_text': about_text}
-    )
+TEMPLATES = {
+    'no-img': 'website/page.html',
+    '1-img-top': 'website/page.html',
+    '1-img-left': 'website/page_side.html',
+    '1-img-right': 'website/page_side.html',
+    'img-col-left': 'website/page_col.html',
+    'img-col-right': 'website/page_col.html',
+}
 
 
-def private(request):
-    private_text = PrivateInfo.objects.all()
+def page(request, page_name):
+    page = get_object_or_404(Page, name=page_name)
+    template = TEMPLATES['no-img']
+    if page.pictures.count() > 0:
+        template = TEMPLATES[page.layout]
+
+    try:
+        include_html = select_template(
+            ['website/include/{}_extra.html'.format(page_name)]
+        )
+    except TemplateDoesNotExist:
+        include_html = ''
+
     return TemplateResponse(
-        request, 'website/private.html', {'private_text': private_text}
+        request, template, {'page': page, 'include_html': include_html}
     )
 
 
