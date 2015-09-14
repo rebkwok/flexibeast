@@ -14,7 +14,7 @@
             </div>
             <div class="panel-body">
                 {% if past %}
-                <h3>This class/workshop is now past.</h3>
+                <h3>This {{ type }} is now past.</h3>
                 {% endif %}
                 <ul class="list-group">
                     {% if event.description %}
@@ -28,8 +28,8 @@
                      <li class="list-group-item"><strong>Contact:</strong> {{ event.contact_person }}
                           (<a href="mailto:{{ event.contact_email }}?Subject=Enquiry regarding booking for {{ event.name }}" target="_blank">{{ event.contact_email }}</a>)</li>
                     <li class="list-group-item"><p><strong>Payment information</strong></p>
-                        <p>{% if not event.advance_payment_required and event.cost and event.event_type.subtype != "External instructor class" %}Advance payment is not required for this
-                        {% if type == "event" %}event{% elif type == "lesson" %}class{% endif %}.{% endif %}</p>
+                        <p>{% if not event.advance_payment_required and event.cost %}Advance payment is not required for this
+                        {{ type }}.{% endif %}</p>
 
                         <p>Cost: £ {{ event.cost }}</p>
 
@@ -71,13 +71,13 @@
                     {% if event.cancellation_period %}
                         <li class="list-group-item"><strong>Cancellation information</strong>
                             <p>Cancellation is allowed up to {{ event.cancellation_period | format_cancellation }} prior to the
-                            {% if type == "event" %}event{% elif type == "lesson" %}class{% endif %}</p></li>
+                            {% if type == "event" %}workshop{% elif type == "lesson" %}class{% endif %}</p></li>
                     {% endif %}
                     <li class="list-group-item">
                     {% if event.max_participants %}
 
                         <h5>There are a maximum {{ event.max_participants }} spaces for this
-                            {% if type == "event" %}event{% elif type == "lesson" %}class{% endif %}.</h5>
+                            {% if type == "event" %}workshop{% elif type == "lesson" %}class{% endif %}.</h5>
                     {% endif %}
                     </li>
 

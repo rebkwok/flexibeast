@@ -14,18 +14,21 @@ def get_event_context(context, event, user):
         context['type'] = "lesson"
         event_type_str = "class"
     else:
-        context['type'] = "event"
-        event_type_str = "event"
+        context['type'] = "workshop"
+        event_type_str = "workshop"
 
     if event.date <= timezone.now():
         context['past'] = True
-
     # payment info text to be displayed
+    payment_text = ''
     if event.cost == 0:
         payment_text = "There is no cost associated with this {}.".format(
             event_type_str
         )
-    context['payment_text'] = event.payment_info
+    context['payment_text'] = '{}{}'.format(
+        event.payment_info +
+        ('  ' if payment_text and event.payment_info else ''), payment_text
+    )
 
     # booked flag
     if user.is_authenticated():
@@ -62,7 +65,8 @@ def get_event_context(context, event, user):
                 booking_info_text = "This {} is now full.".format(event_type_str)
             if event.payment_due_date:
                 if event.payment_due_date < timezone.now():
-                    booking_info_text = "Bookings for this event are now closed."
+                    booking_info_text = "Bookings for this {} are now " \
+                                        "closed.".format(event_type_str)
 
         context['booking_info_text'] = booking_info_text
 

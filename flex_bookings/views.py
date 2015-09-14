@@ -13,7 +13,7 @@ from django.shortcuts import HttpResponse, HttpResponseRedirect, render, get_obj
 from django.template.response import TemplateResponse
 
 from django.views.generic import (
-    ListView, DetailView, CreateView, UpdateView, DeleteView
+    ListView, DetailView, CreateView, DeleteView
 )
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -737,7 +737,7 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
         booking = get_object_or_404(Booking, pk=self.kwargs['pk'])
         if not booking.event.can_cancel():
             return HttpResponseRedirect(
-                reverse('booking:cancellation_period_past',
+                reverse('flexbookings:cancellation_period_past',
                         args=[booking.event.slug])
             )
         return super(BookingDeleteView, self).get(request, *args, **kwargs)
@@ -775,6 +775,9 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
             # can either rebook the entire block if it hasn't started yet, or
             # book single class at the individual rate
             booking.block = None
+            # set payment confirmed to False but leave paid unchanged; email
+            # will be sent to studio to confirm refunded and mark as unpaid
+            booking.payment_confirmed = False
             booking.save()
 
             # if applicable, email users on waiting list
@@ -911,3 +914,13 @@ def booking_not_open(request, event_slug):
         request, 'flex_bookings/booking_not_open.html',
         {'ev_type': ev_type}
     )
+
+
+def cancellation_period_past(request, event_slug):
+    event = get_object_or_404(Event, slug=event_slug)
+    context = {'event': event}
+    return render(request, 'flex_bookings/cancellation_period_past.html', context)
+
+
+def permission_denied(request):
+    return render(request, 'flex_bookings/permission_denied.html')
