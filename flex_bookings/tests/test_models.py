@@ -1,3 +1,5 @@
+import random
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils import timezone
@@ -259,152 +261,114 @@ class BookingTests(TestCase):
             Booking.objects.filter(event=self.event_with_cost).count(), 4
         )
 
+
 class BlockTests(TestCase):
 
     def setUp(self):
-        # note for purposes of testing, start_date is set to 1.1.15
-        self.small_block = mommy.make_recipe('booking.block_5')
-        self.large_block = mommy.make_recipe('booking.block_10')
-
-        mommy.make_recipe('booking.future_PC', _quantity=10)
+        self.block = mommy.make_recipe('flex_bookings.block')
 
     def tearDown(self):
-        del self.small_block
-        del self.large_block
+        del self.block
 
-    def test_block_not_expiry_date(self):
-        """
-        Test that block expiry dates are populated correctly
-        """
-        dt = datetime(2015, 1, 1, tzinfo=timezone.utc)
-        self.assertEqual(self.small_block.start_date, dt)
-        self.assertEqual(self.small_block.expiry_date,
-                         datetime(2015, 3, 1, 23, 59, 59, tzinfo=timezone.utc))
-        self.assertEqual(self.large_block.expiry_date,
-                 datetime(2015, 5, 1, 23, 59, 59, tzinfo=timezone.utc))
 
     @patch.object(timezone, 'now',
                   return_value=datetime(2015, 2, 1, tzinfo=timezone.utc))
-    def test_active_small_block(self, mock_now):
+    def test_block_is_past(self, mock_now):
         """
-        Test that a 5 class unexpired block returns active correctly
+        Test that block is_past property returns correctly
         """
-        # self.small_block has not expired, block isn't full, payment not
-        # confirmed
-        self.assertFalse(self.small_block.active_block())
-        # set paid
-        self.small_block.paid=True
-        self.assertTrue(self.small_block.active_block())
+        # 5 past events attached to block
+        events = mommy.make_recipe(
+            'flex_bookings.future_EV',
+            _quantity=5
+        )
+        for event in events:
+            event.date = timezone.now() - timedelta(days=random.randint(1, 10))
+            event.save()
 
-    @patch.object(timezone, 'now',
-                  return_value=datetime(2015, 3, 2, tzinfo=timezone.utc))
-    def test_active_large_block(self, mock_now):
-        """
-        Test that a 10 class unexpired block returns active correctly
-        """
+        for event in events:
+            self.block.events.add(event)
 
-        # self.large_block has not expired, block isn't full,
-        # payment not confirmed
-        self.assertFalse(self.large_block.active_block())
-        # set paid
-        self.large_block.paid = True
-        self.assertTrue(self.large_block.active_block())
-
-        # but self.small_block has expired, not active even if paid
-        self.small_block.paid = True
-        self.assertFalse(self.small_block.active_block())
+        # check events are ordered correctly by date
+        self.assertTrue(
+            self.block.events.last().date > self.block.events.first().date
+        )
+        self.assertTrue(self.block.is_past)
 
     @patch.object(timezone, 'now',
                   return_value=datetime(2015, 2, 1, tzinfo=timezone.utc))
-    def test_active_full_blocks(self, mock_now):
+    def test_block_is_not_past(self, mock_now):
         """
-        Test that active is set to False if a block is full
+        Test that block is_past property returns correctly.  If any event
+        attached to the block is in the future, is_past=False
         """
-
-        # Neither self.small_block or self.large_block have expired
-        # both paid
-        self.small_block.paid = True
-        self.large_block.paid = True
-        # no bookings against either, active_block = True
-        self.assertEquals(Booking.objects.filter(
-            block__id=self.small_block.id).count(), 0)
-        self.assertEquals(Booking.objects.filter(
-            block__id=self.large_block.id).count(), 0)
-        self.assertTrue(self.small_block.active_block())
-        self.assertTrue(self.large_block.active_block())
-
-        # make some bookings against the blocks
-        poleclasses = Event.objects.all()
-        poleclasses5 = poleclasses[0:5]
-        for pc in poleclasses5:
-            mommy.make_recipe(
-                'booking.booking',
-                user=self.small_block.user,
-                block=self.small_block,
-                event=pc
-            )
-            mommy.make_recipe(
-                'booking.booking',
-                user=self.large_block.user,
-                block=self.large_block,
-                event=pc
-            )
-
-        # small block is now full, large block isn't
-        self.assertFalse(self.small_block.active_block())
-        self.assertTrue(self.large_block.active_block())
-
-        # fill up the large block
-        poleclasses10 = poleclasses[5:]
-        for pc in poleclasses10:
-            mommy.make_recipe(
-                'booking.booking',
-                user=self.large_block.user,
-                block=self.large_block,
-                event=pc
-            )
-        self.assertFalse(self.large_block.active_block())
-
-    def test_unpaid_block_is_not_active(self):
-        self.small_block.paid = False
-        self.assertFalse(self.small_block.active_block())
-
-    def test_block_pre_delete(self):
-        """
-        Test that bookings are reset to unpaid when a block is deleted
-        """
-
-        events = mommy.make_recipe('booking.future_EV', cost=10, _quantity=5)
-        block_bookings = [mommy.make_recipe(
-            'booking.booking',
-            block=self.large_block,
-            user=self.large_block.user,
-            paid=True,
-            payment_confirmed=True,
-            event=event
-            ) for event in events]
-        self.assertEqual(Booking.objects.filter(paid=True).count(), 5)
-        self.large_block.delete()
-        self.assertEqual(Booking.objects.filter(paid=True).count(), 0)
-
-        for booking in Booking.objects.all():
-            self.assertIsNone(booking.block)
-            self.assertFalse(booking.paid)
-            self.assertFalse(booking.payment_confirmed)
-
-    def test_str(self):
-        blocktype = mommy.make_recipe('booking.blocktype', size=4,
-            event_type__subtype="Pole level class"
+        # 5 past events attached to block
+        past_events = mommy.make_recipe(
+            'flex_bookings.future_EV',
+            _quantity=5
         )
-        block = mommy.make_recipe(
-            'booking.block',
-            start_date=datetime(2015, 1, 1, tzinfo=timezone.utc),
-            user=mommy.make_recipe('booking.user', username="TestUser"),
-            block_type=blocktype,
+        for event in past_events:
+            event.date = timezone.now() - timedelta(days=random.randint(1, 10))
+            event.save()
+        # 1 future events attached to block
+        future_event = mommy.make_recipe(
+            'flex_bookings.future_EV',
+            date=timezone.now() + timedelta(days=1),
         )
+        events = past_events + [future_event]
+
+        for event in events:
+            self.block.events.add(event)
+
+        # check events are ordered correctly by date
+        self.assertTrue(
+            self.block.events.last().date > self.block.events.first().date
+        )
+        self.assertTrue(
+            self.block.events.last().date > timezone.now()
+        )
+
+        self.assertFalse(self.block.is_past)
+
+    def test_open_booking_on_block_opens_event_booking(self):
+        """
+        Saving a block as booking_open makes booking open on all attached
+        events too
+        """
+        events = mommy.make_recipe(
+            'flex_bookings.future_EV',
+            _quantity=5
+        )
+        for event in events:
+            event.date = timezone.now() + timedelta(days=random.randint(1, 10))
+            event.save()
+            self.block.events.add(event)
+
+        # events are created with booking_open=False by default
+        self.assertEqual(set([event.booking_open for event in events]), {False})
+        # blocks are also created with booking_open=False
+        self.assertFalse(self.block.booking_open)
+
+        # open booking on the block
+        self.block.booking_open = True
+        self.block.save()
+
+        for event in events:
+            event.refresh_from_db()
+        self.assertEqual(set([event.booking_open for event in events]), {True})
+
+    def test_individual_booking_date(self):
+        """
+        Saving a block as sets the individual_booking_date to the beginning of
+        the chosen day
+        """
+        date = datetime(2015, 2, 1, 18, 0, tzinfo=timezone.utc)
+        self.block.individual_booking_date = date
+        self.block.save()
 
         self.assertEqual(
-            str(block), 'TestUser -- Pole level class -- size 4 -- start 01 Jan 2015'
+            self.block.individual_booking_date,
+            datetime(2015, 2, 1, 0, 0, tzinfo=timezone.utc)
         )
 
 

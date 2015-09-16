@@ -1,0 +1,69 @@
+{% extends "studioadmin/base.html" %}
+{% load static %}
+{% load bookingtags %}
+
+{% block studioadmincontent %}
+
+    <div class="container-fluid row">
+
+        <h2>{% if show_past %}Past{% else %}Current and Upcoming{% endif %}Blocks</h2>
+        <p class="studioadmin-help">Note: only blocks that do not yet been bookings can be deleted. </p>
+        <div class="row">
+            <div class="col-xs-12">
+                <form method="post" action="">
+                    {% csrf_token %}
+                    {{ blockformset.management_form }}
+                    <div class="top-button-row">
+                        <input class="btn btn-success table-btn" name="formset_submitted" type="submit" value="Save changes" />
+                        {% if show_past %}
+                        <input class="btn btn-info table-btn filter-btn pull-right" name="upcoming" type="submit" value="Show upcoming blocks" />
+                        {% else %}
+                        <input class="btn btn-info table-btn filter-btn pull-right" name="past" type="submit" value="Show past blocks" />
+                        {% endif %}
+                    </div>
+                {% if blocks %}
+                <div class="panel panel-success">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr class="success">
+                                <th class="">Block</th>
+                                <th class="table-center">Edit</th>
+                                <th class="table-center">Bookings</th>
+                                <th class="table-center">Booking open</th>
+                                <th class="table-center">Individual Booking Open</th>
+                                <th class="table-center">Delete</th>
+                            </tr>
+
+                            {% for block in blockformset %}
+                            <tr>
+                                <span class="hide">{{ block.id }}</span>
+                                <td class="studioadmin-tbl">{{ block.instance.name }}</td>
+                                <td class="table-center studioadmin-tbl">
+                                    Pending
+                                </td>
+                                <td class="table-center studioadmin-tbl">
+                                    Pending
+                                </td>
+                                <td class="table-center studioadmin-tbl">{{ block.booking_open }}<label for={{ block.booking_open_id }}></label></td>
+                                <td class="table-center studioadmin-tbl">{{ block.individual_booking_date }}</td>
+                                <td class="table-center studioadmin-tbl">{{ block.DELETE }}<label for={{ block.DELETE_id }}></label></td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td class="studioadmin-tbl" colspan="10"><input class="btn btn-success" name="formset_submitted" type="submit" value="Save changes" /></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+                <p>There are no {% if show_past %}past{% else %}current or upcoming{% endif %}Blocks to display.</p>
+            {% endif %}
+            </form>
+
+
+        </div>
+    </div>
+ </div>
+
+
+{% endblock studioadmincontent %}

@@ -166,6 +166,11 @@ class Block(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def is_past(self):
+        last_event_date = self.events.last().date
+        return last_event_date < timezone.now()
+
     def save(self, *args, **kwargs):
         # setting a block to booking_open makes booking open on each of it's
         # classes

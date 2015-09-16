@@ -31,6 +31,17 @@ jQuery(document).ready(function () {
         scrollInput: false
     });
 
+    jQuery('.datepicker').datetimepicker({
+        format: 'DD MMM YYYY',
+        formatTime: 'HH:mm',
+        timepicker: false,
+        minDate: 0,
+        closeOnDateSelect: true,
+        scrollMonth: false,
+        scrollTime: false,
+        scrollInput: false
+    });
+
     jQuery('#logdatepicker').datetimepicker({
         format: 'DD-MMM-YYYY',
         formatTime: 'HH:mm',

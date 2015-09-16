@@ -255,6 +255,162 @@ class EventAdminForm(forms.ModelForm):
         }
 
 
+class BlockBaseForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(BlockBaseForm, self).__init__(*args, **kwargs)
+
+        if self.instance:
+            self.fields['booking_open'] = forms.BooleanField(
+                widget=forms.CheckboxInput(attrs={
+                    'class': "regular-checkbox studioadmin-list",
+                    'id': 'booking_open_{}'.format(self.instance.id)
+                }),
+                required=False
+            )
+            self.booking_open_id = 'booking_open_{}'.format(self.instance.id)
+
+            bookings = Booking.objects.filter(
+                status='OPEN', block=self.instance
+            )
+            if bookings.count() > 0:
+                self.fields['DELETE'] = forms.BooleanField(
+                    widget=forms.CheckboxInput(attrs={
+                        'class': 'delete-checkbox-disabled studioadmin-list',
+                        'disabled': 'disabled',
+                        'id': 'DELETE_{}'.format(self.instance.id)
+                    }),
+                    required=False
+                )
+            else:
+                self.fields['DELETE'] = forms.BooleanField(
+                    widget=forms.CheckboxInput(attrs={
+                        'class': 'delete-checkbox studioadmin-list',
+                        'id': 'DELETE_{}'.format(self.instance.id)
+                    }),
+                    required=False
+                )
+            self.DELETE_id = 'DELETE_{}'.format(self.instance.id)
+
+        self.fields['individual_booking_date'] = forms.CharField(
+            widget=(
+                forms.DateInput(
+                    attrs={
+                        'class': "form-control datepicker",
+                    },
+                    format='%d %b %Y'
+                )
+            )
+        )
+
+    def clean_individual_booking_date(self):
+
+        raw_date = self.cleaned_data['individual_booking_date']
+        if raw_date:
+            if self.errors.get('individual_booking_date'):
+                del self.errors['individual_booking_date']
+            if self.instance:
+                original_date = self.instance.individual_booking_date
+                original_date_fmt = original_date.strftime('%d %b %Y')
+                if original_date_fmt == raw_date:
+                    self.changed_data.remove('individual_booking_date')
+            try:
+                # we need to give the date an hour otherwise it will be set to
+                # 0 and incorrectly changed to the previous day when we
+                # localise for the uk; time will be set back to 0 when the
+                # model saves
+                individual_booking_date = datetime.strptime(
+                    raw_date, '%d %b %Y'
+                ).replace(hour=12)
+            except ValueError:
+                self.add_error(
+                    'individual_booking_date',
+                    'Invalid date format.  Select from the date picker or '
+                    'enter date and time in the format dd Mmm YYYY HH:MM')
+
+            uk = pytz.timezone('Europe/London')
+            return uk.localize(individual_booking_date).\
+                astimezone(pytz.utc)
+
+
+BlockFormSet = modelformset_factory(
+    Block,
+    fields=(
+        'booking_open', 'individual_booking_date'
+    ),
+    form=BlockBaseForm,
+    extra=0,
+    can_delete=True
+)
+
+
+class BlockAdminForm(forms.ModelForm):
+
+    required_css_class = 'form-error'
+
+    item_cost = forms.DecimalField(
+        widget=forms.TextInput(attrs={
+            'type': 'text',
+            'class': 'form-control',
+            'aria-describedby': 'sizing-addon2',
+        }),
+        required=False
+    )
+
+    name = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': "form-control",
+                'placeholder': 'Name of block e.g. "Splits Block - October"'
+            }
+        )
+    )
+
+    def clean(self):
+        super(BlockAdminForm, self).clean()
+        cleaned_data = self.cleaned_data
+        is_new = False if self.instance else True
+
+        individual_booking_date = self.data.get('individual_booking_date')
+        if individual_booking_date:
+            if self.errors.get('individual_booking_date'):
+                del self.errors['individual_booking_date']
+            try:
+                individual_booking_date = datetime.strptime(
+                    self.data['individual_booking_date'], '%d %b %Y'
+                )
+                uk = pytz.timezone('Europe/London')
+                cleaned_data['individual_booking_date'] = uk.localize(date)\
+                    .astimezone(pytz.utc).replace(hour=0, minute=0, second=0)
+            except ValueError:
+                self.add_error(
+                    'individual_booking_date',
+                    'Invalid date format.  Select from the date picker or '
+                    'enter date and time in the format dd Mmm YYYY HH:MM')
+
+        return cleaned_data
+
+    class Meta:
+        model = Block
+        fields = (
+            'name', 'item_cost', 'events', 'booking_open',
+            'individual_booking_date'
+        )
+        widgets = {
+            'name': forms.TextInput(
+                attrs={'class': "form-control"}
+            ),
+            'individual_booking_date': forms.DateInput(
+                attrs={
+                    'class': "form-control",
+                    'id': "datepicker",
+                },
+                format='%d %b %Y'
+            ),
+        }
+
+
+
 class RegisterDayForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
