@@ -779,7 +779,6 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
             # will be sent to studio to confirm refunded and mark as unpaid
             booking.payment_confirmed = False
             booking.save()
-
             # if applicable, email users on waiting list
             if event_was_full:
                 waiting_list_users = WaitingListUser.objects.filter(
@@ -865,8 +864,6 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
         except Exception as e:
             # send mail to tech support with Exception
             send_support_email(e, __name__, "DeleteBookingView - cancelled email")
-            messages.error(self.request, "An error occured, please contact "
-                "the studio for information")
 
         try:
             subject = "block {}".format(block) if cancel_type == 'block' else \

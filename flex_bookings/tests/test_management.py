@@ -10,8 +10,7 @@ from allauth.socialaccount.models import SocialApp
 from mock import patch
 from model_mommy import mommy
 
-from flex_bookings.models import Event, Booking, EventType, BlockType
-from flex_bookings.utils import create_classes
+from flex_bookings.models import Event, Booking, EventType
 from timetable.models import Session
 
 
@@ -30,38 +29,14 @@ class ManagementCommandsTests(TestCase):
     def test_create_events(self):
         self.assertEquals(Event.objects.all().count(), 0)
         management.call_command('create_events')
-        self.assertEquals(Event.objects.all().count(), 5)
-
-    @patch('booking.utils.date')
-    def test_create_classes_with_manage_command(self, mock_date):
-        """
-        Create timetable sessions and add classes
-        """
-        mock_date.today.return_value = datetime(2015, 2, 10)
-
-        self.assertEquals(Event.objects.all().count(), 0)
-        management.call_command('create_classes')
-        # check that there are now classes on the Monday of the mocked week
-        # (mocked now is Wed 10 Feb 2015)
-        mon_classes = Event.objects.filter(
-            Q(date__gte=datetime(2015, 2, 10, tzinfo=timezone.utc)) &
-            Q(date__lte=datetime(2015, 2, 11, tzinfo=timezone.utc))
-        )
-        self.assertTrue(mon_classes)
-        # check that there are now classes on the Monday of the following week
-        # (mocked now is Wed 10 Feb 2015)
-        next_mon_classes = Event.objects.filter(
-            Q(date__gte=datetime(2015, 2, 17, tzinfo=timezone.utc)) &
-            Q(date__lte=datetime(2015, 2, 18, tzinfo=timezone.utc))
-        )
-        self.assertTrue(next_mon_classes)
+        self.assertEquals(Event.objects.all().count(), 3)
 
     def test_create_bookings(self):
         """
         test that create_bookings creates 3 bookings per event
         """
-        mommy.make_recipe('booking.user', _quantity=3)
-        mommy.make_recipe('booking.future_EV', _quantity=2)
+        mommy.make_recipe('flex_bookings.user', _quantity=3)
+        mommy.make_recipe('flex_bookings.future_EV', _quantity=2)
         self.assertEquals(Booking.objects.all().count(), 0)
         management.call_command('create_bookings')
         self.assertEquals(Booking.objects.all().count(), 6)
@@ -70,7 +45,7 @@ class ManagementCommandsTests(TestCase):
         """
         test that create_bookings creates users if none exist
         """
-        mommy.make_recipe('booking.future_EV')
+        mommy.make_recipe('flex_bookings.future_EV')
         self.assertEquals(Booking.objects.all().count(), 0)
         self.assertEquals(User.objects.all().count(), 0)
         management.call_command('create_bookings')
@@ -87,36 +62,31 @@ class ManagementCommandsTests(TestCase):
         # confirm no errors, and no booking are created
         self.assertEquals(Booking.objects.all().count(), 0)
 
-    def test_create_events_and_blocktypes(self):
+    def test_create_event_types(self):
         """
-        test that create_events_and_blocktypes creates the default types
-        """
-        self.assertEquals(EventType.objects.all().count(), 0)
-        self.assertEquals(BlockType.objects.all().count(), 0)
-
-        management.call_command('create_event_and_blocktypes')
-        self.assertEquals(EventType.objects.all().count(), 7)
-        self.assertEquals(BlockType.objects.all().count(), 4)
-
-    def test_create_events_and_blocktypes_twice(self):
-        """
-        test that create_events_and_blocktypes does not create duplicates
+        test that create_event_types creates the default types
         """
         self.assertEquals(EventType.objects.all().count(), 0)
-        self.assertEquals(BlockType.objects.all().count(), 0)
 
-        management.call_command('create_event_and_blocktypes')
-        self.assertEquals(EventType.objects.all().count(), 7)
-        self.assertEquals(BlockType.objects.all().count(), 4)
+        management.call_command('create_event_types')
+        self.assertEquals(EventType.objects.all().count(), 4)
 
-        management.call_command('create_event_and_blocktypes')
-        self.assertEquals(EventType.objects.all().count(), 7)
-        self.assertEquals(BlockType.objects.all().count(), 4)
+    def test_create_event_types_twice(self):
+        """
+        test that create_event_types does not create duplicates
+        """
+        self.assertEquals(EventType.objects.all().count(), 0)
+
+        management.call_command('create_event_types')
+        self.assertEquals(EventType.objects.all().count(), 4)
+
+        management.call_command('create_event_types')
+        self.assertEquals(EventType.objects.all().count(), 4)
 
 
 class EmailReminderAndWarningTests(TestCase):
 
-    @patch('booking.management.commands.email_reminders.timezone')
+    @patch('flex_bookings.management.commands.email_reminders.timezone')
     def test_email_reminders(self, mock_tz):
         """
         Email reminders 24 hours before cancellation period starts
@@ -127,29 +97,29 @@ class EmailReminderAndWarningTests(TestCase):
 
         # cancellation period starts 2015/2/11 18:00
         event = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 12, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             cancellation_period=24)
         # cancellation period starts 2015/2/12 18:00
         event1 = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 13, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             cancellation_period=24)
         mommy.make_recipe(
-            'booking.booking', event=event, _quantity=5,
+            'flex_bookings.booking', event=event, _quantity=5,
             )
         mommy.make_recipe(
-            'booking.booking', event=event1, _quantity=5,
+            'flex_bookings.booking', event=event1, _quantity=5,
             )
         management.call_command('email_reminders')
         # emails are only sent for event1
         self.assertEquals(len(mail.outbox), 5)
 
-    @patch('booking.management.commands.email_reminders.timezone')
+    @patch('flex_bookings.management.commands.email_reminders.timezone')
     def test_email_reminders_not_sent_for_past_events(self, mock_tz):
         mock_tz.now.return_value = datetime(
             2015, 2, 10, tzinfo=timezone.utc
@@ -157,19 +127,19 @@ class EmailReminderAndWarningTests(TestCase):
 
         # cancellation period starts 2015/2/8 00:00
         event = mommy.make_recipe(
-            'booking.past_event',
+            'flex_bookings.past_event',
             date=datetime(2015, 2, 9, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             cancellation_period=24)
 
         mommy.make_recipe(
-            'booking.booking', event=event, _quantity=5,
+            'flex_bookings.booking', event=event, _quantity=5,
             )
         management.call_command('email_reminders')
         self.assertEquals(len(mail.outbox), 0)
 
-    @patch('booking.management.commands.email_reminders.timezone')
+    @patch('flex_bookings.management.commands.email_reminders.timezone')
     def test_email_reminders_not_sent_twice(self, mock_tz):
         mock_tz.now.return_value = datetime(
             2015, 2, 11, 19, 0, tzinfo=timezone.utc
@@ -177,13 +147,13 @@ class EmailReminderAndWarningTests(TestCase):
 
         # cancellation period starts 2015/2/12 18:00
         event = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 13, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             cancellation_period=24)
         mommy.make_recipe(
-            'booking.booking', event=event, _quantity=5,
+            'flex_bookings.booking', event=event, _quantity=5,
             )
 
         management.call_command('email_reminders')
@@ -192,7 +162,7 @@ class EmailReminderAndWarningTests(TestCase):
         management.call_command('email_reminders')
         self.assertEquals(len(mail.outbox), 5)
 
-    @patch('booking.management.commands.email_reminders.timezone')
+    @patch('flex_bookings.management.commands.email_reminders.timezone')
     def test_email_reminders_set_flags(self, mock_tz):
         """
         Test that reminder_sent flag set
@@ -203,13 +173,13 @@ class EmailReminderAndWarningTests(TestCase):
 
         # cancellation period starts 2015/2/12 18:00
         event = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 13, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             cancellation_period=24)
         mommy.make_recipe(
-            'booking.booking', event=event, paid=True, payment_confirmed=True,
+            'flex_bookings.booking', event=event, paid=True, payment_confirmed=True,
             )
         management.call_command('email_reminders')
         self.assertEquals(len(mail.outbox), 1)
@@ -217,7 +187,7 @@ class EmailReminderAndWarningTests(TestCase):
             Booking.objects.filter(reminder_sent=True).count(), 1
             )
 
-    @patch('booking.management.commands.email_reminders.timezone')
+    @patch('flex_bookings.management.commands.email_reminders.timezone')
     def test_email_reminders_only_sent_for_open_bookings(self, mock_tz):
         mock_tz.now.return_value = datetime(
             2015, 2, 12, 19, 0, tzinfo=timezone.utc
@@ -225,16 +195,16 @@ class EmailReminderAndWarningTests(TestCase):
 
         # cancellation period starts 2015/2/11 18:00
         event = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 13, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             cancellation_period=24)
         mommy.make_recipe(
-            'booking.booking', event=event, status='OPEN', _quantity=5
+            'flex_bookings.booking', event=event, status='OPEN', _quantity=5
             )
         mommy.make_recipe(
-            'booking.booking', event=event, status='CANCELLED', _quantity=5
+            'flex_bookings.booking', event=event, status='CANCELLED', _quantity=5
             )
         management.call_command('email_reminders')
         self.assertEquals(len(mail.outbox), 5)
@@ -243,7 +213,7 @@ class EmailReminderAndWarningTests(TestCase):
         for booking in Booking.objects.filter(status='CANCELLED'):
             self.assertFalse(booking.reminder_sent)
 
-    @patch('booking.management.commands.email_warnings.timezone')
+    @patch('flex_bookings.management.commands.email_warnings.timezone')
     def test_email_warnings(self, mock_tz):
         """
         test email warning is sent 48 hours before cancellation_period or
@@ -256,29 +226,29 @@ class EmailReminderAndWarningTests(TestCase):
         # cancellation period starts 2015/2/14 17:00
         # payment_due_date 2015/2/11 23:59
         event = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 14, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             payment_due_date=datetime(2015, 2, 11, tzinfo=timezone.utc),
             cancellation_period=1)
         # cancellation period starts 2015/2/14 17:00
         # payment_due_date 2015/2/12 23:59
         event1 = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 14, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             payment_due_date=datetime(2015, 2, 12, tzinfo=timezone.utc),
             cancellation_period=1)
         mommy.make_recipe(
-            'booking.booking', event=event, paid=False,
+            'flex_bookings.booking', event=event, paid=False,
             payment_confirmed=False,
             date_booked=datetime(2015, 2, 9, 19, 30, tzinfo=timezone.utc),
             _quantity=5,
             )
         mommy.make_recipe(
-            'booking.booking', event=event1, paid=False,
+            'flex_bookings.booking', event=event1, paid=False,
             payment_confirmed=False,
             date_booked=datetime(2015, 2, 9, 19, 30, tzinfo=timezone.utc),
             _quantity=5,
@@ -287,7 +257,7 @@ class EmailReminderAndWarningTests(TestCase):
         management.call_command('email_warnings')
         self.assertEquals(len(mail.outbox), 5)
 
-    @patch('booking.management.commands.email_warnings.timezone')
+    @patch('flex_bookings.management.commands.email_warnings.timezone')
     def test_email_warnings_sent_if_no_payment_due_date(self, mock_tz):
         """
         test email warning is sent 48 hours before cancellation_period for
@@ -300,15 +270,15 @@ class EmailReminderAndWarningTests(TestCase):
         # cancellation period starts 2015/2/13 18:00
         # payment_due_date None
         event = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 14, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             payment_due_date=None,
             cancellation_period=24)
 
         mommy.make_recipe(
-            'booking.booking', event=event, paid=False,
+            'flex_bookings.booking', event=event, paid=False,
             payment_confirmed=False,
             date_booked=datetime(2015, 2, 11, 14, 30, tzinfo=timezone.utc),
             _quantity=5,
@@ -317,7 +287,7 @@ class EmailReminderAndWarningTests(TestCase):
         management.call_command('email_warnings')
         self.assertEquals(len(mail.outbox), 5)
 
-    @patch('booking.management.commands.email_warnings.timezone')
+    @patch('flex_bookings.management.commands.email_warnings.timezone')
     def test_email_warnings_not_sent_twice(self, mock_tz):
 
         mock_tz.now.return_value = datetime(
@@ -326,14 +296,14 @@ class EmailReminderAndWarningTests(TestCase):
         # cancellation period starts 2015/2/13 17:00
         # payment_due_date 2015/2/11 23:59
         event = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 13, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             payment_due_date=datetime(2015, 2, 11, tzinfo=timezone.utc),
             cancellation_period=1)
         mommy.make_recipe(
-            'booking.booking', event=event, paid=False,
+            'flex_bookings.booking', event=event, paid=False,
             payment_confirmed=False,
             date_booked=datetime(2015, 2, 9, 19, 30, tzinfo=timezone.utc),
             _quantity=5,
@@ -347,7 +317,7 @@ class EmailReminderAndWarningTests(TestCase):
         management.call_command('email_warnings')
         self.assertEquals(len(mail.outbox), 5)
 
-    @patch('booking.management.commands.email_warnings.timezone')
+    @patch('flex_bookings.management.commands.email_warnings.timezone')
     def test_email_warnings_only_sent_for_payment_not_confirmed(self, mock_tz):
         """
         test email warning is only sent for bookings that are not marked as
@@ -359,20 +329,20 @@ class EmailReminderAndWarningTests(TestCase):
         # cancellation period starts 2015/2/13 17:00
         # payment_due_date 2015/2/11 23:59
         event = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 13, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             payment_due_date=datetime(2015, 2, 11, tzinfo=timezone.utc),
             cancellation_period=1)
         mommy.make_recipe(
-            'booking.booking', event=event, paid=False,
+            'flex_bookings.booking', event=event, paid=False,
             payment_confirmed=False,
             date_booked=datetime(2015, 2, 9, 19, 30, tzinfo=timezone.utc),
             _quantity=3,
             )
         mommy.make_recipe(
-            'booking.booking', event=event, paid=True,
+            'flex_bookings.booking', event=event, paid=True,
             payment_confirmed=True,
             date_booked=datetime(2015, 2, 9, 19, 30, tzinfo=timezone.utc),
             _quantity=3,
@@ -384,7 +354,7 @@ class EmailReminderAndWarningTests(TestCase):
         for booking in Booking.objects.filter(payment_confirmed=True):
             self.assertFalse(booking.warning_sent)
 
-    @patch('booking.management.commands.email_warnings.timezone')
+    @patch('flex_bookings.management.commands.email_warnings.timezone')
     def test_email_warnings_only_sent_for_open_bookings(self, mock_tz):
         """
         test email warning is only sent for bookings that are not marked as
@@ -394,20 +364,20 @@ class EmailReminderAndWarningTests(TestCase):
             2015, 2, 10, tzinfo=timezone.utc
             )
         event = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 13, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             payment_due_date=datetime(2015, 2, 11, tzinfo=timezone.utc),
             cancellation_period=1)
         mommy.make_recipe(
-            'booking.booking', event=event, paid=False,
+            'flex_bookings.booking', event=event, paid=False,
             payment_confirmed=False, status='OPEN',
             date_booked=datetime(2015, 2, 9, 19, 30, tzinfo=timezone.utc),
             _quantity=3,
             )
         mommy.make_recipe(
-            'booking.booking', event=event, paid=False,
+            'flex_bookings.booking', event=event, paid=False,
             payment_confirmed=False, status='CANCELLED',
             date_booked=datetime(2015, 2, 9, 19, 30, tzinfo=timezone.utc),
             _quantity=3,
@@ -419,7 +389,7 @@ class EmailReminderAndWarningTests(TestCase):
         for booking in Booking.objects.filter(status='CANCELLED'):
             self.assertFalse(booking.warning_sent)
 
-    @patch('booking.management.commands.email_warnings.timezone')
+    @patch('flex_bookings.management.commands.email_warnings.timezone')
     def test_email_warnings_not_sent_within_2_hrs_of_booking(self, mock_tz):
         """
         test email warning is only sent for bookings made more than 2 hrs ago
@@ -428,19 +398,19 @@ class EmailReminderAndWarningTests(TestCase):
             2015, 2, 10, tzinfo=timezone.utc
             )
         event = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 13, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
+            booking_open=True,
             cost=10,
             payment_due_date=datetime(2015, 2, 11, tzinfo=timezone.utc),
             cancellation_period=1)
         booking1 = mommy.make_recipe(
-            'booking.booking', event=event, paid=False,
+            'flex_bookings.booking', event=event, paid=False,
             payment_confirmed=False, status='OPEN',
             date_booked=datetime(2015, 2, 9, 21, 30, tzinfo=timezone.utc)
             )
         booking2 = mommy.make_recipe(
-            'booking.booking', event=event, paid=False,
+            'flex_bookings.booking', event=event, paid=False,
             payment_confirmed=False, status='OPEN',
             date_booked=datetime(2015, 2, 9, 22, 30, tzinfo=timezone.utc)
             )
@@ -456,15 +426,15 @@ class CancelUnpaidBookingsTests(TestCase):
 
     def setUp(self):
         self.event = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             date=datetime(2015, 2, 13, 18, 0, tzinfo=timezone.utc),
-            payment_open=True,
             cost=10,
+            booking_open=True,
             payment_due_date=datetime(2015, 2, 9, tzinfo=timezone.utc),
             advance_payment_required=True,
             cancellation_period=1)
         self.unpaid = mommy.make_recipe(
-            'booking.booking', event=self.event, paid=False,
+            'flex_bookings.booking', event=self.event, paid=False,
             payment_confirmed=False, status='OPEN',
             user__email="unpaid@test.com",
             date_booked=datetime(
@@ -473,7 +443,7 @@ class CancelUnpaidBookingsTests(TestCase):
             warning_sent=True
         )
         self.paid = mommy.make_recipe(
-            'booking.booking', event=self.event, paid=True,
+            'flex_bookings.booking', event=self.event, paid=True,
             payment_confirmed=True, status='OPEN',
             user__email="paid@test.com",
             date_booked= datetime(
@@ -481,7 +451,7 @@ class CancelUnpaidBookingsTests(TestCase):
             )
         )
 
-    @patch('booking.management.commands.cancel_unpaid_bookings.timezone')
+    @patch('flex_bookings.management.commands.cancel_unpaid_bookings.timezone')
     def test_cancel_unpaid_bookings(self, mock_tz):
         """
         test unpaid bookings are cancelled
@@ -508,7 +478,7 @@ class CancelUnpaidBookingsTests(TestCase):
             paid_booking.status, 'OPEN', paid_booking.status
         )
 
-    @patch('booking.management.commands.cancel_unpaid_bookings.timezone')
+    @patch('flex_bookings.management.commands.cancel_unpaid_bookings.timezone')
     def test_dont_cancel_if_advance_payment_not_required(self, mock_tz):
         """
         test unpaid bookings are not cancelled if advance payment not required
@@ -541,7 +511,7 @@ class CancelUnpaidBookingsTests(TestCase):
             paid_booking.status, 'OPEN', paid_booking.status
         )
 
-    @patch('booking.management.commands.cancel_unpaid_bookings.timezone')
+    @patch('flex_bookings.management.commands.cancel_unpaid_bookings.timezone')
     def test_dont_cancel_for_events_with_no_cost(self, mock_tz):
         """
         test unpaid bookings are not cancelled if advance payment not required
@@ -571,7 +541,7 @@ class CancelUnpaidBookingsTests(TestCase):
             paid_booking.status, 'OPEN', paid_booking.status
         )
 
-    @patch('booking.management.commands.cancel_unpaid_bookings.timezone')
+    @patch('flex_bookings.management.commands.cancel_unpaid_bookings.timezone')
     def test_dont_cancel_for_events_in_the_past(self, mock_tz):
         """
         test don't cancel or send emails for past events
@@ -599,7 +569,7 @@ class CancelUnpaidBookingsTests(TestCase):
             paid_booking.status, 'OPEN', paid_booking.status
         )
 
-    @patch('booking.management.commands.cancel_unpaid_bookings.timezone')
+    @patch('flex_bookings.management.commands.cancel_unpaid_bookings.timezone')
     def test_dont_cancel_for_already_cancelled(self, mock_tz):
         """
         ignore already cancelled bookings
@@ -621,7 +591,7 @@ class CancelUnpaidBookingsTests(TestCase):
             unpaid_booking.status, 'CANCELLED', unpaid_booking.status
         )
 
-    @patch('booking.management.commands.cancel_unpaid_bookings.timezone')
+    @patch('flex_bookings.management.commands.cancel_unpaid_bookings.timezone')
     def test_dont_cancel_bookings_created_within_past_4_hours(self, mock_tz):
         """
         Avoid immediately cancelling bookings made within the cancellation
@@ -646,7 +616,7 @@ class CancelUnpaidBookingsTests(TestCase):
             unpaid_booking.status, 'OPEN', unpaid_booking.status
         )
 
-    @patch('booking.management.commands.cancel_unpaid_bookings.timezone')
+    @patch('flex_bookings.management.commands.cancel_unpaid_bookings.timezone')
     def test_only_send_one_email_to_studio(self, mock_tz):
         """
         users are emailed per booking, studio just receives one summary
@@ -657,7 +627,7 @@ class CancelUnpaidBookingsTests(TestCase):
         )
         for i in range(5):
             bookings = mommy.make_recipe(
-                'booking.booking', event=self.event,
+                'flex_bookings.booking', event=self.event,
                 status='OPEN', paid=False,
                 payment_confirmed=False,
                 user__email="unpaid_user{}@test.com".format(i),
@@ -687,7 +657,7 @@ class CancelUnpaidBookingsTests(TestCase):
             all_emails, [email.to for email in mail.outbox]
         )
 
-    @patch('booking.management.commands.cancel_unpaid_bookings.timezone')
+    @patch('flex_bookings.management.commands.cancel_unpaid_bookings.timezone')
     def test_cancelling_for_full_event_emails_waiting_list(self, mock_tz):
         """
         Test that automatically cancelling a booking for a full event emails
@@ -705,7 +675,7 @@ class CancelUnpaidBookingsTests(TestCase):
         # make some waiting list users
         for i in range(3):
             mommy.make_recipe(
-                'booking.waiting_list_user', event=self.event,
+                'flex_bookings.waiting_list_user', event=self.event,
                 user__email='test{}@test.com'.format(i)
             )
 
@@ -718,7 +688,7 @@ class CancelUnpaidBookingsTests(TestCase):
             ['test0@test.com', 'test1@test.com', 'test2@test.com']
         )
 
-    @patch('booking.management.commands.cancel_unpaid_bookings.timezone')
+    @patch('flex_bookings.management.commands.cancel_unpaid_bookings.timezone')
     def test_cancelling_more_than_one_only_emails_once(self, mock_tz):
         """
         Test that the waiting list is only emailed once if more than one
@@ -735,7 +705,7 @@ class CancelUnpaidBookingsTests(TestCase):
 
         # make another booking that will be cancelled
         mommy.make_recipe(
-            'booking.booking', event=self.event, paid=False,
+            'flex_bookings.booking', event=self.event, paid=False,
             payment_confirmed=False, status='OPEN',
             user__email="unpaid@test.com",
             date_booked=datetime(
@@ -747,7 +717,7 @@ class CancelUnpaidBookingsTests(TestCase):
         # make some waiting list users
         for i in range(3):
             mommy.make_recipe(
-                'booking.waiting_list_user', event=self.event,
+                'flex_bookings.waiting_list_user', event=self.event,
                 user__email='test{}@test.com'.format(i)
             )
 
@@ -765,7 +735,7 @@ class CancelUnpaidBookingsTests(TestCase):
 
         self.assertEqual(Booking.objects.filter(status='CANCELLED').count(), 2)
 
-    @patch('booking.management.commands.cancel_unpaid_bookings.timezone')
+    @patch('flex_bookings.management.commands.cancel_unpaid_bookings.timezone')
     def test_cancelling_not_full_event_does_not_email_waiting_list(self, mock_tz):
         """
         Test that the waiting list is not emailed if event not full
@@ -782,7 +752,7 @@ class CancelUnpaidBookingsTests(TestCase):
         # make some waiting list users
         for i in range(3):
             mommy.make_recipe(
-                'booking.waiting_list_user', event=self.event,
+                'flex_bookings.waiting_list_user', event=self.event,
                 user__email='test{}@test.com'.format(i)
             )
 

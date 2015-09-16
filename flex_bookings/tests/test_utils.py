@@ -19,9 +19,9 @@ class UtilsTests(TestCase):
         self.assertEquals(Event.objects.all().count(), 0)
 
         # create some timetabled sessions for mondays, tuesdays and Wednesdays
-        mommy.make_recipe('booking.mon_session', _quantity=3)
-        mommy.make_recipe('booking.tue_session', _quantity=3)
-        mommy.make_recipe('booking.wed_session', _quantity=3)
+        mommy.make_recipe('flex_bookings.mon_session', _quantity=3)
+        mommy.make_recipe('flex_bookings.tue_session', _quantity=3)
+        mommy.make_recipe('flex_bookings.wed_session', _quantity=3)
 
         session_ids = [session.id for session in Session.objects.all()]
 
@@ -49,9 +49,9 @@ class UtilsTests(TestCase):
         self.assertEquals(Event.objects.all().count(), 0)
 
         # create some timetabled sessions for mondays, tuesdays and Wednesdays
-        mommy.make_recipe('booking.mon_session', _quantity=3)
-        mommy.make_recipe('booking.tue_session', _quantity=3)
-        mommy.make_recipe('booking.wed_session', _quantity=3)
+        mommy.make_recipe('flex_bookings.mon_session', _quantity=3)
+        mommy.make_recipe('flex_bookings.tue_session', _quantity=3)
+        mommy.make_recipe('flex_bookings.wed_session', _quantity=3)
 
         session_ids = [session.id for session in Session.objects.all()]
 
@@ -98,9 +98,9 @@ class UtilsTests(TestCase):
         self.assertEquals(Event.objects.all().count(), 0)
 
         # create some timetabled sessions for mondays, tuesdays and Wednesdays
-        mommy.make_recipe('booking.mon_session', _quantity=3)
-        mommy.make_recipe('booking.tue_session', _quantity=3)
-        mommy.make_recipe('booking.wed_session', _quantity=3)
+        mommy.make_recipe('flex_bookings.mon_session', _quantity=3)
+        mommy.make_recipe('flex_bookings.tue_session', _quantity=3)
+        mommy.make_recipe('flex_bookings.wed_session', _quantity=3)
 
         session_ids = [session.id for session in Session.objects.all()]
 
@@ -173,8 +173,8 @@ class UtilsTests(TestCase):
         self.assertEquals(Event.objects.all().count(), 0)
 
         # create some timetabled sessions for mondays, tuesdays and Wednesdays
-        tues_sessions = mommy.make_recipe('booking.tue_session', _quantity=3)
-        mommy.make_recipe('booking.wed_session', _quantity=3)
+        tues_sessions = mommy.make_recipe('flex_bookings.tue_session', _quantity=3)
+        mommy.make_recipe('flex_bookings.wed_session', _quantity=3)
 
         session_ids = [
             session.id for session in Session.objects.all() if

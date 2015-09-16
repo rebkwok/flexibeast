@@ -16,13 +16,16 @@ class EventListViewTests(TestCase):
         set_up_fb()
         self.client = Client()
         self.factory = RequestFactory()
-        mommy.make_recipe('booking.future_EV', _quantity=3)
-        mommy.make_recipe('booking.future_PC', _quantity=3)
-        mommy.make_recipe('booking.future_CL', _quantity=3)
-        self.user = mommy.make_recipe('booking.user')
+        mommy.make_recipe(
+            'flex_bookings.future_WS', booking_open=True, _quantity=3
+        )
+        mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True, _quantity=6
+        )
+        self.user = mommy.make_recipe('flex_bookings.user')
 
     def _get_response(self, user, ev_type):
-        url = reverse('booking:events')
+        url = reverse('flexbookings:events')
         request = self.factory.get(url)
         request.user = user
         view = EventListView.as_view()
@@ -32,7 +35,7 @@ class EventListViewTests(TestCase):
         """
         Test that only events are listed (workshops and other events)
         """
-        url = reverse('booking:events')
+        url = reverse('flexbookings:events')
         resp = self.client.get(url)
 
         self.assertEquals(Event.objects.all().count(), 9)
@@ -43,10 +46,10 @@ class EventListViewTests(TestCase):
         """
         Test that past events is not listed
         """
-        mommy.make_recipe('booking.past_event')
+        mommy.make_recipe('flex_bookings.past_event')
         # check there are now 4 events
         self.assertEquals(Event.objects.all().count(), 10)
-        url = reverse('booking:events')
+        url = reverse('flexbookings:events')
         resp = self.client.get(url)
 
         # event listing should still only show future events
@@ -56,7 +59,7 @@ class EventListViewTests(TestCase):
         """
         Test that no booked_events in context
         """
-        url = reverse('booking:events')
+        url = reverse('flexbookings:events')
         resp = self.client.get(url)
 
         # event listing should still only show future events
@@ -80,7 +83,7 @@ class EventListViewTests(TestCase):
 
         # create a booking for this user
         booked_event = Event.objects.all()[0]
-        mommy.make_recipe('booking.booking', user=self.user, event=booked_event)
+        mommy.make_recipe('flex_bookings.booking', user=self.user, event=booked_event)
         resp = self._get_response(self.user, 'events')
         booked_events = [event for event in resp.context_data['booked_events']]
         self.assertEquals(len(booked_events), 1)
@@ -100,10 +103,10 @@ class EventListViewTests(TestCase):
         self.assertEquals(len(resp.context_data['booked_events']), 0)
 
         # create booking for this user
-        mommy.make_recipe('booking.booking', user=self.user, event=event1)
+        mommy.make_recipe('flex_bookings.booking', user=self.user, event=event1)
         # create booking for another user
-        user1 = mommy.make_recipe('booking.user')
-        mommy.make_recipe('booking.booking', user=user1, event=event2)
+        user1 = mommy.make_recipe('flex_bookings.user')
+        mommy.make_recipe('flex_bookings.booking', user=user1, event=event2)
 
         # check only event1 shows in the booked events
         resp = self._get_response(self.user, 'events')
@@ -112,46 +115,33 @@ class EventListViewTests(TestCase):
         self.assertEquals(len(booked_events), 1)
         self.assertTrue(event1 in booked_events)
 
+    def test_event_list_does_not_show_unopen_events(self):
+        event =  mommy.make_recipe('flex_bookings.future_WS', booking_open=True)
+        resp = self._get_response(self.user, 'events')
+        self.assertEqual(resp.context_data['events'].count(), 4)
+
+        # make the new event closed
+        event.booking_open = False
+        event.save()
+        resp = self._get_response(self.user, 'events')
+        self.assertEqual(resp.context_data['events'].count(), 3)
+
     def test_filter_events(self):
         """
         Test that we can filter the classes by name
         """
-        mommy.make_recipe('booking.future_EV', name='test_name', _quantity=3)
-        mommy.make_recipe('booking.future_EV', name='test_name1', _quantity=4)
+        mommy.make_recipe(
+            'flex_bookings.future_WS',
+            name='test_name', booking_open=True, _quantity=3
+        )
+        mommy.make_recipe(
+            'flex_bookings.future_WS', name='test_name1',
+            booking_open=True, _quantity=4
+        )
 
-        url = reverse('booking:events')
+        url = reverse('flexbookings:events')
         resp = self.client.get(url, {'name': 'test_name'})
-        self.assertEquals(resp.context['events'].count(), 3)
-
-    def test_pole_practice_context_without_permission(self):
-        Event.objects.all().delete()
-        pp_event_type = mommy.make_recipe('booking.event_type_OC', subtype="Pole practice")
-        pole_practice = mommy.make_recipe('booking.future_CL', event_type=pp_event_type)
-
-        user = mommy.make_recipe('booking.user')
-
-        response = self._get_response(user, 'lessons')
-        response.render()
-        self.assertIn('N/A - see details', str(response.content))
-        self.assertNotIn('book_button', str(response.content))
-        self.assertNotIn('join_waiting_list_button', str(response.content))
-        self.assertNotIn('leave_waiting_list_button', str(response.content))
-
-    def test_pole_practice_context_with_permission(self):
-        Event.objects.all().delete()
-        pp_event_type = mommy.make_recipe('booking.event_type_OC', subtype="Pole practice")
-        pole_practice = mommy.make_recipe('booking.future_CL', event_type=pp_event_type)
-
-        user = mommy.make_recipe('booking.user')
-        perm = Permission.objects.get(codename='is_regular_student')
-        user.user_permissions.add(perm)
-        user.save()
-
-        response = self._get_response(user, 'lessons')
-        response.render()
-        self.assertIn('book_button', str(response.content))
-        self.assertNotIn('join_waiting_list_button', str(response.content))
-        self.assertNotIn('leave_waiting_list_button', str(response.content))
+        self.assertEquals(resp.context_data['events'].count(), 3)
 
 
 class EventDetailViewTests(TestCase):
@@ -160,13 +150,17 @@ class EventDetailViewTests(TestCase):
         set_up_fb()
         self.client = Client()
         self.factory = RequestFactory()
-        self.event = mommy.make_recipe('booking.future_EV')
-        mommy.make_recipe('booking.future_PC', _quantity=3)
-        mommy.make_recipe('booking.future_CL', _quantity=3)
-        self.user = mommy.make_recipe('booking.user')
+        self.event = mommy.make_recipe(
+            'flex_bookings.future_WS', booking_open=True
+        )
+        self.not_open_event = mommy.make_recipe('flex_bookings.future_WS')
+        mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True, _quantity=2
+        )
+        self.user = mommy.make_recipe('flex_bookings.user')
 
     def _get_response(self, user, event, ev_type):
-        url = reverse('booking:event_detail', args=[event.slug])
+        url = reverse('flexbookings:event_detail', args=[event.slug])
         request = self.factory.get(url)
         request.user = user
         view = EventDetailView.as_view()
@@ -174,77 +168,61 @@ class EventDetailViewTests(TestCase):
 
     def test_login_required(self):
         """
-        test that page redirects if there is no user logged in
+        test that page shows login link if there is no user logged in
         """
-        url = reverse('booking:event_detail', kwargs={'slug': self.event.slug})
+        url = reverse('flexbookings:event_detail', kwargs={'slug': self.event.slug})
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('Sign in to book', resp.rendered_content)
 
     def test_with_logged_in_user(self):
         """
-        test that page loads if there user is available
+        test that page loads if there is a user available
         """
         resp = self._get_response(self.user, self.event, 'event')
         self.assertEqual(resp.status_code, 200)
-        self.assertEquals(resp.context_data['type'], 'event')
+        self.assertEquals(resp.context_data['type'], 'workshop')
+        self.assertNotIn('Sign in to book', resp.rendered_content)
 
     def test_with_booked_event(self):
         """
         Test that booked event is shown as booked
         """
         #create a booking for this event and user
-        mommy.make_recipe('booking.booking', user=self.user, event=self.event)
+        mommy.make_recipe(
+            'flex_bookings.booking', user=self.user, event=self.event
+        )
         resp = self._get_response(self.user, self.event, 'event')
         self.assertTrue(resp.context_data['booked'])
         self.assertEquals(resp.context_data['booking_info_text'],
-                          'You have booked for this event.')
+                          'You have booked for this workshop.')
+
+    def test_with_not_open_event(self):
+        """
+        Test that not open event redirects
+        """
+        resp = self._get_response(self.user, self.not_open_event, 'event')
+        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(
+            resp.url,
+            reverse(
+                'flexbookings:not_open',
+                kwargs={'event_slug': self.not_open_event.slug}
+            )
+        )
 
     def test_with_booked_event_for_different_user(self):
         """
         Test that the event is not shown as booked if the current user has
         not booked it
         """
-        user1 = mommy.make_recipe('booking.user')
+        user1 = mommy.make_recipe('flex_bookings.user')
         #create a booking for this event and a different user
-        mommy.make_recipe('booking.booking', user=user1, event=self.event)
+        mommy.make_recipe('flex_bookings.booking', user=user1, event=self.event)
 
         resp = self._get_response(self.user, self.event,'event')
         self.assertFalse('booked' in resp.context_data)
         self.assertEquals(resp.context_data['booking_info_text'], '')
-
-    def test_pole_practice_context_without_permission(self):
-        pp_event_type = mommy.make_recipe('booking.event_type_OC', subtype="Pole practice")
-        pole_practice = mommy.make_recipe('booking.future_CL', event_type=pp_event_type)
-
-        user = mommy.make_recipe('booking.user')
-
-        response = self._get_response(user, pole_practice, 'lessons')
-        response.render()
-        self.assertIn('unbookable_pole_practice', response.context_data)
-        self.assertTrue(response.context_data['unbookable_pole_practice'])
-        self.assertFalse(response.context_data['bookable'])
-        self.assertNotIn('book_button_disabled', str(response.content))
-        self.assertNotIn('book_button', str(response.content))
-        self.assertNotIn('join_waiting_list_button', str(response.content))
-        self.assertNotIn('leave_waiting_list_button', str(response.content))
-
-    def test_pole_practice_context_with_permission(self):
-        pp_event_type = mommy.make_recipe('booking.event_type_OC', subtype="Pole practice")
-        pole_practice = mommy.make_recipe('booking.future_CL', event_type=pp_event_type)
-
-        user = mommy.make_recipe('booking.user')
-        perm = Permission.objects.get(codename='is_regular_student')
-        user.user_permissions.add(perm)
-        user.save()
-
-        response = self._get_response(user, pole_practice, 'lessons')
-        response.render()
-        self.assertNotIn('unbookable_pole_practice', response.context_data)
-        self.assertTrue(response.context_data['bookable'])
-        self.assertNotIn('book_button_disabled', str(response.content))
-        self.assertIn('book_button', str(response.content))
-        self.assertNotIn('join_waiting_list_button', str(response.content))
-        self.assertNotIn('leave_waiting_list_button', str(response.content))
 
 
 class LessonListViewTests(TestCase):
@@ -256,14 +234,14 @@ class LessonListViewTests(TestCase):
         set_up_fb()
         self.client = Client()
         self.factory = RequestFactory()
-        mommy.make_recipe('booking.future_EV', _quantity=1)
-        mommy.make_recipe('booking.future_PC', _quantity=3)
-        mommy.make_recipe('booking.future_CL', _quantity=3)
-        mommy.make_recipe('booking.future_WS', _quantity=1)
-        self.user = mommy.make_recipe('booking.user')
+        mommy.make_recipe('flex_bookings.future_WS', booking_open=True)
+        mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True, _quantity=6
+        )
+        self.user = mommy.make_recipe('flex_bookings.user')
 
     def _get_response(self, user, ev_type):
-        url = reverse('booking:lessons')
+        url = reverse('flexbookings:lessons')
         request = self.factory.get(url)
         request.user = user
         view = EventListView.as_view()
@@ -282,7 +260,7 @@ class LessonListViewTests(TestCase):
         """
         Test that no booked_events in context
         """
-        url = reverse('booking:lessons')
+        url = reverse('flexbookings:lessons')
         resp = self.client.get(url)
 
         # event listing should still only show future events
@@ -292,10 +270,10 @@ class LessonListViewTests(TestCase):
         """
         Test that only classes are listed (pole classes and other classes)
         """
-        url = reverse('booking:lessons')
+        url = reverse('flexbookings:lessons')
         resp = self.client.get(url)
 
-        self.assertEquals(Event.objects.all().count(), 8)
+        self.assertEquals(Event.objects.all().count(), 7)
         self.assertEquals(resp.status_code, 200)
         self.assertEquals(resp.context['events'].count(), 6)
         self.assertEquals(resp.context['type'], 'lessons')
@@ -304,14 +282,19 @@ class LessonListViewTests(TestCase):
         """
         Test that we can filter the classes by name
         """
-        mommy.make_recipe('booking.future_PC', name='test_name', _quantity=3)
-        mommy.make_recipe('booking.future_PC', name='test_name1', _quantity=4)
+        mommy.make_recipe(
+            'flex_bookings.future_EV', name='test_name',
+            booking_open=True, _quantity=3)
+        mommy.make_recipe(
+            'flex_bookings.future_EV', name='test_name1',
+            booking_open=True, _quantity=4
+        )
 
-        url = reverse('booking:lessons')
+        url = reverse('flexbookings:lessons')
         resp = self.client.get(url, {'name': 'test_name'})
-        self.assertEquals(resp.context['events'].count(), 3)
+        self.assertEquals(resp.context_data['events'].count(), 3)
         resp = self.client.get(url, {'name': 'test_name1'})
-        self.assertEquals(resp.context['events'].count(), 4)
+        self.assertEquals(resp.context_data['events'].count(), 4)
 
     def test_lesson_list_shows_only_current_user_bookings(self):
         """
@@ -326,10 +309,10 @@ class LessonListViewTests(TestCase):
         self.assertEquals(len(resp.context_data['booked_events']), 0)
 
         # create booking for this user
-        mommy.make_recipe('booking.booking', user=self.user, event=event1)
+        mommy.make_recipe('flex_bookings.booking', user=self.user, event=event1)
         # create booking for another user
-        user1 = mommy.make_recipe('booking.user')
-        mommy.make_recipe('booking.booking', user=user1, event=event2)
+        user1 = mommy.make_recipe('flex_bookings.user')
+        mommy.make_recipe('flex_bookings.booking', user=user1, event=event2)
 
         # check only event1 shows in the booked events
         resp = self._get_response(self.user, 'lessons')
@@ -348,9 +331,10 @@ class LessonListViewTests(TestCase):
         self.assertEquals(len(resp.context_data['booked_events']), 0)
 
         # create open and cancelled booking for this user
-        mommy.make_recipe('booking.booking', user=self.user, event=event1)
+        mommy.make_recipe('flex_bookings.booking', user=self.user, event=event1)
         mommy.make_recipe(
-            'booking.booking', user=self.user, event=event2, status='CANCELLED'
+            'flex_bookings.booking', user=self.user, event=event2,
+            status='CANCELLED'
         )
 
         # check only event1 shows in the booked events
@@ -368,17 +352,17 @@ class LessonDetailViewTests(TestCase):
     """
     def setUp(self):
         self.factory = RequestFactory()
-        self.lesson = mommy.make_recipe('booking.future_PC')
-        mommy.make_recipe('booking.future_EV', _quantity=3)
-        mommy.make_recipe('booking.future_PC', _quantity=3)
+        self.lesson = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True
+        )
         set_up_fb()
-        self.user = mommy.make_recipe('booking.user')
+        self.user = mommy.make_recipe('flex_bookings.user')
 
     def test_with_logged_in_user(self):
         """
         test that page loads if there user is available
         """
-        url = reverse('booking:lesson_detail', args=[self.lesson.slug])
+        url = reverse('flexbookings:lesson_detail', args=[self.lesson.slug])
         request = self.factory.get(url)
         # Set the user on the request
         request.user = self.user
@@ -387,4 +371,4 @@ class LessonDetailViewTests(TestCase):
 
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(resp.context_data['type'], 'lesson')
-
+        self.assertNotIn('Sign in to book', resp.rendered_content)

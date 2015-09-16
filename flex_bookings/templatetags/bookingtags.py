@@ -49,6 +49,9 @@ def plural_format(value):
 
 @register.filter
 def get_range(value):
+    """
+    returns a range based on a number so we can iterate over it in templates
+    """
     return range(value)
 
 

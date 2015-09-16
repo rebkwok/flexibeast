@@ -53,7 +53,6 @@ def upload_timetable(start_date, end_date, session_ids, user=None):
                 cl.contact_person=session.contact_person
                 cl.contact_email=session.contact_email
                 cl.cost=session.cost
-                cl.payment_open=session.payment_open
                 cl.advance_payment_required=session.advance_payment_required
                 cl.payment_info=session.payment_info
                 cl.cancellation_period=session.cancellation_period
