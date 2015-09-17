@@ -94,11 +94,6 @@ def formatted_uk_date(date):
 
 
 @register.filter
-def is_regular_student(user):
-    return user.has_perm('booking.is_regular_student')
-
-
-@register.filter
 def block_cost(block):
     return block.item_cost * block.events.count()
 

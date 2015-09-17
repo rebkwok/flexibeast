@@ -39,7 +39,7 @@
                                 <span class="hide">{{ block.id }}</span>
                                 <td class="studioadmin-tbl">{{ block.instance.name }}</td>
                                 <td class="table-center studioadmin-tbl">
-                                    Pending
+                                    <a href="{% url 'studioadmin:edit_block' block.instance.pk %}"><span class="fa fa-pencil-square-o fa-lg"></span>
                                 </td>
                                 <td class="table-center studioadmin-tbl">
                                     Pending

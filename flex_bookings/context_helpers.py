@@ -75,9 +75,13 @@ def get_event_context(context, event, user):
             booking.event for booking in user.bookings.all()
             if booking.status == 'OPEN'
         ]
+        open_blocks = [
+            block for block in event.blocks.all() if block.booking_open
+            ]
+        context['open_blocks'] = open_blocks
         available_blocks = []
         unavailable_reasons = []
-        for block in event.blocks.all():
+        for block in open_blocks:
             available_blocks.append(block)
             related_events = block.events.all()
             for ev in related_events:
@@ -141,9 +145,13 @@ def get_booking_create_context(event, request, context):
         booking.event for booking in request.user.bookings.all()
         if booking.status == 'OPEN'
     ]
+    open_blocks = [
+            block for block in event.blocks.all() if block.booking_open
+            ]
+    context['open_blocks'] = open_blocks
     available_blocks = []
     unavailable_reasons = []
-    for block in event.blocks.all():
+    for block in open_blocks:
         available_blocks.append(block)
         related_events = block.events.all()
         for ev in related_events:
@@ -185,7 +193,7 @@ def get_booking_create_context(event, request, context):
 
     context['individual_booking_allowed'] = True
     date_individual_booking_allowed = None
-    for block in event.blocks.all():
+    for block in open_blocks:
         if block.individual_booking_date > timezone.now():
             context['individual_booking_allowed'] = False
             # set individual booking date to the latest date according to

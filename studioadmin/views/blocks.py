@@ -19,6 +19,8 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.core.mail import send_mail
 
+from braces.views import LoginRequiredMixin
+
 from flex_bookings.models import Block
 
 # from flex_bookings import utils
@@ -60,20 +62,23 @@ def admin_block_list(request):
                 else:
                     for form in blockformset:
                         if form.has_changed():
-                            block = form.save(commit=False)
                             if 'DELETE' in form.changed_data:
                                 messages.success(
                                     request, mark_safe(
-                                        'Block {} <strong>{}</strong> has been deleted!'.format(
-                                            block.name,
+                                        'Block <strong>{}</strong> has been deleted!'.format(
+                                            form.instance.name,
                                         )
                                     )
                                 )
                                 ActivityLog.objects.create(
                                     log='Block {} (id {}) deleted by admin user {}'.format(
-                                        block.name,
-                                        block.id, request.user.username
+                                        form.instance.name,
+                                        form.instance.id, request.user.username
                                     )
+                                )
+                                form.delete()
+                                return HttpResponseRedirect(
+                                    reverse('studioadmin:blocks')
                                 )
                             else:
                                 for field in form.changed_data:
@@ -82,19 +87,19 @@ def admin_block_list(request):
                                             "<strong>{}</strong> updated for "
                                             "<strong>{}</strong>".format(
                                                 field.title().replace("_", " "),
-                                                block.name))
+                                                form.instance.name,))
                                     )
 
                                     ActivityLog.objects.create(
                                         log='Block {} (id {}) updated by admin user {}: {} changed from {} to {}'.format(
-                                            block.name, block.id,
+                                            form.instance.name, form.instance.id,
                                             request.user.username,
                                             field.title().replace("_", " "),
                                             form.initial[field],
                                             form.cleaned_data[field]
                                         )
                                     )
-                            form.save()
+                                form.save()
 
                         for error in form.errors:
                             messages.error(request, mark_safe("{}".format(error)))
@@ -125,3 +130,74 @@ def admin_block_list(request):
             'show_past': show_past,
             }
     )
+
+
+class BlockAdminUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
+
+    form_class = BlockAdminForm
+    model = Block
+    template_name = 'studioadmin/block_create_update.html'
+    context_object_name = 'block_obj'
+
+    def get_object(self):
+        queryset = Block.objects.all()
+        return get_object_or_404(queryset, pk=self.kwargs['pk'])
+
+    def get_context_data(self, **kwargs):
+        context = super(BlockAdminUpdateView, self).get_context_data(**kwargs)
+        context['sidenav_selection'] = 'blocks'
+
+        return context
+
+    def form_valid(self, form):
+        if form.has_changed():
+            block = form.save()
+            msg = '<strong>Block {}</strong> has been updated!'.format(
+                block.name
+            )
+            ActivityLog.objects.create(
+                log='Block {} (id {}) updated by admin user {}'.format(
+                    block.name, block.id,
+                    self.request.user.username
+                )
+            )
+        else:
+            msg = 'No changes made'
+        messages.success(self.request, mark_safe(msg))
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('studioadmin:blocks')
+
+
+class BlockAdminCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
+
+    form_class = BlockAdminForm
+    model = Block
+    template_name = 'studioadmin/block_create_update.html'
+    context_object_name = 'block'
+
+    def get_context_data(self, **kwargs):
+        context = super(BlockAdminCreateView, self).get_context_data(**kwargs)
+        context['sidenav_selection'] = 'add_block'
+        return context
+
+    def form_valid(self, form):
+        block = form.save()
+        messages.success(
+            self.request, mark_safe(
+                '<strong>Block {}</strong> has been created!'.format(
+                    block.name
+                )
+            )
+        )
+        ActivityLog.objects.create(
+            log='Block {} (id {}) created by admin user {}'.format(
+                block.name, block.id, self.request.user.username
+            )
+        )
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('studioadmin:blocks')
+

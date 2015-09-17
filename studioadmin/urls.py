@@ -2,7 +2,8 @@ from django.conf.urls import patterns, url
 from django.views.generic import RedirectView
 from studioadmin.views.misc import ConfirmPaymentView, ConfirmRefundView
 from studioadmin.views.activitylog import ActivityLogListView
-from studioadmin.views.events import EventAdminUpdateView, EventAdminCreateView
+from studioadmin.views.events import EventAdminCreateView, EventAdminUpdateView
+from studioadmin.views.blocks import BlockAdminCreateView, BlockAdminUpdateView
 # from studioadmin.views import (
 #                                TimetableSessionUpdateView,
 #                                TimetableSessionCreateView,
@@ -32,6 +33,10 @@ urlpatterns = patterns('',
         name='registers_by_date'),
     url(r'^blocks/$', 'studioadmin.views.blocks.admin_block_list',
         name='blocks'),
+    url(r'^blocks/(?P<pk>\d+)/edit$', BlockAdminUpdateView.as_view(),
+        name='edit_block'),
+    url(r'^blocks/new/$', BlockAdminCreateView.as_view(),
+        name='add_block'),
     # url(r'^timetable/$', 'studioadmin.views.timetable.timetable_admin_list', name='timetable'),
     # url(
     #     r'^timetable/session/(?P<pk>\d+)/edit$',

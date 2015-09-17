@@ -9,6 +9,7 @@ from django.forms.models import modelformset_factory, BaseModelFormSet, \
     inlineformset_factory, BaseInlineFormSet
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
 
 from ckeditor.widgets import CKEditorWidget
 
@@ -40,7 +41,6 @@ class EventBaseFormSet(BaseModelFormSet):
                 required=False
             )
             form.advance_payment_required_id = 'advance_payment_required_{}'.format(index)
-
             if form.instance.bookings.count() > 0:
                 form.fields['DELETE'] = forms.BooleanField(
                     widget=forms.CheckboxInput(attrs={
@@ -276,7 +276,7 @@ class BlockBaseForm(forms.ModelForm):
             if bookings.count() > 0:
                 self.fields['DELETE'] = forms.BooleanField(
                     widget=forms.CheckboxInput(attrs={
-                        'class': 'delete-checkbox-disabled studioadmin-list',
+                        'class': 'delete-checkbox-disabled disabled studioadmin-list',
                         'disabled': 'disabled',
                         'id': 'DELETE_{}'.format(self.instance.id)
                     }),
@@ -340,7 +340,6 @@ BlockFormSet = modelformset_factory(
     ),
     form=BlockBaseForm,
     extra=0,
-    can_delete=True
 )
 
 
@@ -354,7 +353,8 @@ class BlockAdminForm(forms.ModelForm):
             'class': 'form-control',
             'aria-describedby': 'sizing-addon2',
         }),
-        required=False
+        help_text="The (discounted) cost of each individual class when booked "
+                  "as part of the block"
     )
 
     name = forms.CharField(
@@ -366,29 +366,71 @@ class BlockAdminForm(forms.ModelForm):
         )
     )
 
-    def clean(self):
-        super(BlockAdminForm, self).clean()
-        cleaned_data = self.cleaned_data
-        is_new = False if self.instance else True
+    event_choices = tuple([(event.id, event) for event in Event.objects.filter(date__gt=timezone.now())])
+    events = forms.MultipleChoiceField(
+        label="Select classes",
+        widget=forms.CheckboxSelectMultiple,
+        choices=event_choices,
+    )
 
-        individual_booking_date = self.data.get('individual_booking_date')
-        if individual_booking_date:
+    individual_booking_date = forms.CharField(
+        widget=(
+            forms.DateInput(
+                attrs={
+                    'class': "form-control datepicker",
+                },
+                format='%d %b %Y'
+            )
+        ),
+        initial=timezone.now().strftime('%d %b %Y')
+    )
+
+    booking_open = forms.BooleanField(
+        widget=forms.CheckboxInput(
+            attrs={
+                'class': "form-control regular-checkbox",
+                'id': 'booking_open_id',
+                }
+            ),
+        help_text=mark_safe(
+            "Controls whether the block is visible on the site and can be "
+            "booked.</br>If this box is checked, all classes in the block "
+            "will automatically be opened.  Single class booking will only be "
+            "available from the date you have selected.  Note that unchecking "
+            "the box does NOT close booking for individual classes."
+        ),
+        required=False
+    )
+
+    def clean_individual_booking_date(self):
+
+        raw_date = self.cleaned_data['individual_booking_date']
+        if raw_date:
             if self.errors.get('individual_booking_date'):
                 del self.errors['individual_booking_date']
+            if self.instance:
+                original_date = self.instance.individual_booking_date
+                original_date_fmt = original_date.strftime('%d %b %Y')
+                if original_date_fmt == raw_date \
+                        and 'individual_booking_date' in self.changed_data:
+                    self.changed_data.remove('individual_booking_date')
             try:
+                # we need to give the date an hour otherwise it will be set to
+                # 0 and incorrectly changed to the previous day when we
+                # localise for the uk; time will be set back to 0 when the
+                # model saves
                 individual_booking_date = datetime.strptime(
-                    self.data['individual_booking_date'], '%d %b %Y'
-                )
-                uk = pytz.timezone('Europe/London')
-                cleaned_data['individual_booking_date'] = uk.localize(date)\
-                    .astimezone(pytz.utc).replace(hour=0, minute=0, second=0)
+                    raw_date, '%d %b %Y'
+                ).replace(hour=12)
             except ValueError:
                 self.add_error(
                     'individual_booking_date',
                     'Invalid date format.  Select from the date picker or '
                     'enter date and time in the format dd Mmm YYYY HH:MM')
 
-        return cleaned_data
+            uk = pytz.timezone('Europe/London')
+            return uk.localize(individual_booking_date).\
+                astimezone(pytz.utc)
 
     class Meta:
         model = Block
@@ -400,15 +442,7 @@ class BlockAdminForm(forms.ModelForm):
             'name': forms.TextInput(
                 attrs={'class': "form-control"}
             ),
-            'individual_booking_date': forms.DateInput(
-                attrs={
-                    'class': "form-control",
-                    'id': "datepicker",
-                },
-                format='%d %b %Y'
-            ),
         }
-
 
 
 class RegisterDayForm(forms.Form):

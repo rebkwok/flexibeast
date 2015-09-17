@@ -71,14 +71,6 @@ class EventListView(ListView):
             user_waiting_lists = WaitingListUser.objects.filter(user=self.request.user)
             waiting_list_events = [wluser.event for wluser in user_waiting_lists]
             context['booked_events'] = booked_events
-
-            related_block_events = []
-            for event in booked_events:
-                events = [block.events.all() for block in event.blocks.all()]
-                if events:
-                    related_block_events += events[0]
-            context['related_block_events'] = related_block_events
-
             context['waiting_list_events'] = waiting_list_events
 
         context['type'] = self.kwargs['ev_type']

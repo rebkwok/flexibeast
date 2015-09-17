@@ -51,7 +51,7 @@
                             {% endif %}
                                 <span class="divider"></span>
                             <h4>Block booking</h4>
-                            {% for block in event.blocks.all %}
+                            {% for block in open_blocks %}
 
                                 <h5>{{ block.name }}</h5>
                                 <p>Total block cost: £{{ block|block_cost }} (per class cost £{{ block.item_cost }})</p>

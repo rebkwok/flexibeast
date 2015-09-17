@@ -145,7 +145,11 @@ class Block(models.Model):
 
     """
     name = models.CharField(max_length=255)
-    item_cost = models.DecimalField(default=6, max_digits=8, decimal_places=2)
+    item_cost = models.DecimalField(
+        default=6, max_digits=8, decimal_places=2,
+        help_text="The (discounted) cost of each individual class when booked "
+                  "as part of the block"
+    )
     events = models.ManyToManyField(Event, related_name='blocks')
     booking_open = models.BooleanField(
         default=False, help_text="If this box is checked, all classes in the "
@@ -159,8 +163,8 @@ class Block(models.Model):
         default=timezone.now,
         verbose_name="Date individual bookings allowed",
         help_text="Set the date when individual booking will be allowed for "
-                  "classes in this block.  Defaults to the creation date of "
-                  "the block."
+                  "classes in this block.  Defaults to the date the block is "
+                  "created."
     )
 
     def __str__(self):
@@ -168,8 +172,10 @@ class Block(models.Model):
 
     @property
     def is_past(self):
-        last_event_date = self.events.last().date
-        return last_event_date < timezone.now()
+        if self.events.exists():
+            last_event_date = self.events.last().date
+            return last_event_date < timezone.now()
+        return True
 
     def save(self, *args, **kwargs):
         # setting a block to booking_open makes booking open on each of it's

@@ -41,7 +41,7 @@
                     {% if event.blocks %}
                         <li class="list-group-item"><p><strong>Block information</strong></p>
                                 <ul>
-                                    {% for block in event.blocks.all %}
+                                    {% for block in open_blocks %}
                                         <li>{{ block.name }} - total cost £{{ block|block_cost }}</li>
                                         <ul>
                                             {% for block_event in block.events.all %}

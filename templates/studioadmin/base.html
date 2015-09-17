@@ -27,12 +27,15 @@
 {#                    <span class="sidebar_active">Upload timetable</span>{% else %}Upload timetable{% endif %}</a></li>#}
     <li class="divider"></li>
     <li class="active-nav"><a href="{% url 'studioadmin:events' %}">{% if sidenav_selection == 'events' %}
-                <span class="sidebar_active">View and edit events</span>{% else %}View and edit workshops{% endif %}</a></li>
+        <span class="sidebar_active">View and edit events</span>{% else %}View and edit workshops{% endif %}</a></li>
     <li class="active-nav"><a href="{% url 'studioadmin:add_event' %}">{% if sidenav_selection == 'add_event' %}
-                <span class="sidebar_active">Add a new event</span>{% else %}Add a new workshops{% endif %}</a></li>
+        <span class="sidebar_active">Add a new event</span>{% else %}Add a new workshops{% endif %}</a></li>
  <li class="divider"></li>
     <li class="active-nav"><a href="{% url 'studioadmin:blocks' %}">{% if sidenav_selection == 'blocks' %}
-                <span class="sidebar_active">View and edit blocks</span>{% else %}View and edit blocks{% endif %}</a></li>
+        <span class="sidebar_active">View and edit blocks</span>{% else %}View and edit blocks{% endif %}</a></li>
+    <li class="active-nav"><a href="{% url 'studioadmin:add_block' %}">{% if sidenav_selection == 'add_block' %}
+        <span class="sidebar_active">Add a new block</span>{% else %}Add a new block{% endif %}</a></li>
+
 {#    <li class="active-nav"><a href="{% url 'studioadmin:event_register_list' %}">{% if sidenav_selection == 'events_register' %}#}
 {#                    <span class="sidebar_active">Event registers</span>{% else %}Registers & waiting lists{% endif %}</a></li>#}
 <li class="divider"></li>
@@ -87,6 +90,8 @@
                 <li class="sidebar-title">Blocks</li>
                     <li class="active-nav"><a href="{% url 'studioadmin:blocks' %}">{% if sidenav_selection == 'blocks' %}
                         <span class="sidebar_active">View and edit blocks</span>{% else %}View and edit blocks{% endif %}</a></li>
+                    <li class="active-nav"><a href="{% url 'studioadmin:add_block' %}">{% if sidenav_selection == 'add_block' %}
+                        <span class="sidebar_active">Add a new block</span>{% else %}Add a new block{% endif %}</a></li>
                 <li class="sidebar-title">Registers</li>
                     <li class="active-nav"><a href="{% url 'studioadmin:registers_by_date' %}">{% if sidenav_selection == 'registers_by_date' %}
                         <span class="sidebar_active">Registers by date</span>{% else %}Registers by date{% endif %}</a></li>
