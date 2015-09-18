@@ -17,7 +17,10 @@ now = timezone.now()
 class EventTests(TestCase):
 
     def setUp(self):
-        self.event = mommy.make_recipe('booking.future_EV')
+        self.event = mommy.make_recipe(
+            'flex_bookings.future_EV',
+            booking_open=True
+        )
 
     def tearDown(self):
         del self.event
@@ -26,10 +29,12 @@ class EventTests(TestCase):
         """
         Test that event bookable logic returns correctly
         """
-        event = mommy.make_recipe('booking.future_EV')
+        event = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True
+        )
         self.assertTrue(event.bookable())
 
-    @patch('booking.models.timezone')
+    @patch('flex_bookings.models.timezone')
     def test_bookable_with_payment_dates(self, mock_tz):
         """
         Test that event bookable logic returns correctly for events with
@@ -37,15 +42,17 @@ class EventTests(TestCase):
         """
         mock_tz.now.return_value = datetime(2015, 2, 1, tzinfo=timezone.utc)
         event = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             cost=10,
+            booking_open=True,
             payment_due_date=datetime(2015, 2, 2, tzinfo=timezone.utc))
 
         self.assertTrue(event.bookable())
 
         event1 = mommy.make_recipe(
-            'booking.future_EV',
+            'flex_bookings.future_EV',
             cost=10,
+            booking_open=True,
             payment_due_date=datetime(2015, 1, 31, tzinfo=timezone.utc)
         )
         self.assertFalse(event1.bookable())
@@ -57,31 +64,26 @@ class EventTests(TestCase):
         """
         # if an event is created with 0 cost, the following fields are set to
         # False/None/""
-        # advance_payment_required, payment_open, payment_due_date
+        # advance_payment_required, payment_due_date
 
-        poleclass = mommy.make_recipe('booking.future_PC', cost=7)
-
+        ev = mommy.make_recipe('flex_bookings.future_EV', cost=7)
+        self.assertTrue(ev.advance_payment_required)
         #change cost to 0
-        poleclass.cost = 0
-        poleclass.save()
-
-        # event with cost, check other fields are left as is
-        workshop = mommy.make_recipe('booking.future_WS',
-                                     cost=10,
-                                     payment_open=True,
-                                     payment_info="Pay me")
-        self.assertEquals(workshop.payment_open, True)
-        self.assertEquals(workshop.payment_info, "Pay me")
+        ev.cost = 0
+        ev.save()
+        self.assertFalse(ev.advance_payment_required)
 
     def test_absolute_url(self):
         self.assertEqual(
             self.event.get_absolute_url(),
-            reverse('booking:event_detail', kwargs={'slug': self.event.slug})
+            reverse(
+                'flexbookings:event_detail', kwargs={'slug': self.event.slug}
+            )
         )
 
     def test_str(self):
         event = mommy.make_recipe(
-            'booking.past_event',
+            'flex_bookings.past_event',
             name='Test event',
             date=datetime(2015, 1, 1, tzinfo=timezone.utc)
         )
@@ -91,10 +93,14 @@ class EventTests(TestCase):
 class BookingTests(TestCase):
 
     def setUp(self):
-        mommy.make_recipe('booking.user', _quantity=15)
+        mommy.make_recipe('flex_bookings.user', _quantity=15)
         self.users = User.objects.all()
-        self.event = mommy.make_recipe('booking.future_EV', max_participants=20)
-        self.event_with_cost = mommy.make_recipe('booking.future_EV',
+        self.event = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True, max_participants=20,
+            cost=0
+        )
+        self.event_with_cost = mommy.make_recipe('flex_bookings.future_EV',
+                                                 booking_open=True,
                                                  advance_payment_required=True,
                                                  cost=10)
 
@@ -111,7 +117,7 @@ class BookingTests(TestCase):
         self.assertEqual(self.event.spaces_left(), 20)
 
         for user in self.users:
-            mommy.make_recipe('booking.booking', user=user, event=self.event)
+            mommy.make_recipe('flex_bookings.booking', user=user, event=self.event)
 
         self.assertEqual(self.event.spaces_left(), 5)
 
@@ -120,7 +126,7 @@ class BookingTests(TestCase):
         Test that a booking for an event with no cost is automatically confirmed
         """
 
-        booking = mommy.make_recipe('booking.booking',
+        booking = mommy.make_recipe('flex_bookings.booking',
                                     user=self.users[0], event=self.event)
         self.assertTrue(booking.space_confirmed())
 
@@ -129,7 +135,7 @@ class BookingTests(TestCase):
         Test confirm_space method on a booking
         """
 
-        booking = mommy.make_recipe('booking.booking',
+        booking = mommy.make_recipe('flex_bookings.booking',
                                     user=self.users[0],
                                     event=self.event_with_cost)
         self.assertFalse(booking.space_confirmed())
@@ -147,7 +153,7 @@ class BookingTests(TestCase):
         advance payments required
         """
         event = self.event_with_cost
-        booking = mommy.make_recipe('booking.booking',
+        booking = mommy.make_recipe('flex_bookings.booking',
                                     user=self.users[0],
                                     event=event)
         self.assertFalse(booking.space_confirmed())
@@ -163,7 +169,7 @@ class BookingTests(TestCase):
         event = self.event_with_cost
         event.advance_payment_required = False
 
-        booking = mommy.make_recipe('booking.booking',
+        booking = mommy.make_recipe('flex_bookings.booking',
                                     user=self.users[0],
                                     event=event)
         self.assertTrue(booking.space_confirmed())
@@ -172,7 +178,7 @@ class BookingTests(TestCase):
         """
         Test autopopulating date payment confirmed.
         """
-        booking = mommy.make_recipe('booking.booking',
+        booking = mommy.make_recipe('flex_bookings.booking',
                                     user=self.users[0],
                                     event=self.event_with_cost)
         # booking is created with no payment confirmed date
@@ -183,7 +189,7 @@ class BookingTests(TestCase):
         self.assertTrue(booking.date_payment_confirmed)
 
     def test_cancelled_booking_is_no_longer_confirmed(self):
-        booking = mommy.make_recipe('booking.booking',
+        booking = mommy.make_recipe('flex_bookings.booking',
                                     user=self.users[0],
                                     event=self.event_with_cost)
         booking.confirm_space()
@@ -193,20 +199,11 @@ class BookingTests(TestCase):
         booking.save()
         self.assertFalse(booking.space_confirmed())
 
-    def test_free_class_is_set_to_paid(self):
-        booking = mommy.make_recipe('booking.booking',
-                                    user=self.users[0],
-                                    event=self.event_with_cost,
-                                    free_class=True)
-        self.assertTrue(booking.paid)
-        self.assertTrue(booking.payment_confirmed)
-        self.assertTrue(booking.space_confirmed())
-
     def test_str(self):
         booking = mommy.make_recipe(
-            'booking.booking',
-            event=mommy.make_recipe('booking.future_EV', name='Test event'),
-            user=mommy.make_recipe('booking.user', username='Test user'),
+            'flex_bookings.booking',
+            event=mommy.make_recipe('flex_bookings.future_EV', name='Test event'),
+            user=mommy.make_recipe('flex_bookings.user', username='Test user'),
             )
         self.assertEqual(str(booking), 'Test event - Test user')
 
@@ -218,7 +215,7 @@ class BookingTests(TestCase):
         self.event_with_cost.max_participants = 3
         self.event_with_cost.save()
         mommy.make_recipe(
-            'booking.booking', event=self.event_with_cost, _quantity=3
+            'flex_bookings.booking', event=self.event_with_cost, _quantity=3
         )
         with self.assertRaises(BookingError):
             Booking.objects.create(
@@ -234,11 +231,11 @@ class BookingTests(TestCase):
         self.event_with_cost.save()
         user = self.users[0]
         booking = mommy.make_recipe(
-            'booking.booking', event=self.event_with_cost, user=user,
+            'flex_bookings.booking', event=self.event_with_cost, user=user,
             status='CANCELLED'
         )
         mommy.make_recipe(
-            'booking.booking', event=self.event_with_cost, _quantity=3
+            'flex_bookings.booking', event=self.event_with_cost, _quantity=3
         )
         with self.assertRaises(BookingError):
             booking.status = 'OPEN'
@@ -252,7 +249,7 @@ class BookingTests(TestCase):
         self.event_with_cost.max_participants = 3
         self.event_with_cost.save()
         mommy.make_recipe(
-            'booking.booking', event=self.event_with_cost, _quantity=3
+            'flex_bookings.booking', event=self.event_with_cost, _quantity=3
         )
         Booking.objects.create(
             event=self.event_with_cost, user=self.users[0], status='CANCELLED'
@@ -375,9 +372,9 @@ class BlockTests(TestCase):
 class EventTypeTests(TestCase):
 
     def test_str_class(self):
-        evtype = mommy.make_recipe('booking.event_type_PC', subtype="class subtype")
+        evtype = mommy.make_recipe('flex_bookings.event_type_YC', subtype="class subtype")
         self.assertEqual(str(evtype), 'Class - class subtype')
 
     def test_str_event(self):
-        evtype = mommy.make_recipe('booking.event_type_OE', subtype="event subtype")
+        evtype = mommy.make_recipe('flex_bookings.event_type_WS', subtype="event subtype")
         self.assertEqual(str(evtype), 'Event - event subtype')
