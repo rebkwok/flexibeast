@@ -4,13 +4,12 @@ from studioadmin.views.misc import ConfirmPaymentView, ConfirmRefundView
 from studioadmin.views.activitylog import ActivityLogListView
 from studioadmin.views.events import EventAdminCreateView, EventAdminUpdateView
 from studioadmin.views.blocks import BlockAdminCreateView, BlockAdminUpdateView
-# from studioadmin.views import (
-#                                TimetableSessionUpdateView,
-#                                TimetableSessionCreateView,
-#                                UserListView,
+from studioadmin.views.timetable import (
+                               TimetableSessionUpdateView,
+                               TimetableSessionCreateView,
 #                                BlockListView,
-#                                )
-
+                               )
+from studioadmin.views.users import UserListView
 
 urlpatterns = patterns('',
     url(r'^confirm-payment/(?P<pk>\d+)/$', ConfirmPaymentView.as_view(),
@@ -37,27 +36,30 @@ urlpatterns = patterns('',
         name='edit_block'),
     url(r'^blocks/new/$', BlockAdminCreateView.as_view(),
         name='add_block'),
-    # url(r'^timetable/$', 'studioadmin.views.timetable.timetable_admin_list', name='timetable'),
-    # url(
-    #     r'^timetable/session/(?P<pk>\d+)/edit$',
-    #     TimetableSessionUpdateView.as_view(), name='edit_session'
-    # ),
-    # url(
-    #     r'^timetable/session/new$',
-    #     TimetableSessionCreateView.as_view(), name='add_session'
-    # ),
-    # url(r'^timetable/upload/$', 'studioadmin.views.timetable.upload_timetable_view',
-    #     name='upload_timetable'),
-    # url(r'^users/$', UserListView.as_view(), name="users"),
+    url(
+        r'^timetable/$', 'studioadmin.views.timetable.timetable_admin_list',
+        name='timetable'
+    ),
+    url(
+        r'^timetable/session/(?P<pk>\d+)/edit$',
+        TimetableSessionUpdateView.as_view(), name='edit_session'
+    ),
+    url(
+        r'^timetable/session/new$',
+        TimetableSessionCreateView.as_view(), name='add_session'
+    ),
+    url(r'^timetable/upload/$', 'studioadmin.views.timetable.upload_timetable_view',
+        name='upload_timetable'),
+    url(r'^users/$', UserListView.as_view(), name="users"),
     # url(r'^blocks/$', BlockListView.as_view(), name="blocks"),
     # url(r'^users/email/$', 'studioadmin.views.choose_users_to_email',
     #     name="choose_email_users"),
     # url(r'^users/email/emailform/$', 'studioadmin.views.email_users_view',
     #     name="email_users_view"),
-    # url(
-    #     r'^users/(?P<user_id>\d+)/bookings/(?P<booking_status>[\w-]+)$',
-    #     'studioadmin.views.user_bookings_view', name='user_bookings_list'
-    # ),
+    url(
+        r'^users/(?P<user_id>\d+)/bookings/(?P<booking_status>[\w-]+)$',
+        'studioadmin.views.users.user_bookings_view', name='user_bookings_list'
+    ),
     # url(
     #     r'^users/(?P<user_id>\d+)/blocks/$',
     #     'studioadmin.views.user_blocks_view', name='user_blocks_list'

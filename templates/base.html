@@ -193,9 +193,9 @@
         <div class="push"></div>
     </div> <!--/end of page .wrap -->
 
+{% block footer %}
     <div class="footer">
             <span class="divider"></span>
-
         <div class="container-fluid">
             <div class="row footer_box">
                 <div class="col-sm-5 footer-fb pull-left">
@@ -223,6 +223,8 @@
             </div>
         </div>
     </div>
+{% endblock footer %}
+
 
 {% if is_debug_on %}
     <script src="{% static 'flex_bookings/bootstrap/jquery.min.js' %}"></script>

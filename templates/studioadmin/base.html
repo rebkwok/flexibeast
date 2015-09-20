@@ -16,15 +16,13 @@
                     <span class="sidebar_active">View and edit classes</span>{% else %}View and edit classes{% endif %}</a></li>
     <li class="active-nav"><a href="{% url 'studioadmin:add_lesson' %}">{% if sidenav_selection == 'add_lesson' %}
                         <span class="sidebar_active">Add a new class</span>{% else %}Add a new class{% endif %}</a></li>
-{#    <li class="active-nav"><a href="{% url 'studioadmin:class_register_list' %}">{% if sidenav_selection == 'lessons_register' %}#}
-{#                    <span class="sidebar_active">Class registers</span>{% else %}Registers & waiting lists{% endif %}</a></li>#}
-{#    <li class="divider"></li>#}
-{#    <li class="active-nav"><a href="{% url 'studioadmin:timetable' %}">{% if sidenav_selection == 'timetable' %}#}
-{#                    <span class="sidebar_active">View and edit timetable</span>{% else %}View and edit timetable{% endif %}</a></li>#}
-{#    <li class="active-nav"><a href="{% url 'studioadmin:add_session' %}">{% if sidenav_selection == 'add_session' %}#}
-{#                    <span class="sidebar_active">Add a new session</span>{% else %}Add a new session{% endif %}</a></li>#}
-{#    <li class="active-nav"><a href="{% url 'studioadmin:upload_timetable' %}">{% if sidenav_selection == 'upload_timetable' %}#}
-{#                    <span class="sidebar_active">Upload timetable</span>{% else %}Upload timetable{% endif %}</a></li>#}
+    <li class="divider"></li>
+    <li class="active-nav"><a href="{% url 'studioadmin:timetable' %}">{% if sidenav_selection == 'timetable' %}
+                    <span class="sidebar_active">View and edit timetable</span>{% else %}View and edit timetable{% endif %}</a></li>
+    <li class="active-nav"><a href="{% url 'studioadmin:add_session' %}">{% if sidenav_selection == 'add_session' %}
+                    <span class="sidebar_active">Add a new session</span>{% else %}Add a new session{% endif %}</a></li>
+    <li><a href="{% url 'studioadmin:upload_timetable' %}">{% if sidenav_selection == 'upload_timetable' %}
+                    <span class="sidebar_active">Upload timetable</span>{% else %}Upload timetable{% endif %}</a></li>
     <li class="divider"></li>
     <li class="active-nav"><a href="{% url 'studioadmin:events' %}">{% if sidenav_selection == 'events' %}
         <span class="sidebar_active">View and edit events</span>{% else %}View and edit workshops{% endif %}</a></li>
@@ -35,15 +33,12 @@
         <span class="sidebar_active">View and edit blocks</span>{% else %}View and edit blocks{% endif %}</a></li>
     <li class="active-nav"><a href="{% url 'studioadmin:add_block' %}">{% if sidenav_selection == 'add_block' %}
         <span class="sidebar_active">Add a new block</span>{% else %}Add a new block{% endif %}</a></li>
-
-{#    <li class="active-nav"><a href="{% url 'studioadmin:event_register_list' %}">{% if sidenav_selection == 'events_register' %}#}
-{#                    <span class="sidebar_active">Event registers</span>{% else %}Registers & waiting lists{% endif %}</a></li>#}
 <li class="divider"></li>
     <li class="active-nav"><a href="{% url 'studioadmin:registers_by_date' %}">{% if sidenav_selection == 'registers_by_date' %}
         <span class="sidebar_active">Registers by date</span>{% else %}Registers by date{% endif %}</a></li>
-{#    <li class="divider"></li>#}
-{#    <li class="active-nav"><a href="{% url 'studioadmin:users' %}">{% if sidenav_selection == 'users' %}#}
-{#                    <span class="sidebar_active">Registered users</span>{% else %}Registered users{% endif %}</a></li>#}
+    <li class="divider"></li>
+    <li class="active-nav"><a href="{% url 'studioadmin:users' %}">{% if sidenav_selection == 'users' %}
+                    <span class="sidebar_active">Registered users</span>{% else %}Registered users{% endif %}</a></li>
 {#    <li class="active-nav"><a href="{% url 'studioadmin:blocks' %}">{% if sidenav_selection == 'blocks' %}#}
 {#                    <span class="sidebar_active">Blocks</span>{% else %}Blocks{% endif %}</a></li>#}
 {#    <li class="active-nav"><a href="{% url 'studioadmin:choose_email_users' %}">{% if sidenav_selection == 'email_users' %}#}
@@ -71,22 +66,18 @@
                     <span class="sidebar_active">View and edit classes</span>{% else %}View and edit classes{% endif %}</a></li>
                     <li><a href="{% url 'studioadmin:add_lesson' %}">{% if sidenav_selection == 'add_lesson' %}
                         <span class="sidebar_active">Add a new class</span>{% else %}Add a new class{% endif %}</a></li>
-{#                    <li><a href="{% url 'studioadmin:class_register_list' %}">{% if sidenav_selection == 'lessons_register' %}#}
-{#                    <span class="sidebar_active">Registers & waiting lists</span>{% else %}Registers & waiting lists{% endif %}</a></li>#}
-{#                <li class="sidebar-title">Timetable</li>#}
-{#                     <li><a href="{% url 'studioadmin:timetable' %}">{% if sidenav_selection == 'timetable' %}#}
-{#                    <span class="sidebar_active">View and edit timetable</span>{% else %}View and edit timetable{% endif %}</a></li>#}
-{#                    <li><a href="{% url 'studioadmin:add_session' %}">{% if sidenav_selection == 'add_session' %}#}
-{#                    <span class="sidebar_active">Add a new session</span>{% else %}Add a new session{% endif %}</a></li>#}
-{#                    <li><a href="{% url 'studioadmin:upload_timetable' %}">{% if sidenav_selection == 'upload_timetable' %}#}
-{#                    <span class="sidebar_active">Upload timetable</span>{% else %}Upload timetable{% endif %}</a></li>#}
+                <li class="sidebar-title">Timetable</li>
+                     <li><a href="{% url 'studioadmin:timetable' %}">{% if sidenav_selection == 'timetable' %}
+                    <span class="sidebar_active">View and edit timetable</span>{% else %}View and edit timetable{% endif %}</a></li>
+                    <li><a href="{% url 'studioadmin:add_session' %}">{% if sidenav_selection == 'add_session' %}
+                    <span class="sidebar_active">Add a new session</span>{% else %}Add a new session{% endif %}</a></li>
+                    <li><a href="{% url 'studioadmin:upload_timetable' %}">{% if sidenav_selection == 'upload_timetable' %}
+                    <span class="sidebar_active">Upload timetable</span>{% else %}Upload timetable{% endif %}</a></li>
                 <li class="sidebar-title">Workshops</li>
                      <li><a href="{% url 'studioadmin:events' %}">{% if sidenav_selection == 'events' %}
                     <span class="sidebar_active">View and edit workshops</span>{% else %}View and edit workshops{% endif %}</a></li>
                      <li><a href="{% url 'studioadmin:add_event' %}">{% if sidenav_selection == 'add_event' %}
                     <span class="sidebar_active">Add a new workshop</span>{% else %}Add a new event{% endif %}</a></li>
-{#                    <li><a href="{% url 'studioadmin:event_register_list' %}">{% if sidenav_selection == 'events_register' %}#}
-{#                    <span class="sidebar_active">Registers & waiting lists</span>{% else %}Registers & waiting lists{% endif %}</a></li>#}
                 <li class="sidebar-title">Blocks</li>
                     <li class="active-nav"><a href="{% url 'studioadmin:blocks' %}">{% if sidenav_selection == 'blocks' %}
                         <span class="sidebar_active">View and edit blocks</span>{% else %}View and edit blocks{% endif %}</a></li>
@@ -95,9 +86,9 @@
                 <li class="sidebar-title">Registers</li>
                     <li class="active-nav"><a href="{% url 'studioadmin:registers_by_date' %}">{% if sidenav_selection == 'registers_by_date' %}
                         <span class="sidebar_active">Registers by date</span>{% else %}Registers by date{% endif %}</a></li>
-{#                <li class="sidebar-title">Students</li>#}
-{#                    <li><a href="{% url 'studioadmin:users' %}">{% if sidenav_selection == 'users' %}#}
-{#                    <span class="sidebar_active">Registered users</span>{% else %}Registered users{% endif %}</a></li>#}
+                <li class="sidebar-title">Students</li>
+                    <li><a href="{% url 'studioadmin:users' %}">{% if sidenav_selection == 'users' %}
+                    <span class="sidebar_active">Registered users</span>{% else %}Registered users{% endif %}</a></li>
 {#                    <li><a href="{% url 'studioadmin:blocks' %}">{% if sidenav_selection == 'blocks' %}#}
 {#                    <span class="sidebar_active">Blocks</span>{% else %}Blocks{% endif %}</a></li>#}
 {#                    <li><a href="{% url 'studioadmin:choose_email_users' %}">{% if sidenav_selection == 'email_users' %}#}
@@ -123,3 +114,16 @@
         </div>
 </div>
 {% endblock %}
+
+{% block footer %}
+    <div class="studioadmin-footer">
+        <div class="container-fluid">
+            <div class="row footer_box">
+                <div class="footer-fb pull-right">
+                    <div class="footer-credit">Site developed by <a href="https://twitter.com/rebkwok" target="_blank" style="color: #0B0B61">Becky Smith</a></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock footer %}

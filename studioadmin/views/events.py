@@ -27,19 +27,8 @@ from django.core.mail import send_mail
 
 from braces.views import LoginRequiredMixin
 
-from flex_bookings.models import Event, Booking, Block, WaitingListUser, \
-    BookingError
-# from flex_bookings import utils
-from flex_bookings.email_helpers import send_support_email, send_waiting_list_email
-
-# from timetable.models import Session
+from flex_bookings.models import Event, Booking, Block, WaitingListUser
 from studioadmin.forms import EventFormSet, EventAdminForm, RegisterDayForm
-# from studioadmin.forms import BookingStatusFilter, \
-#     SimpleBookingRegisterFormSet, StatusFilter, \
-#     TimetableSessionFormSet, SessionAdminForm, DAY_CHOICES, \
-#     UploadTimetableForm, EmailUsersForm, ChooseUsersFormSet, UserFilterForm, \
-#     BlockStatusFilter, UserBookingFormSet, UserBlockFormSet, \
-from studioadmin.forms import ActivityLogSearchForm, ConfirmPaymentForm
 from studioadmin.views.utils import StaffUserMixin, staff_required
 from activitylog.models import ActivityLog
 
@@ -105,10 +94,13 @@ def event_admin_list(request, ev_type):
                                     )
 
                                     ActivityLog.objects.create(
-                                        log='{} {} (id {}) updated by admin user {}: field_changed: {}'.format(
+                                        log='{} {} (id {}) updated by admin '
+                                            'user {}: field_changed: '
+                                            '{}'.format(
                                             ev_type_text.title(),
                                             form.instance, form.instance.id,
-                                            request.user.username, field.title().replace("_", " ")
+                                            request.user.username,
+                                            field.title().replace("_", " ")
                                         )
                                     )
 
@@ -259,7 +251,11 @@ def registers_by_date(request):
             ctx = {'form': new_form, 'sidenav_selection': 'registers_by_date'}
 
             if not events:
-                messages.info(request, 'There are no classes/workshops/events on the date selected')
+                messages.info(
+                    request,
+                    'There are no classes/workshops/events on the date '
+                    'selected'
+                )
                 return TemplateResponse(
                     request, "studioadmin/register_day_form.html", ctx
                 )
@@ -272,7 +268,9 @@ def registers_by_date(request):
                         id__in=event_ids
                     )
                 else:
-                    messages.info(request, 'Please select at least one register to print')
+                    messages.info(
+                        request, 'Please select at least one register to print'
+                    )
                     form = RegisterDayForm(
                         initial={'register_date': register_date,
                                  'register_format': register_format,
@@ -281,7 +279,10 @@ def registers_by_date(request):
                     )
                     return TemplateResponse(
                         request, "studioadmin/register_day_form.html",
-                        {'form': form, 'sidenav_selection': 'registers_by_date'}
+                        {
+                            'form': form,
+                            'sidenav_selection': 'registers_by_date'
+                        }
                     )
 
                 eventlist = []
@@ -299,7 +300,8 @@ def registers_by_date(request):
                         extra_lines = event.spaces_left()
                     elif event.bookings.count() < 15:
                         open_bookings = [
-                            event for event in event.bookings.all() if event.status == 'OPEN'
+                            event for event in event.bookings.all() if
+                            event.status == 'OPEN'
                         ]
                         extra_lines = 15 - len(open_bookings)
                     else:

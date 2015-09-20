@@ -319,8 +319,7 @@ CKEDITOR_CONFIGS = {
           'Table', 'HorizontalRule', 'Smiley', 'SpecialChar'],
          ['Format', 'Font', 'FontSize']
         ],
-        # 'height': 300,
-        'width': 350,
+        'width': '100%',
     },
     'studioadmin': {
         'toolbar': [
@@ -331,15 +330,14 @@ CKEDITOR_CONFIGS = {
           'Table', 'HorizontalRule', 'Smiley', 'SpecialChar'],
          ['Format', 'Font', 'FontSize', 'Link']
         ],
-        'height': 200,
-        'width': 600,
+        'width': '100%',
     },
     'studioadmin_min': {
         'toolbar': [
             ['Bold', 'Italic', 'Underline', 'FontSize', 'Link']
         ],
         'height': 100,
-        'width': 600,
+        'width': '100%',
     },
 }
 CKEDITOR_JQUERY_URL = \

@@ -21,9 +21,9 @@
 
                     <div class="top-button-row">
                         <input class="btn btn-success table-btn" name="formset_submitted" type="submit" value="Save changes" />
-                        <span class="pull-right">Show:
-                            {{ booking_status_filter.booking_status }}
-                            <input class="btn btn-info table-btn" name="booking_status" type="submit" value="Filter" /></span>
+                        <span class="pull-right">Show: {{ booking_status_filter.booking_status }}
+                            <input class="btn btn-info table-btn" name="booking_status" type="submit" value="Filter" />
+                        </span>
 
                     </div>
 
@@ -32,11 +32,10 @@
                             <thead>
                             <tr class="success">
                                 <th>Date</th>
-                                <th>Class/Event</th>
+                                <th>Class/Workshop</th>
                                 <th class="table-center">Paid</th>
                                 <th class="table-center">PayPal ID</th>
-                                <th class="table-center">Free class?</th>
-                                <th class="table-center">Block used</th>
+                                <th class="table-center">Block booked</th>
                                 <th class="table-center">Booking status</th>
                                 <th class="table-center">Send confirmation?</th>
                             </tr>
@@ -62,28 +61,14 @@
                                             <span class="fa fa-check"></span>
                                         {% endif %}
                                     </td>
-                                    <td class="table-center studioadmin-tbl">{{ booking.free_class }}<label for={{ booking.free_class_id }}></label></td>
-                                    <td class="table-center studioadmin-tbl">{% if booking.instance.block and booking.instance.paid %}
-                                        <div class="form-group form-group-sm">{{ booking.block }}</div>
-                                        {% elif booking.instance.free_class %}
-                                        Free class
-                                        {% elif booking.instance.paid %}
-                                        Paid directly
-                                        {% else %}
-                                            {% if booking.instance.event.cost and booking.has_available_block %}
-                                                <div class="form-group form-group-sm">{{ booking.block }}</div>
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        {% endif %}</td>
+                                    <td class="table-center studioadmin-tbl">{% if booking.instance.block %}{{ booking.instance.block }}{% endif %}</td>
                                     <td class="table-center studioadmin-tbl"><div class="form-group form-group-sm">{{ booking.status }}</div></td>
                                 {% else %}
                                     <td class="studioadmin-tbl"><strong>New booking</strong></td>
                                     <td class="studioadmin-tbl"><div class="form-group form-group-sm">{{ booking.event }}</div></td>
                                     <td class="table-center studioadmin-tbl">{{ booking.paid }}<label for={{ booking.paid_id }}></label></td>
                                     <td></td>
-                                    <td class="table-center studioadmin-tbl">{{ booking.free_class }}<label for={{ booking.free_class_id }}></label></td>
-                                    <td class="table-center studioadmin-tbl"><div class="form-group form-group-sm">{{ booking.block }}</div></td>
+                                    <td></td>
                                     <td class="table-center studioadmin-tbl">OPEN</td>
                                     <span class="hide">{{ booking.status }}</span>
                                 {% endif %}

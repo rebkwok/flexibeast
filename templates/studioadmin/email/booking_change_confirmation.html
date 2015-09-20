@@ -5,10 +5,6 @@
 
 <p>Your booking for {{ event }} has been {{ action }} by an administrator.</p>
 
-{% if set_as_free %}
-<p>This is your free class!</p>
-{% endif %}
-
-<a href="{{ host }}{% url 'booking:bookings' %}">View your bookings</a>
+<a href="{{ host }}{% url 'flexbookings:bookings' %}">View your bookings</a>
 </div>
 {% endblock %}
