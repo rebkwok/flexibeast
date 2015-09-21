@@ -1,0 +1,10 @@
+{% extends 'email_base.html' %}
+
+{% block messagecontent %}
+<div style="font-family: sans-serif;">
+
+<p>Block {{ block.name }} has been {{ action }} for you by an administrator.</p>
+
+<a href="{{ host }}{% url 'flexbookings:bookings' %}">View your bookings</a>
+</div>
+{% endblock %}

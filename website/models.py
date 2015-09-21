@@ -47,8 +47,9 @@ class Page(models.Model):
         return "{} page content".format(self.name.title())
 
     def save(self):
+        self.name = self.name.lower()
         if ' ' in self.name:
-            self.name = self.name.replace(' ', '-').lower()
+            self.name = self.name.replace(' ', '-')
         super(Page, self).save()
 
 

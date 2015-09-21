@@ -27,12 +27,13 @@
                                         <span class="fa fa-question-circle"></span>
                                     </a>
                                 </th>
-                                <th class="table-center">Delete</th>
+                                <th class="table-center">Cancel</th>
+                                <th class="table-center">Send confirmation?</th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for userblockform in userblocksformset %}
-                            <tr>
+                            <tr {% if userblockform.block_status == 'CANCELLED' %}class="expired"{% endif %}>
                                 {% if userblockform.initial %}
                                     <span class="hide">{{ userblockform.user }}</span>
                                     <span class="hide">{{ userblockform.block }}</span>
@@ -50,6 +51,7 @@
                                     <td class="studioadmin-tbl table-center">{{ userblockform.block }}</td>
                                     <td class="studioadmin-tbl"></td>
                                 {% endif %}
+                                <td class="table-center studioadmin-tbl">{{ userblockform.send_confirmation }}<label for={{ userblockform.send_confirmation_id }}></label></td>
                             </tr>
                         {% endfor %}
                             </tbody>

@@ -100,7 +100,8 @@ class EventAdminForm(forms.ModelForm):
             'class': 'form-control',
             'aria-describedby': 'sizing-addon2',
         }),
-        required=False
+        required=False,
+        initial=7,
     )
 
     def __init__(self, *args, **kwargs):
@@ -109,6 +110,7 @@ class EventAdminForm(forms.ModelForm):
         self.fields['event_type'] = forms.ModelChoiceField(
             widget=forms.Select(attrs={'class': "form-control"}),
             queryset=EventType.objects.filter(event_type=ev_type),
+            label='{} type'.format('Class' if ev_type == 'CL' else 'Workshop')
         )
         ph_type = "class" if ev_type == 'CL' else 'event'
         ex_name = "Flexibility for Splits" if ev_type == 'CL' \
@@ -175,6 +177,7 @@ class EventAdminForm(forms.ModelForm):
             'payment_due_date', 'cancellation_period',
             'email_studio_when_booked',
         )
+
         widgets = {
             'description': CKEditorWidget(
                 attrs={'class': 'form-control container-fluid'},
@@ -237,7 +240,7 @@ class EventAdminForm(forms.ModelForm):
             }
         help_texts = {
             'payment_due_date': _('Only use this field if the cost is greater '
-                                  'than £0.  If a payment due date is set, '
+                                  'than 0.  If a payment due date is set, '
                                   'advance payment will always be required'),
             'email_studio_when_booked': _('Tick if you want the studio to '
                                           'receive email notifications when a '
@@ -396,7 +399,7 @@ class BlockAdminForm(forms.ModelForm):
         event_choices = [(event.id, event) for event in
              Event.objects.filter(date__gt=timezone.now())]
 
-        if self.instance:
+        if self.instance.id and self.instance.events.exists():
             past_events = [
                 event for event in self.instance.events.all().order_by('-date')
                 if event.date <= timezone.now()
@@ -812,9 +815,15 @@ class UserBlockBaseFormset(BaseFormSet):
         super(UserBlockBaseFormset, self).add_fields(form, index)
 
         if form.initial:
-
             form.user_instance = User.objects.get(id=form.initial['user'])
             form.block_instance = Block.objects.get(id=form.initial['block'])
+
+            form.block_status = 'CANCELLED'
+            for booking in Booking.objects.filter(
+                    block=form.block_instance, user=form.user_instance):
+                if booking.status == 'OPEN':
+                    form.block_status = 'OPEN'
+
             form.fields['DELETE'] = forms.BooleanField(
                 widget=forms.CheckboxInput(attrs={
                     'class': 'delete-checkbox studioadmin-list',
@@ -841,6 +850,15 @@ class UserBlockBaseFormset(BaseFormSet):
                 widget=forms.Select(attrs={'class': 'form-control input-sm'}),
             )
 
+        form.fields['send_confirmation'] = forms.BooleanField(
+            widget=forms.CheckboxInput(attrs={
+                'class': "regular-checkbox",
+                'id': 'send_confirmation_{}'.format(index)
+            }),
+            initial=False,
+            required=False
+        )
+        form.send_confirmation_id = 'send_confirmation_{}'.format(index)
 
     def clean(self):
         for form in self.forms:

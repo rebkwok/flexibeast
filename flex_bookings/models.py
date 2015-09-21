@@ -56,7 +56,7 @@ class Event(models.Model):
     date = models.DateTimeField()
     location = models.CharField(max_length=255, default="Watermelon Studio")
     max_participants = models.PositiveIntegerField(
-        null=True, blank=True,
+        null=True, blank=True, default=9,
         help_text="Leave blank if no max number of participants"
     )
     contact_person = models.CharField(max_length=255, default="Alicia Alexandra")

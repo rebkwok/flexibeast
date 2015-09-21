@@ -94,7 +94,9 @@ def admin_block_list(request):
                                     )
 
                                     ActivityLog.objects.create(
-                                        log='Block {} (id {}) updated by admin user {}: {} changed from {} to {}'.format(
+                                        log='Block {} (id {}) updated by admin '
+                                            'user {}: {} changed from {} to '
+                                            '{}'.format(
                                             form.instance.name, form.instance.id,
                                             request.user.username,
                                             field.title().replace("_", " "),

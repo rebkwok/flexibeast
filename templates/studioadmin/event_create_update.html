@@ -33,7 +33,7 @@
                     <div class="form-group-sm col-sm-11">
 
                         {% for field in form %}
-                            {% if field.label == "Cost" %}
+                            {% if field.name == "cost" %}
                                 <div class="form-group">
                                     <label class="control-label col-sm-3">{% if field.field.required %}*{% endif %}{{ field.label }}</label>
                                     <div class="col-sm-9">
@@ -43,7 +43,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            {% elif field.label == "Booking open"%}
+                            {% elif field.name == "booking_open"%}
                             <div class="form-group cbox">
                                 <label class="control-label col-sm-3">{% if field.field.required %}*{% endif %}{{ field.label }}</label>
                                 <div class="col-sm-9">
@@ -51,14 +51,14 @@
                                 </div>
                             </div>
 
-                            {% elif field.label == "Advance payment required" %}
+                            {% elif field.name == "advance_payment_required" %}
                             <div class="form-group cbox">
                                 <label class="control-label col-sm-3">{% if field.field.required %}*{% endif %}{{ field.label }}</label>
                                 <div class="col-sm-9">
                                         <div class="col-sm-1 pull-left">{{ field }}<label for='advance_payment_required_id'></label></div><div class="col-sm-8 studioadmincbox-help">  {{ field.help_text }}</div>
                                 </div>
                             </div>
-                            {% elif field.label == "Email studio when booked"%}
+                            {% elif field.name == "email_studio_when_booked"%}
                             <div class="form-group cbox">
                                 <label class="control-label col-sm-3">{% if field.field.required %}*{% endif %}{{ field.label }}</label>
                                 <div class="col-sm-9">

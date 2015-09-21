@@ -1,20 +1,10 @@
-import urllib.parse
-import ast
 import logging
-
-from datetime import datetime
-from functools import wraps
-
-
-from django.db.utils import IntegrityError
-from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Permission
 
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.db.models import Q
 from django.template.loader import get_template
 from django.template import Context
 from django.template.response import TemplateResponse
@@ -29,20 +19,12 @@ from braces.views import LoginRequiredMixin
 
 from flex_bookings.models import Event, Booking, Block, WaitingListUser, \
     BookingError
-from flex_bookings import utils
+
 from flex_bookings.email_helpers import send_support_email, \
     send_waiting_list_email
 from studioadmin.forms import BookingStatusFilter, UserBookingFormSet, \
     UserBlockFormSet
 
-# from timetable.models import Session
-# from studioadmin.forms import BookingStatusFilter, \
-#     EventFormSet, \
-#     EventAdminForm, SimpleBookingRegisterFormSet, StatusFilter, \
-#     TimetableSessionFormSet, SessionAdminForm, DAY_CHOICES, \
-#     UploadTimetableForm, EmailUsersForm, ChooseUsersFormSet, UserFilterForm, \
-#     BlockStatusFilter, UserBookingFormSet, UserBlockFormSet, \
-from studioadmin.forms import ActivityLogSearchForm, ConfirmPaymentForm
 from studioadmin.views.utils import StaffUserMixin, staff_required
 from activitylog.models import ActivityLog
 
@@ -303,7 +285,8 @@ def _process_waiting_list(booking, request):
                 e, __name__, "Automatic cancel job - waiting list email"
             )
 
-
+@login_required
+@staff_required
 def block_bookings_view(request):
 
     userblocks = []
@@ -321,21 +304,75 @@ def block_bookings_view(request):
 
             else:
                 for form in userblocksformset:
-                    if form.has_changed():
-                        if form.is_valid():
-                            if form.cleaned_data['DELETE']:
-                                # TODO cancel all remaining bookings; leave block on
-                                # booking. Don't cancel past bookings.
-                                pass
-                            else:
-                                block = form.cleaned_data['block']
-                                user = form.cleaned_data['user']
+                    if form.is_valid() and form.has_changed():
+                        if form.changed_data == ['send_confirmation']:
+                            messages.info(
+                                request,
+                                "'Send confirmation' checked for '{}' "
+                               "but no changes were made; email has not "
+                               "been sent to user." .format(
+                                    form.instance.event
+                                )
+                            )
+                        else:
+                            block = form.cleaned_data['block']
+                            user = form.cleaned_data['user']
 
+                            if form.cleaned_data['DELETE']:
+                                bookings = [
+                                    bk for bk in user.bookings.all()
+                                    if bk.block == block
+                                    and bk.event.date > timezone.now()
+                                    ]
+                                for booking in bookings:
+                                    was_full = booking.event.spaces_left() == 0
+                                    booking.status = 'CANCELLED'
+                                    booking.save()
+                                    if was_full:
+                                        _process_waiting_list(booking, request)
+
+                                messages.success(
+                                    request,
+                                    mark_safe(
+                                        'Remaining bookings in block {} have '
+                                        'been cancelled for user {}: '
+                                        '<ul>{}</ul>'.format(
+                                            block.name, user.username,
+                                            ''.join(['<li>{}</li>'.format(bk.event)
+                                                 for bk in bookings])
+                                            )
+                                        )
+                                    )
+                                ActivityLog.objects.create(
+                                    log='Block {} for user {} cancelled by admin'
+                                        'user {} (booking ids {})'.format(
+                                        block.name, user.username,
+                                        request.user.username,
+                                        ', '.join([str(bk.id) for bk in bookings])
+                                    )
+                                )
+                                _process_block_confirmation_email(
+                                    request, user, form, block, 'cancelled'
+                                )
+                            else:
                                 for event in block.events.all():
                                     Booking.objects.create(
                                         event=event, user=user, block=block,
                                         paid=True, payment_confirmed=True
                                     )
+                                    try:
+                                        waiting_list_user = WaitingListUser.objects.get(
+                                            user=user, event=event
+                                        )
+                                        waiting_list_user.delete()
+                                        ActivityLog.objects.create(
+                                            log='User {} has been removed '
+                                                'from the waiting list for {}'
+                                                .format(user.username, event)
+                                            )
+                                    except WaitingListUser.DoesNotExist:
+                                        pass
+
                                 messages.success(
                                     request,
                                     'Block {} booked for user {}. Bookings for '
@@ -351,9 +388,12 @@ def block_bookings_view(request):
                                         request.user.username
                                         )
                                     )
-                        else:
-                            for error in form.errors:
-                                messages.error(request, mark_safe("{}".format(error)))
+                                _process_block_confirmation_email(
+                                    request, user, form, block, 'created'
+                                )
+                    else:
+                        for error in form.errors:
+                            messages.error(request, mark_safe("{}".format(error)))
             return HttpResponseRedirect(reverse('studioadmin:block_bookings'))
 
         else:
@@ -381,3 +421,36 @@ def block_bookings_view(request):
             'sidenav_selection': 'block_bookings'
         }
     )
+
+def _process_block_confirmation_email(request, user, form, block, action):
+
+    if 'send_confirmation' in form.changed_data:
+
+        try:
+            # send confirmation email
+            host = 'http://{}'.format(request.META.get('HTTP_HOST'))
+            # send email to studio
+            ctx = Context({
+                'host': host,
+                'block': block,
+                'user': user,
+                'action': action,
+            })
+            send_mail('{} block {} has been {}'.format(
+                settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, block.name, action
+                ),
+                get_template(
+                    'studioadmin/email/block_change_confirmation.txt'
+                ).render(ctx),
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                html_message=get_template(
+                    'studioadmin/email/block_change_confirmation.html'
+                    ).render(ctx),
+                fail_silently=False)
+        except Exception as e:
+            # send mail to tech support with Exception
+            send_support_email(
+                e, __name__, "block_bookings_list - "
+                "send confirmation email"
+            )
