@@ -177,6 +177,21 @@ class Block(models.Model):
             return last_event_date < timezone.now()
         return True
 
+    @property
+    def has_full_class(self):
+        if self.events.exists():
+            return bool(
+                [ev for ev in self.events.all() if ev.spaces_left() <= 0]
+            )
+        return False
+
+    @property
+    def has_started(self):
+        if self.events.exists():
+            first_event_date = self.events.first().date
+            return first_event_date < timezone.now()
+        return False
+
     def save(self, *args, **kwargs):
         # setting a block to booking_open makes booking open on each of it's
         # classes

@@ -354,7 +354,7 @@ logger = logging.getLogger(__name__)
 #             user=user
 #         )
 #
-#     template = 'studioadmin/user_block_list.html'
+#     template = 'studioadmin/block_bookings_list.html'
 #     return TemplateResponse(
 #         request, template, {
 #             'userblockformset': userblockformset, 'user': user,

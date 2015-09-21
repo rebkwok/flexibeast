@@ -6,7 +6,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.forms.models import modelformset_factory, BaseModelFormSet, \
-    inlineformset_factory, BaseInlineFormSet
+    inlineformset_factory, formset_factory, BaseFormSet, BaseInlineFormSet
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
@@ -41,23 +41,18 @@ class EventBaseFormSet(BaseModelFormSet):
                 required=False
             )
             form.advance_payment_required_id = 'advance_payment_required_{}'.format(index)
+
             if form.instance.bookings.count() > 0:
-                form.fields['DELETE'] = forms.BooleanField(
-                    widget=forms.CheckboxInput(attrs={
-                        'class': 'delete-checkbox-disabled studioadmin-list',
-                        'disabled': 'disabled',
-                        'id': 'DELETE_{}'.format(index)
-                    }),
-                    required=False
-                )
+                delete_class = 'delete-checkbox-disabled studioadmin-list'
             else:
-                form.fields['DELETE'] = forms.BooleanField(
-                    widget=forms.CheckboxInput(attrs={
-                        'class': 'delete-checkbox studioadmin-list',
-                        'id': 'DELETE_{}'.format(index)
-                    }),
-                    required=False
-                )
+                delete_class = 'delete-checkbox studioadmin-list'
+            form.fields['DELETE'] = forms.BooleanField(
+                widget=forms.CheckboxInput(attrs={
+                    'class': delete_class,
+                    'id': 'DELETE_{}'.format(index)
+                }),
+                required=False
+            )
             form.DELETE_id = 'DELETE_{}'.format(index)
 
 EventFormSet = modelformset_factory(
@@ -366,13 +361,6 @@ class BlockAdminForm(forms.ModelForm):
         )
     )
 
-    event_choices = tuple([(event.id, event) for event in Event.objects.filter(date__gt=timezone.now())])
-    events = forms.MultipleChoiceField(
-        label="Select classes",
-        widget=forms.CheckboxSelectMultiple,
-        choices=event_choices,
-    )
-
     individual_booking_date = forms.CharField(
         widget=(
             forms.DateInput(
@@ -401,6 +389,26 @@ class BlockAdminForm(forms.ModelForm):
         ),
         required=False
     )
+
+    def __init__(self, *args, **kwargs):
+        super(BlockAdminForm, self).__init__(*args, **kwargs)
+
+        event_choices = [(event.id, event) for event in
+             Event.objects.filter(date__gt=timezone.now())]
+
+        if self.instance:
+            past_events = [
+                event for event in self.instance.events.all().order_by('-date')
+                if event.date <= timezone.now()
+                ]
+            for event in past_events:
+                event_choices.insert(0, (event.id, event))
+
+        self.fields['events'] = forms.MultipleChoiceField(
+            label="Select classes",
+            widget=forms.CheckboxSelectMultiple,
+            choices=event_choices,
+        )
 
     def clean_individual_booking_date(self):
 
@@ -523,66 +531,7 @@ class RegisterDayForm(forms.Form):
         return cleaned_data
 
 
-# class BookingRegisterInlineFormSet(BaseInlineFormSet):
-#
-#     def add_fields(self, form, index):
-#         super(BookingRegisterInlineFormSet, self).add_fields(form, index)
-#
-#         if form.instance.id:
-#             form.index = index + 1
-#             user = form.instance.user
-#             event_type = form.instance.event.event_type
-#             available_block = [
-#                 block for block in Block.objects.filter(user=user) if
-#                 block.active_block()
-#                 and block.block_type.event_type == event_type
-#             ]
-#             form.available_block = form.instance.block or (
-#                 available_block[0] if available_block else None
-#             )
-#             available_block_ids = [block.id for block in available_block
-#                                    ]
-#             form.fields['block'] = UserBlockModelChoiceField(
-#                 queryset=Block.objects.filter(id__in=available_block_ids),
-#                 widget=forms.Select(attrs={'class': 'form-control input-sm studioadmin-list'}),
-#                 required=False
-#             )
-#
-#             form.fields['user'] = forms.ModelChoiceField(
-#                 queryset=User.objects.all(),
-#                 initial=user,
-#                 widget=forms.Select(attrs={'class': 'hide'})
-#             )
-#
-#             form.fields['paid'] = forms.BooleanField(
-#                 widget=forms.CheckboxInput(attrs={
-#                     'class': "regular-checkbox",
-#                     'id': 'checkbox_paid_{}'.format(index)
-#                 }),
-#                 required=False
-#             )
-#             form.checkbox_paid_id = 'checkbox_paid_{}'.format(index)
-#
-#         form.fields['attended'] = forms.BooleanField(
-#             widget=forms.CheckboxInput(attrs={
-#                 'class': "regular-checkbox",
-#                 'id': 'checkbox_attended_{}'.format(index)
-#             }),
-#             initial=False,
-#             required=False
-#         )
-#         form.checkbox_attended_id = 'checkbox_attended_{}'.format(index)
-#
-#
-# SimpleBookingRegisterFormSet = inlineformset_factory(
-#     Event,
-#     Booking,
-#     fields=('attended', 'user', 'paid', 'block'),
-#     can_delete=False,
-#     formset=BookingRegisterInlineFormSet,
-#     extra=0,
-# )
-#
+
 #
 # class StatusFilter(forms.Form):
 #
@@ -601,6 +550,7 @@ class BookingStatusFilter(forms.Form):
         choices=(
             ('future', 'Upcoming bookings'),
             ('past', 'Past bookings'),
+            ('all', 'All bookings'),
         ),
     )
 
@@ -622,7 +572,7 @@ class SessionBaseFormSet(BaseModelFormSet):
 
     def add_fields(self, form, index):
         super(SessionBaseFormSet, self).add_fields(form, index)
-        
+
         if form.instance:
             form.formatted_day = DAY_CHOICES[form.instance.day]
 
@@ -848,6 +798,88 @@ class UploadTimetableForm(forms.Form):
         return cleaned_data
 
 
+class UserBlockForm(forms.Form):
+
+    user = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control input-sm'}),
+    )
+
+
+class UserBlockBaseFormset(BaseFormSet):
+
+    def add_fields(self, form, index):
+        super(UserBlockBaseFormset, self).add_fields(form, index)
+
+        if form.initial:
+
+            form.user_instance = User.objects.get(id=form.initial['user'])
+            form.block_instance = Block.objects.get(id=form.initial['block'])
+            form.fields['DELETE'] = forms.BooleanField(
+                widget=forms.CheckboxInput(attrs={
+                    'class': 'delete-checkbox studioadmin-list',
+                    'id': 'DELETE_{}'.format(index)
+                }),
+                required=False
+            )
+            form.DELETE_id = 'DELETE_{}'.format(index)
+
+            form.fields['block'] = forms.ModelChoiceField(
+                queryset=Block.objects.all()
+            )
+
+        else:
+            bookable_blocks = [
+                block.id for block in Block.objects.all() if (not block.is_past and
+                block.booking_open and not
+                block.has_full_class and not
+                block.has_started)
+            ]
+
+            form.fields['block'] = forms.ModelChoiceField(
+                queryset=Block.objects.filter(id__in=bookable_blocks),
+                widget=forms.Select(attrs={'class': 'form-control input-sm'}),
+            )
+
+
+    def clean(self):
+        for form in self.forms:
+            if not form.initial and form.cleaned_data:
+                user = form.cleaned_data['user']
+                block = form.cleaned_data['block']
+
+                bookable_blocks = [
+                    block for block in Block.objects.all() if not block.is_past and
+                    block.booking_open and not
+                    block.has_full_class and not
+                    block.has_started
+                    ]
+                # add errors if:
+                # - user already has bookings for this block
+                # - block is not bookable
+
+                if block not in bookable_blocks:
+                    # no need to be too descriptive since block drop down is
+                    # already filtered so should be unlikely to get there
+                    form.add_error('block', 'not bookable')
+                user_booked_events = [
+                    booking.id for booking in user.bookings.all()
+                    if booking.event in block.events.all()
+                    ]
+                if user_booked_events:
+                    form.add_error('block', 'user {} already has at least one '
+                                            'booking for a class in '
+                                            'block "{}"'.format(
+                        user.username, block.name
+                    ))
+
+UserBlockFormSet = formset_factory(
+    form=UserBlockForm,
+    formset=UserBlockBaseFormset,
+    extra=1,
+    can_delete=True,
+)
+
 # class ChooseUsersBaseFormSet(BaseModelFormSet):
 #
 #     def add_fields(self, form, index):
@@ -1010,95 +1042,6 @@ UserBookingFormSet = inlineformset_factory(
     formset=UserBookingInlineFormSet,
     extra=1,
 )
-
-
-# class UserBlockInlineFormSet(BaseInlineFormSet):
-#
-#     def __init__(self, *args, **kwargs):
-#         self.user = kwargs.pop('user', None)
-#         super(UserBlockInlineFormSet, self).__init__(*args, **kwargs)
-#
-#         for form in self.forms:
-#             form.empty_permitted = True
-#
-#     def add_fields(self, form, index):
-#         super(UserBlockInlineFormSet, self).add_fields(form, index)
-#
-#         user_blocks = Block.objects.filter(user=self.user)
-#         # get the event types for the user's blocks that are currently active
-#         # or awaiting payment
-#         user_block_event_types = [
-#             block.block_type.event_type for block in user_blocks
-#             if block.active_block() or
-#             (not block.expired and not block.paid and not block.full)
-#         ]
-#         available_block_types = BlockType.objects.exclude(
-#             event_type__in=user_block_event_types
-#         )
-#         form.can_buy_block = True if available_block_types else False
-#
-#         if not form.instance.id:
-#             form.fields['block_type'] = (forms.ModelChoiceField(
-#                 queryset=available_block_types,
-#                 widget=forms.Select(attrs={'class': 'form-control input-sm'}),
-#                 required=False,
-#                 empty_label="---Choose block type---"
-#             ))
-#
-#             form.fields['start_date'] = forms.DateTimeField(
-#                 widget=forms.DateTimeInput(
-#                     attrs={
-#                         'class': "form-control",
-#                         'id': "datepicker",
-#                         'placeholder': "dd/mm/yy",
-#                         'style': 'text-align: center'
-#                     },
-#                     format='%d %m %y',
-#                 ),
-#                 required=False,
-#             )
-#
-#         if form.instance:
-#             # only allow deleting blocks if not yet paid
-#             if form.instance.paid:
-#                 form.fields['DELETE'] = forms.BooleanField(
-#                     widget=forms.CheckboxInput(attrs={
-#                         'class': 'delete-checkbox-disabled studioadmin-list',
-#                         'disabled': 'disabled',
-#                         'id': 'DELETE_{}'.format(index)
-#                     }),
-#                     required=False
-#                 )
-#             else:
-#                 form.fields['DELETE'] = forms.BooleanField(
-#                     widget=forms.CheckboxInput(attrs={
-#                         'class': 'delete-checkbox studioadmin-list',
-#                         'id': 'DELETE_{}'.format(index)
-#                     }),
-#                     required=False
-#                 )
-#             form.DELETE_id = 'DELETE_{}'.format(index)
-#
-#         form.fields['paid'] = forms.BooleanField(
-#             widget=forms.CheckboxInput(attrs={
-#                 'class': "regular-checkbox",
-#                 'id': 'paid_{}'.format(index)
-#             }),
-#             required=False
-#             )
-#         form.paid_id = 'paid_{}'.format(index)
-#
-#
-#
-#
-# UserBlockFormSet = inlineformset_factory(
-#     User,
-#     Block,
-#     fields=('paid', 'start_date', 'block_type'),
-#     can_delete=True,
-#     formset=UserBlockInlineFormSet,
-#     extra=1,
-# )
 
 
 class ActivityLogSearchForm(forms.Form):

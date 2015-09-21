@@ -51,7 +51,6 @@ urlpatterns = patterns('',
     url(r'^timetable/upload/$', 'studioadmin.views.timetable.upload_timetable_view',
         name='upload_timetable'),
     url(r'^users/$', UserListView.as_view(), name="users"),
-    # url(r'^blocks/$', BlockListView.as_view(), name="blocks"),
     # url(r'^users/email/$', 'studioadmin.views.choose_users_to_email',
     #     name="choose_email_users"),
     # url(r'^users/email/emailform/$', 'studioadmin.views.email_users_view',
@@ -60,10 +59,10 @@ urlpatterns = patterns('',
         r'^users/(?P<user_id>\d+)/bookings/(?P<booking_status>[\w-]+)$',
         'studioadmin.views.users.user_bookings_view', name='user_bookings_list'
     ),
-    # url(
-    #     r'^users/(?P<user_id>\d+)/blocks/$',
-    #     'studioadmin.views.user_blocks_view', name='user_blocks_list'
-    # ),
+    url(
+        r'^users/blocks/$',
+        'studioadmin.views.users.block_bookings_view', name='block_bookings'
+    ),
     url(
         r'activitylog/$', ActivityLogListView.as_view(), name='activitylog'
     ),

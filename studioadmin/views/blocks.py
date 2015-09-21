@@ -43,12 +43,14 @@ def admin_block_list(request):
 
     if request.method == 'POST':
         if "past" in request.POST:
-            queryset = [
-                block for block in Block.objects.all() if block.is_past
+            block_list = [
+                block.id for block in Block.objects.all() if block.is_past
                 ]
             blocks = True if len(queryset) > 0 else False
             show_past = True
-            blockformset = BlockFormSet(queryset=queryset)
+            blockformset = BlockFormSet(
+                queryset=Block.objects.filter(id__in=block_list)
+            )
         elif "upcoming" in request.POST:
             queryset = queryset
             show_past = False
@@ -65,7 +67,8 @@ def admin_block_list(request):
                             if 'DELETE' in form.changed_data:
                                 messages.success(
                                     request, mark_safe(
-                                        'Block <strong>{}</strong> has been deleted!'.format(
+                                        'Block <strong>{}</strong> has been '
+                                        'deleted!'.format(
                                             form.instance.name,
                                         )
                                     )
