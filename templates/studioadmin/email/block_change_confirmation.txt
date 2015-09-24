@@ -2,4 +2,6 @@
 
 Block {{ block.name }} has been {{ action }} for you by an administrator.
 
+{% if action == 'cancelled' %}Please note that block-booked classes are not typically eligible for refunds.{% endif %}
+
 View your bookings: {{ host }}{% url 'flexbookings:bookings' %}

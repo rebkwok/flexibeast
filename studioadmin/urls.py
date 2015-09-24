@@ -10,6 +10,8 @@ from studioadmin.views.timetable import (
 #                                BlockListView,
                                )
 from studioadmin.views.users import UserListView
+from studioadmin.views.website import PageListView, PageUpdateView
+
 
 urlpatterns = patterns('',
     url(r'^confirm-payment/(?P<pk>\d+)/$', ConfirmPaymentView.as_view(),
@@ -69,6 +71,14 @@ urlpatterns = patterns('',
     url(
         r'^waitinglists/(?P<event_id>\d+)$',
         'studioadmin.views.waitinglist.event_waiting_list_view', name='event_waiting_list'
+    ),
+    url(
+        r'^website-pages/$',
+        PageListView.as_view(), name='website_pages_list'
+    ),
+    url(
+        r'^website-pages/(?P<name>[\w-]+)$',
+        PageUpdateView.as_view(), name='edit_page'
     ),
     url(r'^$', RedirectView.as_view(url='/studioadmin/classes/', permanent=True)),
     )

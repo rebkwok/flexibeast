@@ -46,6 +46,9 @@
 {#    <li class="divider"></li>#}
     <li class="active-nav"><a href="{% url 'studioadmin:activitylog' %}">{% if sidenav_selection == 'activitylog' %}
                     <span class="sidebar_active">Activity Log</span>{% else %}Activity Log{% endif %}</a></li>
+      <li class="divider"></li>
+      <li class="active-nav"><a href="{% url 'studioadmin:website_pages_list' %}">{% if sidenav_selection == 'page_list' %}
+                    <span class="sidebar_active">Website pages</span>{% else %}Website pages{% endif %}</a></li>
 
   </ul>
 </li>
@@ -96,6 +99,9 @@
                 <li class="sidebar-title">Site Activity Log</li>
                     <li class="active-nav"><a href="{% url 'studioadmin:activitylog' %}">{% if sidenav_selection == 'activitylog' %}
                     <span class="sidebar_active">View log</span>{% else %}View log{% endif %}</a></li>
+                <li class="sidebar-title">Website pages</li>
+                 <li class="active-nav"><a href="{% url 'studioadmin:website_pages_list' %}">{% if sidenav_selection == 'page_list' %}
+                    <span class="sidebar_active">View and edit pages</span>{% else %}View and edit pages{% endif %}</a></li>
 
             </ul>
 
@@ -127,3 +133,7 @@
         </div>
     </div>
 {% endblock footer %}
+
+{% block extra_scripts %}
+    <script type="text/javascript" src="{% static 'flex_bookings/js/bootstrap-filestyle.min.js' %}"> </script>
+{% endblock %}

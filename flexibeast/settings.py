@@ -62,6 +62,7 @@ INSTALLED_APPS = (
     'allauth.socialaccount.providers.facebook',
     'django_extensions',
     'crispy_forms',
+    'floppyforms',
     'debug_toolbar',
     'accounts',
     'flex_bookings',

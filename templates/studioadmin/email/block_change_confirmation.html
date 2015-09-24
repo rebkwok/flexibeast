@@ -5,6 +5,11 @@
 
 <p>Block {{ block.name }} has been {{ action }} for you by an administrator.</p>
 
+{% if action == 'cancelled' %}
+    <p>Please note that block-booked classes are not typically eligible for
+        refunds.</p>
+{% endif %}
+
 <a href="{{ host }}{% url 'flexbookings:bookings' %}">View your bookings</a>
 </div>
 {% endblock %}

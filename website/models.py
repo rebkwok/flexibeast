@@ -62,7 +62,10 @@ class SubSection(models.Model):
         'Content',
         help_text='Leave a blank line between paragraphs.'
     )
-    index = models.PositiveIntegerField()
+    index = models.PositiveIntegerField(
+        help_text="This controls the order subsections are displayed on "
+                  "the page"
+    )
     page = models.ForeignKey(Page, related_name='subsections')
 
     class Meta:
@@ -77,8 +80,9 @@ class SubSection(models.Model):
 class Picture(models.Model):
     image = models.ImageField(
         upload_to='website_pages', null=True, blank=True,
-        help_text="Upload a .jpg image")
+    )
     page = models.ForeignKey(Page, related_name='pictures')
+    main = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         # delete old image file when replacing by updating the file
@@ -89,3 +93,8 @@ class Picture(models.Model):
         except:
             pass # when new photo then we do nothing, normal case
         super(Picture, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        # delete the image from storage when deleting Picture object
+        self.image.delete()
+        super(Picture, self).delete(*args, **kwargs)

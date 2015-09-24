@@ -1,0 +1,51 @@
+{% extends "studioadmin/base.html" %}
+{% load static %}
+{% load bookingtags %}
+
+{% block studioadmincontent %}
+
+    <div class="container-fluid row">
+
+        <h2>Website Pages</h2>
+        <p>Please note you must have one page named "about".  This will be the home page.</p>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-success">
+
+                    <div class="table-responsive">
+                        <table class="table tablesorter" id="sortTable">
+                            <thead>
+                            <tr class="success">
+                                <th>Page name</th>
+                                <th>Page heading</th>
+                                <th>Menu name</th>
+                                <th>Menu location</th>
+                                <th>Layout</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            {% for page in pages %}
+                                <tr>
+                                    <td class="studioadmin-tbl"><a href="{% url 'studioadmin:edit_page' page.name %}">{{ page.name }}</a></td>
+                                    <td class="studioadmin-tbl">{{ page.heading }}</td>
+                                    <td class="studioadmin-tbl">{{ page.menu_name }}</td>
+                                    <td class="studioadmin-tbl">{{ page.menu_location }}</td>
+                                    <td class="studioadmin-tbl">{{ page.layout }}</td>
+                                </tr>
+                            {% endfor %}
+
+
+
+                            </tbody>
+                        </table>
+
+
+                    </div>
+                </div>
+            </div>
+         </div>
+
+    </div>
+
+{% endblock studioadmincontent %}

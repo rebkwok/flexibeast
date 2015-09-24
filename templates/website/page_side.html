@@ -14,8 +14,16 @@
 
         <div class="col-sm-10 col-sm-offset-1">
         <h1>{{ page.heading }}</h1>
-            <img class={% if page.layout == '1-img-left' %}"page-img-side-left"{% else %}"page-img-side-right"{% endif %} src="{{ MEDIA_URL }}{{ page.pictures.first.image.name }}" alt="{{ page.name }} photo">
-            {% include 'website/page_content.html' %}
+
+        {% if page.pictures.count > 0 and page.layout != 'no-img' %}
+            {% for picture in page.pictures.all %}
+                {% if picture.main %}
+                   <img class={% if page.layout == '1-img-left' %}"page-img-side-left"{% else %}"page-img-side-right"{% endif %} src="{{ MEDIA_URL }}{{ picture.image.name }}" alt="{{ page.name }} photo">
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {% include 'website/page_content.html' %}
 
         </div>
 	</div>

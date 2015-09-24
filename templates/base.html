@@ -225,7 +225,6 @@
     </div>
 {% endblock footer %}
 
-
 {% if is_debug_on %}
     <script src="{% static 'flex_bookings/bootstrap/jquery.min.js' %}"></script>
     <script src="{% static 'flex_bookings/bootstrap/bootstrap.min.js' %}"></script>
@@ -241,8 +240,8 @@
 <script src="{% static 'flex_bookings/js/custom.js' %}"></script>
 
 <!--<script src="{% static 'flex_bookings/js/bootstrap-switch.js' %}"></script>-->
-<!--<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script>-->
 
+{% block extra_scripts %}{% endblock %}
 
 
 </html>

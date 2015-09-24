@@ -901,7 +901,8 @@ a > span.fa.fa-print {
     margin-bottom: 0px;
 }
 
-.page-img-single, {
+.page-img-single {
+    height: 320px;
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -919,11 +920,8 @@ a > span.fa.fa-print {
     margin-left: 20px;
 }
 
-.page-img-single {
-    height: 320px;
-}
 .page-img-side-left, .page-img-side-right {
-    width: 200px;
+    width: 300px;
 }
 
 .page-img-col {
@@ -938,4 +936,19 @@ a > span.fa.fa-print {
     .page-img-single {
         max-width: 300px;
     }
+}
+
+.new-inline-label{
+    margin-left: 10px;
+}
+
+.aligned-label-container {
+    display: inline;
+}
+.aligned-label{
+    vertical-align: middle;
+}
+
+.centred-heading {
+    text-align: center;
 }

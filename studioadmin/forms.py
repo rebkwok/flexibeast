@@ -16,6 +16,13 @@ from ckeditor.widgets import CKEditorWidget
 from flex_bookings.models import Block, Booking, Event, EventType
 from timetable.models import Session
 from payments.models import PaypalBookingTransaction
+from website.models import Page, SubSection, Picture
+
+from floppyforms import ClearableFileInput
+
+
+class ImageThumbnailFileInput(ClearableFileInput):
+    template_name = 'floppyforms/image_thumbnail.html'
 
 
 class EventBaseFormSet(BaseModelFormSet):
@@ -1038,11 +1045,7 @@ class UserBookingInlineFormSet(BaseInlineFormSet):
         form.paid_id = 'paid_{}'.format(index)
 
     def clean(self):
-        """
-        make sure that block selected is for the correct event type
-        and that a block has not been filled
-        :return:
-        """
+
         super(UserBookingInlineFormSet, self).clean()
         if {
             '__all__': ['Booking with this User and Event already exists.']
@@ -1087,3 +1090,146 @@ class ActivityLogSearchForm(forms.Form):
         }),
         initial='on'
     )
+
+
+class PageForm(forms.ModelForm):
+
+    class Meta:
+        model = Page
+        fields = ('name', 'menu_name', 'menu_location', 'layout', 'heading')
+        widgets = {
+            'name': forms.TextInput(
+                attrs={
+                    'class': 'form-control'
+                }
+            ),
+            'heading': forms.TextInput(
+                attrs={
+                    'class': 'form-control'
+                }
+            ),
+            'menu_name': forms.TextInput(
+                attrs={
+                    'class': 'form-control'
+                }
+            ),
+            'menu_location': forms.Select(
+                attrs={
+                    'class': 'form-control'
+                }
+            ),
+            'layout': forms.Select(
+                attrs={
+                    'class': 'form-control'
+                }
+            )
+        }
+
+class SubsectionBaseFormset(BaseInlineFormSet):
+
+    def __init__(self, *args, **kwargs):
+        super(SubsectionBaseFormset, self).__init__(*args, **kwargs)
+        self.empty_permitted = True
+
+    def add_fields(self, form, index):
+        super(SubsectionBaseFormset, self).add_fields(form, index)
+
+        if form.instance.id:
+
+            form.fields['DELETE'] = forms.BooleanField(
+                widget=forms.CheckboxInput(attrs={
+                    'class': 'delete-checkbox studioadmin-list',
+                    'id': 'DELETE_{}'.format(index)
+                }),
+                help_text="Tick box and click Save to delete this subsection",
+                required=False
+            )
+            form.DELETE_id = 'DELETE_{}'.format(index)
+
+        form.fields['content'] = forms.CharField(
+            widget=forms.Textarea(
+                attrs={'class': 'form-control'}
+            ),
+            required=True
+        )
+
+        form.fields['subheading'] = forms.CharField(
+            widget=forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+            required=False
+        )
+
+        form.fields['index'] = forms.IntegerField(
+            widget=forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+            help_text="Use this to change the order subsections "
+                      "are displayed on the page",
+            required=True
+        )
+
+SubsectionFormset = inlineformset_factory(
+    Page,
+    SubSection,
+    fields=('subheading', 'content', 'index'),
+    formset=SubsectionBaseFormset,
+    can_delete=True,
+    extra=1,
+)
+
+class PictureBaseFormset(BaseInlineFormSet):
+
+    def add_fields(self, form, index):
+        super(PictureBaseFormset, self).add_fields(form, index)
+
+        if form.instance.id:
+
+            form.fields['DELETE'] = forms.BooleanField(
+                widget=forms.CheckboxInput(attrs={
+                    'class': 'delete-checkbox studioadmin-list',
+                    'id': 'DELETE_PIC_{}'.format(index)
+                }),
+                required=False,
+                help_text="Tick box and click Save to delete this image"
+            )
+            form.DELETE_PIC_id = 'DELETE_PIC_{}'.format(index)
+
+        form.fields['main'] = forms.BooleanField(
+            widget=forms.CheckboxInput(attrs={
+                'class': 'regular-checkbox studioadmin-list',
+                'id': 'main_{}'.format(index)
+            }),
+            label="Main image",
+            required=False,
+            help_text="Show this image in single-image page layouts"
+            )
+        form.main_id = 'main_{}'.format(index)
+
+        form.fields['image'] = forms.ImageField(
+            label=_(''),
+            error_messages={'invalid':_("Image files only")},
+            widget=ImageThumbnailFileInput,
+            required=False
+        )
+
+    def clean(self):
+        super(PictureBaseFormset, self).clean()
+
+        main_pics = [
+            form.instance for form in self.forms if form.instance.main == True
+        ]
+        if len(main_pics) != 1:
+            self.errors.append({'main image': 'Please select a single "main" image '
+                                              'to be displayed in single '
+                                              'image layouts'})
+            raise forms.ValidationError('Only one "main" image can be selected')
+
+PictureFormset = inlineformset_factory(
+    Page,
+    Picture,
+    fields=('image', 'main'),
+    formset=PictureBaseFormset,
+    can_delete=True,
+    extra=1,
+)

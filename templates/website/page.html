@@ -12,10 +12,18 @@
 
         <div class="row">
         <div class="col-sm-10 col-xs-12 col-sm-offset-1">
-            <h1>{{ page.heading }}</h1>
 
             {% if page.pictures.count > 0 and page.layout != 'no-img' %}
-            <img class="img-responsive page-img-single" src="{{ MEDIA_URL }}{{ page.pictures.first.image.name }}" alt="{{ page.name }} photo">
+                <h1 class="centred-heading">{{ page.heading }}</h1>
+                {% for picture in page.pictures.all %}
+                    {% if picture.main %}
+                        <div class="page-img-single-container">
+                            <img class="img-responsive page-img-single" src="{{ MEDIA_URL }}{{ picture.image.name }}" alt="{{ page.name }} photo">
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <h1>{{ page.heading }}</h1>
             {% endif %}
 
             {% include 'website/page_content.html' %}
