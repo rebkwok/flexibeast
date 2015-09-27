@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils import timezone
 
 PAGE_LAYOUT_CHOICES = (
     ('no-img', 'No images'),
@@ -64,18 +64,34 @@ class SubSection(models.Model):
     )
     index = models.PositiveIntegerField(
         help_text="This controls the order subsections are displayed on "
-                  "the page"
+                  "the page",
+        null=True,
     )
     page = models.ForeignKey(Page, related_name='subsections')
 
     class Meta:
         ordering = ['index']
+        unique_together = [('page', 'index'),]
 
     def __str__(self):
         return "{} page - subsection {} {}".format(
             self.page.name.title(), self.index,
             "- {}".format(self.subheading) if self.subheading else ''
         )
+
+    def save(self):
+        # assign/edit indices
+        subsections = self.page.subsections.all()
+
+        # assign index if one has not been provided
+        if not self.index:
+            if self.id:
+                self.index = len(subsections)
+            else:
+                self.index = len(subsections) + 1
+
+        super(SubSection, self).save()
+
 
 class Picture(models.Model):
     image = models.ImageField(

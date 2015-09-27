@@ -114,4 +114,20 @@ jQuery(document).ready(function () {
             });
         }
     });
+
+    jQuery('.collapse')
+        .on('shown.bs.collapse', function() {
+            jQuery(this)
+                .parent()
+                .find("." + this.id + ".fa-plus-square")
+                .removeClass("fa-plus-square")
+                .addClass("fa-minus-square");
+        })
+        .on('hidden.bs.collapse', function() {
+            jQuery(this)
+                .parent()
+                .find("." + this.id + ".fa-minus-square")
+                .removeClass("fa-minus-square")
+                .addClass("fa-plus-square");
+        });
 });

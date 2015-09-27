@@ -1092,6 +1092,30 @@ class ActivityLogSearchForm(forms.Form):
     )
 
 
+class PagesBaseFormSet(BaseModelFormSet):
+
+    def add_fields(self, form, index):
+        super(PagesBaseFormSet, self).add_fields(form, index)
+
+        if form.instance:
+            form.fields['DELETE'] = forms.BooleanField(
+                widget=forms.CheckboxInput(attrs={
+                    'class': 'delete-checkbox studioadmin-list',
+                    'id': 'DELETE_{}'.format(index)
+                }),
+                required=False
+            )
+            form.DELETE_id = 'DELETE_{}'.format(index)
+
+
+PagesFormset = modelformset_factory(
+    Page,
+    fields=('id',),
+    formset=PagesBaseFormSet,
+    extra=0,
+    can_delete=True
+)
+
 class PageForm(forms.ModelForm):
 
     class Meta:
@@ -1162,12 +1186,13 @@ class SubsectionBaseFormset(BaseInlineFormSet):
 
         form.fields['index'] = forms.IntegerField(
             widget=forms.TextInput(
-                attrs={'class': 'form-control'}
+               attrs={'class': 'form-control'}
             ),
             help_text="Use this to change the order subsections "
                       "are displayed on the page",
-            required=True
+            required=False
         )
+
 
 SubsectionFormset = inlineformset_factory(
     Page,
@@ -1177,6 +1202,7 @@ SubsectionFormset = inlineformset_factory(
     can_delete=True,
     extra=1,
 )
+
 
 class PictureBaseFormset(BaseInlineFormSet):
 
@@ -1216,14 +1242,28 @@ class PictureBaseFormset(BaseInlineFormSet):
     def clean(self):
         super(PictureBaseFormset, self).clean()
 
-        main_pics = [
-            form.instance for form in self.forms if form.instance.main == True
-        ]
-        if len(main_pics) != 1:
-            self.errors.append({'main image': 'Please select a single "main" image '
-                                              'to be displayed in single '
-                                              'image layouts'})
-            raise forms.ValidationError('Only one "main" image can be selected')
+        # only check for main images if there are pictures attached
+        # if only 1 form, then it's either an empty blank one, or a single new
+        # pic
+        if len(self.forms) > 1 or \
+                (len(self.forms) == 1 and self.forms[0].instance.image):
+            main_pics = [
+                form.instance for form in self.forms if form.instance.main == True
+            ]
+            # raise error if > 1 pic selected as main. Set first pic to main if
+            # none selected
+            if len(main_pics) > 1:
+                self.errors.append(
+                    {'main image': 'More than one image is selected as the '
+                                   '"main" image to be displayed in single '
+                                   'image layouts.  Please select one only.'})
+                raise forms.ValidationError(
+                    'Only one "main" image can be selected'
+                )
+            elif len(main_pics) == 0:
+                first_form = self.forms[0]
+                first_form.instance.main = True
+                first_form.instance.save()
 
 PictureFormset = inlineformset_factory(
     Page,

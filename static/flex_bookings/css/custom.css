@@ -248,20 +248,25 @@ color: #000;
     padding-left: 15px;
 }
 
+
+
+.sidebar-nav li {
+  line-height: 25px;
+  text-indent: 2px;
+}
+
+.sidebar-nav .collapse li {
+  text-indent: 20px;
+}
+
 .sidebar-title {
   font-weight: 600;
   background: rgba(0, 0, 0, 0.05);
   border-top: solid 1px #BDBDBD;
   border-bottom: solid 1px #BDBDBD;
-
 }
 
-.sidebar-nav li {
-  line-height: 25px;
-  text-indent: 20px;
-}
-
-.sidebar-nav li a {
+.sidebar-nav li > a {
   color: #000;
   display: block;
   text-decoration: none;

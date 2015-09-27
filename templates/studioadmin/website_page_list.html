@@ -11,7 +11,8 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-success">
-
+                    <form class="form-horizontal" method="post" action="">
+                    {% csrf_token %}
                     <div class="table-responsive">
                         <table class="table tablesorter" id="sortTable">
                             <thead>
@@ -21,25 +22,30 @@
                                 <th>Menu name</th>
                                 <th>Menu location</th>
                                 <th>Layout</th>
+                                <th class="table-center">Delete page</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            {% for page in pages %}
+                            {{ pages_formset.management_form }}
+                            {% for page in pages_formset %}
+                                <span class=hide>{{ page.id }}</span>
                                 <tr>
-                                    <td class="studioadmin-tbl"><a href="{% url 'studioadmin:edit_page' page.name %}">{{ page.name }}</a></td>
-                                    <td class="studioadmin-tbl">{{ page.heading }}</td>
-                                    <td class="studioadmin-tbl">{{ page.menu_name }}</td>
-                                    <td class="studioadmin-tbl">{{ page.menu_location }}</td>
-                                    <td class="studioadmin-tbl">{{ page.layout }}</td>
+                                    <td class="studioadmin-tbl"><a href="{% url 'studioadmin:edit_page' page.instance.name %}">{{ page.instance.name }}</a></td>
+                                    <td class="studioadmin-tbl">{{ page.instance.heading }}</td>
+                                    <td class="studioadmin-tbl">{{ page.instance.menu_name }}</td>
+                                    <td class="studioadmin-tbl">{{ page.instance.menu_location }}</td>
+                                    <td class="studioadmin-tbl">{{ page.instance.layout }}</td>
+                                    <td class="studioadmin-tbl table-center">{{ page.DELETE }}<label for={{ page.DELETE_id }}></label>
                                 </tr>
                             {% endfor %}
-
-
+                            <tr>
+                                <td class="studioadmin-tbl" colspan="6"><input class="btn btn-success" name="formset_submitted" type="submit" value="Delete selected pages" /></td>
+                            </tr>
 
                             </tbody>
                         </table>
-
+                    </form>
 
                     </div>
                 </div>

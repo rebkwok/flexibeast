@@ -27,10 +27,10 @@ from django.core.mail import send_mail
 
 from braces.views import LoginRequiredMixin
 
-from studioadmin.forms import PageForm, SubsectionFormset, PictureFormset
+from studioadmin.forms import PageForm, PagesFormset, SubsectionFormset, PictureFormset
 from studioadmin.views.utils import StaffUserMixin
 
-from website.models import Page
+from website.models import Page, SubSection, Picture
 
 
 logger = logging.getLogger(__name__)
@@ -44,8 +44,41 @@ class PageListView(LoginRequiredMixin, StaffUserMixin, ListView):
 
     def get_context_data(self):
         context = super(PageListView, self).get_context_data()
+        context['pages_formset'] = PagesFormset()
         context['sidenav_selection'] = 'page_list'
         return context
+
+    def post(self, request, *args, **kwargs):
+        pages_forms = PagesFormset(request.POST)
+
+        if pages_forms.has_changed():
+            deleted_page_names = []
+            for form in pages_forms:
+                if form.has_changed() and 'DELETE' in form.changed_data:
+                    page = Page.objects.get(id=form.instance.id)
+                    # delete associated subsections and pictures
+                    SubSection.objects.filter(page=page).delete()
+                    Picture.objects.filter(page=page).delete()
+                    deleted_page_names.append(page.name)
+                    # delete page
+                    page.delete()
+
+            if len(deleted_page_names) == 1:
+                msg = "Page '{}' has been deleted".format(deleted_page_names[0])
+            elif len(deleted_page_names) > 1:
+                msg = "Pages {} have been deleted".format(
+                    ', '.join(["'{}'".format(name) for name in deleted_page_names])
+                )
+            else:
+                msg = "No changes made"
+            messages.success(request, msg)
+        else:
+            messages.info(request, "No changes made")
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('studioadmin:website_pages_list')
 
 
 class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
@@ -63,10 +96,10 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
         context = super(PageUpdateView, self).get_context_data(**kwargs)
         context['sidenav_selection'] = 'page_list'
 
-        subsection_formset = SubsectionFormset(instance=self.object)
+        subsection_formset = SubsectionFormset(instance=self.get_object())
         context['subsection_formset'] = subsection_formset
 
-        picture_formset = PictureFormset(instance=self.object)
+        picture_formset = PictureFormset(instance=self.get_object())
         context['picture_formset'] = picture_formset
         return context
 
@@ -83,13 +116,14 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
             if (form.has_changed() or subsection_formset.has_changed() or
                     picture_formset.has_changed()):
 
+                change_messages = []
+
                 if form.has_changed():
-                    messages.success(
-                        request,
-                        "{} has been updated".format(
-                            ', '.join(form.changed_data)
+                    change_messages.append("{} has been updated".format(
+                        ', '.join(form.changed_data)
                         )
                     )
+
                 page = form.save()
 
                 for form in subsection_formset.forms:
@@ -97,16 +131,13 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
                         subsection = form.save(commit=False)
                         if 'DELETE' in form.changed_data:
                             subsection.delete()
-                            messages.success(
-                                request,
+                            change_messages.append(
                                 'Subsection deleted from "{}" page'.format(
                                     page.name.title()
-                                )
-                            )
+                                ))
                         elif form.has_changed():
                             subsection.save()
-                            messages.success(
-                                request,
+                            change_messages.append(
                                 'Subsection successfully edited for "{}" '
                                 'page'.format(
                                     page.name.title()
@@ -122,8 +153,7 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
                         if 'DELETE' in form.changed_data:
                             name = picture.image.name
                             picture.delete()
-                            messages.success(
-                                request,
+                            change_messages.append(
                                 'Picture {} deleted from "{}" page'.format(
                                     name.split('/')[-1],
                                     page.name.title()
@@ -132,8 +162,7 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
                         elif form.has_changed():
                             action = 'edited' if picture.id else 'added'
                             picture.save()
-                            messages.success(
-                                request,
+                            change_messages.append(
                                 'Picture {} has been {}'.format(
                                     picture.image.name.split('/')[-1],
                                     action
@@ -142,26 +171,41 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
                     else:
                         for error in form.errors:
                             messages.error(request, mark_safe(error))
+
+                messages.success(
+                    request,
+                    mark_safe(
+                         "<ul>{}</ul>".format(
+                             ''.join(['<li>{}</li>'.format(msg)
+                              for msg in change_messages])
+                         )
+                    )
+                )
+
             else:
                 messages.info(request, "No changes made")
+        else:
+            if not subsection_formset.is_valid():
+                for error in subsection_formset.errors:
+                    for k, v in error.items():
+                        messages.error(
+                            request, mark_safe("{}: {}".format(k.title(), v))
+                        )
 
-        if not form.is_valid():
-            for error in form.errors:
-                messages.error(request, mark_safe(error))
+            if not picture_formset.is_valid():
+                for error in picture_formset.errors:
+                    for k, v in error.items():
+                        messages.error(
+                            request, mark_safe("{}: {}".format(k.title(), v))
+                        )
+            context = {
+                'form': form,
+                'subsection_formset': subsection_formset,
+                'picture_formset': picture_formset,
+                'sidenav_selection': 'page_list'
+            }
 
-        if not subsection_formset.is_valid():
-            for error in picture_formset.errors:
-                for k, v in error.items():
-                    messages.error(
-                        request, mark_safe("{}: {}".format(k.title(), v))
-                    )
-
-        if not picture_formset.is_valid():
-            for error in picture_formset.errors:
-                for k, v in error.items():
-                    messages.error(
-                        request, mark_safe("{}: {}".format(k.title(), v))
-                    )
+            return TemplateResponse(request, self.template_name, context)
 
         return HttpResponseRedirect(self.get_success_url(name=page.name))
 
@@ -169,3 +213,68 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
         return reverse(
             'studioadmin:edit_page', kwargs={'name': name}
         )
+
+
+class PageCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
+
+    model = Page
+    template_name = 'studioadmin/page_create_update.html'
+    context_object_name = 'page'
+    form_class = PageForm
+
+    def get_context_data(self, **kwargs):
+        context = super(PageCreateView, self).get_context_data(**kwargs)
+        context['sidenav_selection'] = 'page_list'
+
+        subsection_formset = SubsectionFormset()
+        context['subsection_formset'] = subsection_formset
+
+        picture_formset = PictureFormset()
+        context['picture_formset'] = picture_formset
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = PageForm(request.POST)
+
+        if form.is_valid():
+            page = form.save()
+            subsection_formset = SubsectionFormset(request.POST, instance=page)
+            picture_formset = PictureFormset(request.POST, request.FILES, instance=page)
+
+            if form.is_valid() and subsection_formset.is_valid() and picture_formset.is_valid():
+                form.save()
+                subsection_formset.save()
+                picture_formset.save()
+
+                messages.success(request, mark_safe(
+                    "Page {} has been created".format(page.name.title())
+                    )
+                )
+            else:
+                if not subsection_formset.is_valid():
+                    for error in subsection_formset.errors:
+                        for k, v in error.items():
+                            messages.error(
+                                request, mark_safe("{}: {}".format(k.title(), v))
+                            )
+
+                if not picture_formset.is_valid():
+                    for error in picture_formset.errors:
+                        for k, v in error.items():
+                            messages.error(
+                                request, mark_safe("{}: {}".format(k.title(), v))
+                            )
+
+                context = {
+                    'form': form,
+                    'subsection_formset': subsection_formset,
+                    'picture_formset': picture_formset,
+                    'sidenav_selection': 'page_list'
+                }
+
+                return TemplateResponse(request, self.template_name, context)
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('studioadmin:website_pages_list')

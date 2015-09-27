@@ -7,10 +7,9 @@ from studioadmin.views.blocks import BlockAdminCreateView, BlockAdminUpdateView
 from studioadmin.views.timetable import (
                                TimetableSessionUpdateView,
                                TimetableSessionCreateView,
-#                                BlockListView,
                                )
 from studioadmin.views.users import UserListView
-from studioadmin.views.website import PageListView, PageUpdateView
+from studioadmin.views.website import PageListView, PageCreateView, PageUpdateView
 
 
 urlpatterns = patterns('',
@@ -79,6 +78,9 @@ urlpatterns = patterns('',
     url(
         r'^website-pages/(?P<name>[\w-]+)$',
         PageUpdateView.as_view(), name='edit_page'
+    ),
+   url(
+        r'^website-pages/new/$', PageCreateView.as_view(), name='add_page'
     ),
     url(r'^$', RedirectView.as_view(url='/studioadmin/classes/', permanent=True)),
     )
