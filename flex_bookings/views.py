@@ -679,7 +679,9 @@ def payments_pending(request):
                     booking.cost,
                     booking.event,
                     invoice_id,
-                    '{} {}'.format('booking', booking.id)
+                    'userid {} {} {}'.format(
+                        request.user.id, 'booking', booking.id
+                    )
                 )
             )
             unpaid_booking = {

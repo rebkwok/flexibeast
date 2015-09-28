@@ -1,4 +1,4 @@
-Your payment status for {{ event }} has been updated to paid and confirmed.
+Your payment status for {{ block_obj.name }} has been updated to paid and confirmed.
 
 View your bookings: {{ host }}{% url 'flexbookings:bookings' %}
 

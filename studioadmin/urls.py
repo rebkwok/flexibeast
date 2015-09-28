@@ -13,8 +13,12 @@ from studioadmin.views.website import PageListView, PageCreateView, PageUpdateVi
 
 
 urlpatterns = patterns('',
-    url(r'^confirm-payment/(?P<pk>\d+)/$', ConfirmPaymentView.as_view(),
+    url(r'^confirm-payment/(?P<pk>\d+)/$',
+        'studioadmin.views.misc.confirm_user_booking_payment',
         name='confirm-payment'),
+    url(r'^confirm-payment/user/(?P<user_id>\d+)/block/(?P<block_id>\d+)/$',
+        'studioadmin.views.misc.confirm_user_block_payment',
+        name='confirm-block-payment'),
     url(r'^confirm-refunded/(?P<pk>\d+)/$', ConfirmRefundView.as_view(),
         name='confirm-refund'),
     url(r'^events/(?P<slug>[\w-]+)/edit$', EventAdminUpdateView.as_view(),

@@ -189,6 +189,11 @@ class BlockAdminCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
 
     def form_valid(self, form):
         block = form.save()
+        if block.booking_open:
+            for event in block.events.all():
+                event.booking_open = True
+                event.save()
+
         messages.success(
             self.request, mark_safe(
                 '<strong>Block {}</strong> has been created!'.format(

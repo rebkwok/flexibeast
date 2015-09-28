@@ -569,16 +569,6 @@ class BookingStatusFilter(forms.Form):
     )
 
 
-class ConfirmPaymentForm(forms.ModelForm):
-    class Meta:
-        model = Booking
-        fields = ('paid', 'payment_confirmed')
-        widgets = {
-            'paid': forms.CheckboxInput(),
-            'payment_confirmed': forms.CheckboxInput()
-        }
-
-
 DAY_CHOICES = dict(Session.DAY_CHOICES)
 
 

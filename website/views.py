@@ -31,14 +31,17 @@ def page(request, page_name):
         template = TEMPLATES[page.layout]
 
     try:
-        include_html = select_template(
+        select_template(
             ['website/include/{}_extra.html'.format(page_name)]
         )
+        include_html = 'website/include/{}_extra.html'.format(page_name)
+        test = "try"
     except TemplateDoesNotExist:
         include_html = ''
+        test = "except"
 
     return TemplateResponse(
-        request, template, {'page': page, 'include_html': include_html}
+        request, template, {'page': page, 'include_html': include_html, 'test': test}
     )
 
 
