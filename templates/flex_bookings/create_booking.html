@@ -52,10 +52,10 @@
                                 <span class="divider"></span>
 
                             <h4>Block booking</h4>
-                            {% for block in open_blocks %}
+                            {% for block_obj in open_blocks %}
 
-                                <h5>{{ block.name }}</h5>
-                                <p>Total block cost: £{{ block|block_cost }} (per class cost £{{ block.item_cost }})</p>
+                                <h5>{{ block_obj.name }}</h5>
+                                <p>Total block cost: £{{ block_obj|block_cost }} (per class cost £{{ block_obj.item_cost }})</p>
 
                                 <p>Booking this block will book you in to the following classes:</p>
 
@@ -64,20 +64,20 @@
                                     <li>{% if block_event == event %}<strong>{{ block_event }}</strong>{% else %}{{ block_event }}{% endif %}</li>
                                 {% endfor %}
                                 </ul>
-                                {% if block in available_blocks %}
+                                {% if block_obj in available_blocks %}
                                     <button class="btn btn-success update-btn"
-                                            type="submit" name="book_block" value={{ block.id }}>Book block
+                                            type="submit" name="book_block" value={{ block_obj.id }}>Book block
                                     </button>
                                 {% else %}
                                     <p><strong>Booking is unavailable because
                                     {% for unavailable_block in unavailable_reasons %}
-                                        {% if unavailable_block.block == block %}
+                                        {% if unavailable_block.block == block_obj %}
                                             {{ unavailable_block.reason|lower }}
                                         {% endif %}
                                     {% endfor %}
                                     </strong></p>
                                     <button class="btn btn-success update-btn" disabled
-                                                type="submit" name="book_block" value={{ block.id }}>Book block
+                                                type="submit" name="book_block" value={{ block_obj.id }}>Book block
                                     </button>
                                 {% endif %}
                                 <span class="divider"></span>

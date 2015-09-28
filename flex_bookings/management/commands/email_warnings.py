@@ -91,11 +91,11 @@ def send_warning_email(self, upcoming_bookings):
 
         send_mail('{} Reminder: {}'.format(
             settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, booking.event.name),
-            get_template('booking/email/booking_warning.txt').render(ctx),
+            get_template('flex_bookings/email/booking_warning.txt').render(ctx),
             settings.DEFAULT_FROM_EMAIL,
             [booking.user.email],
             html_message=get_template(
-                'booking/email/booking_warning.html'
+                'flex_bookings/email/booking_warning.html'
                 ).render(ctx),
             fail_silently=False)
         booking.warning_sent = True

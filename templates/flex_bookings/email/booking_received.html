@@ -2,7 +2,7 @@
 
 {% block messagecontent %}
 <div style="font-family: sans-serif;">
-{% if block %}
+{% if block_obj %}
     <p>Your booking has been received for {{ block_name }}.</p>
     <p>Advance payment is required for block bookings.  Your space will be
         confirmed for the relevant classes once the organiser has received
@@ -31,15 +31,11 @@
                 <p>Advance payment is required for this {{ ev_type }}.  Your space will be confirmed once the
                     organiser has received your payment.</p>
             {% endif %}
-            {% if event.payment_open %}
-                <p><strong>Payment information</strong></p>
-                    {{ event.payment_info|safe }}
-                <p>Payments are open; visit your bookings page at <a href="{{ host }}{% url 'flexbookings:bookings' %}">{{ host }}{% url 'flexbookings:bookings' %}</a> to
-                    make your payment.</p>
-            {% else %}
-                <p>Payments are not being taken for this {{ ev_type }} yet.  Further information will be
-                    sent nearer the {{ ev_type }} date.</p>
-            {% endif %}
+
+            <p><strong>Payment information</strong></p>
+                {{ event.payment_info|safe }}
+            <p>Visit your bookings page at <a href="{{ host }}{% url 'flexbookings:bookings' %}">{{ host }}{% url 'flexbookings:bookings' %}</a> to
+                make your payment.</p>
 
             {% if prev_cancelled_and_direct_paid %}
                 <p>You are rebooking a previously cancelled booking which is

@@ -1,8 +1,8 @@
-{% if block %}
+{% if block_obj %}
 {{ user.first_name }} {{ user.last_name }} ({{ user.username }}) has booked block {{ block_name }}.
 
 Click the link below to review and confirm that payment has been made for this block.  This will mark {{ user.first_name }}'s space as confirmed.
-{{ host }}/studioadmin/confirm-payment/block/{{ block.id }}
+{{ host }}/studioadmin/confirm-payment/block/{{ block_obj.id }}
 
 {% else %}
 {{ booking.user.first_name }} {{ booking.user.last_name }} ({{ booking.user.username }}) booked for {{ event }}.

@@ -41,8 +41,8 @@
                     {% if event.blocks %}
                         <li class="list-group-item"><p><strong>Block information</strong></p>
                                 <ul>
-                                    {% for block in open_blocks %}
-                                        <li>{{ block.name }} - total cost £{{ block|block_cost }}</li>
+                                    {% for block_obj in open_blocks %}
+                                        <li>{{ block_obj.name }} - total cost £{{ block_obj|block_cost }}</li>
                                         <ul>
                                             {% for block_event in block.events.all %}
                                                 <li>{% if block_event == event %}<strong>{{ block_event }}</strong>{% else %}{{ block_event }}{% endif %}</li>
@@ -60,8 +60,8 @@
                                 {% else %}
                                     <p>Block booking is not available for the following reasons:</p>
                                     <ul>
-                                    {% for block in unavailable_reasons %}
-                                        <li><strong>{{ block.block }}:</strong> {{ block.reason }}</li>
+                                    {% for block_obj in unavailable_reasons %}
+                                        <li><strong>{{ block_obj.block }}:</strong> {{ block_obj.reason }}</li>
                                     {% endfor %}
                                     </ul>
                                 {% endif %}

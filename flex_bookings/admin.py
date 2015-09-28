@@ -204,27 +204,6 @@ class BookingAdmin(admin.ModelAdmin):
         return obj.user.last_name
     get_user_last_name.short_description = 'Last name'
 
-    actions = ['confirm_space']
-
-    def confirm_space(self, request, queryset):
-        for obj in queryset:
-            obj.confirm_space()
-
-            send_mail('{} Space for {} confirmed'.format(
-                settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, obj.event.name),
-                get_template('booking/email/space_confirmed.txt').render(
-                    Context({'event': obj.event.name,
-                             'date': obj.event.date.strftime('%A %d %B'),
-                             'time': obj.event.date.strftime('%I:%M %p')
-                    })
-                ),
-                settings.DEFAULT_FROM_EMAIL,
-                [obj.user.email],
-                fail_silently=False)
-
-    confirm_space.short_description = \
-        "Mark selected bookings as paid and confirmed"
-
 
 class WaitingListUserAdmin(admin.ModelAdmin):
     fields = ('user', 'event')

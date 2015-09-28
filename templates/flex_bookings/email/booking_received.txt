@@ -1,6 +1,6 @@
 {% include "account/email/do_not_reply.txt" %}
-{% if block %}
-Your booking has been received for {{ block.name }}.
+{% if block_obj %}
+Your booking has been received for {{ block_name }}.
 Advance payment is required for block bookings.  Your space will be confirmed for the relevant classes once the organiser has received your payment.
 
 Classes in this block:
@@ -16,14 +16,10 @@ Your booking has been received for {{ event }}.
 {% else %}
     Advance payment is required for this {{ ev_type }}.  Your space will be confirmed once the organiser has received your payment.
 {% endif %}
-{% if event.payment_open %}
     Payment information
-    ===============
-    {{ event.payment_info|safe }}
-    Payments are open; visit your bookings page at {{ host }}{% url 'flexbookings:bookings' %} to make your payment.
-{% else %}
-    Payments are not being taken for this {{ ev_type }} yet.  Further information will be sent nearer the {{ ev_type }} date.
-{% endif %}
+===============
+{{ event.payment_info|safe }}
+Visit your bookings page at {{ host }}{% url 'flexbookings:bookings' %} to make your payment.
 
 {% if prev_cancelled_and_direct_paid %}
     You are rebooking a previously cancelled booking which is still marked as paid.  The organiser has been sent a request to review your payment status and confirm that this payment has not been refunded yet.  Your booking will remain as pending until your payment status has been confirmed.

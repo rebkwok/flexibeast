@@ -69,7 +69,7 @@
                                     <td class="hidden-xs table-center">
                                         {% if event.max_participants %}{{ event.spaces_left }}
                                         {% else %}N/A{% endif %}</td>
-                                    <td class="table-center">{% for block in event.blocks.all %}<div>{% if block.booking_open %}{{ block.name }}{% endif %}</div>{% endfor %}</td>
+                                    <td class="table-center">{% for block_obj in event.blocks.all %}<div>{% if block_obj.booking_open %}{{ block_obj.name }}{% endif %}</div>{% endfor %}</td>
                                 </tr>
                             {% endfor %}
                         </table>

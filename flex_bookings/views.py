@@ -366,7 +366,7 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
             # send email to user
             ctx = Context(
                 {
-                    'host': host, 'block': block, 'block_name': block.name,
+                    'host': host, 'block_obj': block, 'block_name': block.name,
                     'block_events': block.events.all(), 'user': self.request.user
                 }
             )
@@ -590,7 +590,7 @@ def update_block(request, pk):
     ctx = Context({
         'host': host,
         'user': request.user,
-        'block': block
+        'block_obj': block
     })
     try:
         send_mail('{} Payment confirmed for {} by {} {}'.format(
@@ -739,7 +739,7 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
         context = super(BookingDeleteView, self).get_context_data(**kwargs)
         booking = get_object_or_404(Booking, pk=self.kwargs['pk'])
         if booking.block:
-            context['block'] = True
+            context['has_block'] = True
         event = Event.objects.get(id=booking.event.id)
         context['event'] = event
 
@@ -836,7 +836,7 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
         ctx = Context({
                       'host': host,
                       'bookings': bookings,
-                      'block': block,
+                      'block_obj': block,
                       'user': request.user,
                       'contact_person': bookings[0].event.contact_person,
                       'contact_email': bookings[0].event.contact_email,

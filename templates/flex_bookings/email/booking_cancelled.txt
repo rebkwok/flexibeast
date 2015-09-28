@@ -5,7 +5,7 @@ The following bookings have been cancelled:
 - {{ booking.event }}
 {% endfor %}
 
-{% if not block %}
+{% if not block_obj %}
 Please note that payments are not automatically refunded. The organiser has been informed of your cancellation and will be in contact soon.
 {% else %}
 Please note that refunds are not given for individual class cancellations from block bookings.

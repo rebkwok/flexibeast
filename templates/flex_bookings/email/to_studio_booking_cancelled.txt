@@ -1,5 +1,5 @@
-{% if block %}
-{{ user.username }} has cancelled block {{ block }}.
+{% if block_obj %}
+{{ user.username }} has cancelled block {{ block_obj.name }}.
 {% else %}
 {{ user.username }} has cancelled a booking.
 {% endif %}
@@ -9,7 +9,7 @@ The following bookings have been cancelled:
 - {{ booking.event }}
 {% endfor %}
 
-{% if not block %}
+{% if not block_obj %}
 This was a single-class booking.  Please review and refund this payment.
 
 When the payment has been refunded, use the link below to confirm and update the payment status on the booking site:

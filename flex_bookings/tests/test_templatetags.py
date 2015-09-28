@@ -160,7 +160,7 @@ class BookingsCountTagsTests(TestCase):
 
         resp = self._get_response(self.user)
         self.assertIn(
-            '<a href="/studioadmin/waitinglists/{}">{}</a>'.format(
+            '<a href="/studioadmin/bookings-waitinglists/{}">{}</a>'.format(
                 event.id, event.bookings.count()
             ),
             str(resp.content)

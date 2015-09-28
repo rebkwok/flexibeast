@@ -71,21 +71,4 @@ class BookingAdminTests(TestCase):
         )
         self.assertEqual(booking_admin.event_name(booking_query), event.name)
 
-    def test_confirm_space(self):
-        users = mommy.make_recipe('flex_bookings.user', _quantity=10)
-        ev = mommy.make_recipe('flex_bookings.future_EV', cost=5)
-        ws = mommy.make_recipe('flex_bookings.future_WS', cost=5)
-        for user in users[:5]:
-            mommy.make_recipe('flex_bookings.booking', user=user, event=ev)
-        for user in users[5:]:
-            mommy.make_recipe('flex_bookings.booking', user=user, event=ws)
-
-        self.assertEquals(len(Booking.objects.filter(paid=True)), 0)
-        self.assertEquals(len(Booking.objects.filter(payment_confirmed=True)), 0)
-
-        booking_admin = admin.BookingAdmin(Booking, AdminSite())
-        queryset = Booking.objects.filter(event__event_type__subtype__contains='Yoga class')
-        booking_admin.confirm_space(None, queryset)
-        self.assertEquals(len(Booking.objects.filter(paid=True)), 5)
-        self.assertEquals(len(Booking.objects.filter(payment_confirmed=True)), 5)
 
