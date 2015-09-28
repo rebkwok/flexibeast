@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from django.views.generic import RedirectView
-from studioadmin.views.misc import ConfirmPaymentView, ConfirmRefundView
+from studioadmin.views.misc import ConfirmRefundView
 from studioadmin.views.activitylog import ActivityLogListView
 from studioadmin.views.events import EventAdminCreateView, EventAdminUpdateView
 from studioadmin.views.blocks import BlockAdminCreateView, BlockAdminUpdateView
