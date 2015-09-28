@@ -1,5 +1,5 @@
 """
-WSGI config for pipsevents project.
+WSGI config for flexibeast project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

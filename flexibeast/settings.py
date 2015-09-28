@@ -151,6 +151,9 @@ DATABASES = {
     # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
 }
 
+if env('HEROKU'):
+    DATABASES['default'] = dj_database_url.config()
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
@@ -171,6 +174,8 @@ STATICFILES_DIRS = (root('static'),)
 
 STATIC_URL = '/static/'
 STATIC_ROOT = root('collected-static')
+if env('HEROKU'):
+    STATIC_ROOT = 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = root('media')

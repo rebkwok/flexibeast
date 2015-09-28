@@ -1,1 +1,1 @@
-web: gunicorn pipsevents.wsgi --log-file -
+web: gunicorn flexibeast.wsgi --log-file -
