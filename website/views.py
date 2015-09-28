@@ -32,16 +32,14 @@ def page(request, page_name):
 
     try:
         select_template(
-            ['website/include/{}_extra.html'.format(page_name)]
+            ['website/{}_extra.html'.format(page_name)]
         )
-        include_html = 'website/include/{}_extra.html'.format(page_name)
-        test = "try"
+        include_html = 'website/{}_extra.html'.format(page_name)
     except TemplateDoesNotExist:
         include_html = ''
-        test = "except"
 
     return TemplateResponse(
-        request, template, {'page': page, 'include_html': include_html, 'test': test}
+        request, template, {'page': page, 'include_html': include_html}
     )
 
 
