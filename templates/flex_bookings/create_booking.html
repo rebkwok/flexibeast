@@ -42,7 +42,7 @@
 
                         <span class="hide">{{ form.event }}</span>
                         <span class="hide">{{ form.user }}</span>
-                        {% if event.blocks %}
+                        {% if open_blocks %}
                             <h4>Single class booking</h4>
                             {% if individual_booking_allowed %}
                                 <input class="btn btn-success update-btn" type="submit" name="book_one_off" value="Book single class" />
@@ -50,6 +50,7 @@
                                 <p>Single class booking is not yet available for this {{ ev_type }}.  Single class booking opens on {{ date_individual_booking_allowed|date:"D d F Y" }}.</p>
                             {% endif %}
                                 <span class="divider"></span>
+
                             <h4>Block booking</h4>
                             {% for block in open_blocks %}
 

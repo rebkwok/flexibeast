@@ -1,3 +1,0 @@
-{% include "account/email/do_not_reply.txt" %}
-
-Your payment has been received for {{ event }} and your space is now confirmed!

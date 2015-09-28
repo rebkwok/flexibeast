@@ -71,13 +71,13 @@
                     {% if event.cancellation_period %}
                         <li class="list-group-item"><strong>Cancellation information</strong>
                             <p>Cancellation is allowed up to {{ event.cancellation_period | format_cancellation }} prior to the
-                            {% if type == "event" %}workshop{% elif type == "lesson" %}class{% endif %}</p></li>
+                            {% if type == "workshop" %}workshop{% elif type == "lesson" %}class{% endif %}</p></li>
                     {% endif %}
                     <li class="list-group-item">
                     {% if event.max_participants %}
 
                         <h5>There are a maximum {{ event.max_participants }} spaces for this
-                            {% if type == "event" %}workshop{% elif type == "lesson" %}class{% endif %}.</h5>
+                            {% if type == "workshop" %}workshop{% elif type == "lesson" %}class{% endif %}.</h5>
                     {% endif %}
                     </li>
 
