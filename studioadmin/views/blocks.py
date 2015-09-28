@@ -157,6 +157,10 @@ class BlockAdminUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
     def form_valid(self, form):
         if form.has_changed():
             block = form.save()
+            if block.booking_open:
+                for event in block.events.all():
+                    event.booking_open = True
+                    event.save()
             msg = '<strong>Block {}</strong> has been updated!'.format(
                 block.name
             )

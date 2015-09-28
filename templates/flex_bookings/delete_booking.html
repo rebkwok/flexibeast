@@ -26,8 +26,10 @@
                     <input class="btn btn-danger" type="submit" name="cancel_block" value="Cancel block **" />
                 {% endif %}
                 <a href="{% url 'flexbookings:bookings' %}"><div class="btn btn-warning">Back</div></a>
-                <p class="studioadmin-help">** This will cancel all remaining classes in the block.  Please note that refunds are not
-                given for individual class cancellations from block bookings.</p>
+                {% if has_block %}
+                    <p class="studioadmin-help">** This will cancel all remaining classes in the block.  Please note that refunds are not
+                    given for individual class cancellations from block bookings.</p>
+                {% endif %}
             </form>
             </br>
         </div>

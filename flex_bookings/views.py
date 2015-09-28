@@ -601,7 +601,7 @@ def update_block(request, pk):
                 'flex_bookings/email/to_studio_payment_confirmed.txt'
             ).render(ctx),
             settings.DEFAULT_FROM_EMAIL,
-            [request.user.email],
+            [settings.DEFAULT_STUDIO_EMAIL],
             fail_silently=False)
     except Exception as e:
         # send mail to tech support with Exception
@@ -647,7 +647,7 @@ def update_booking(request, pk):
                 'flex_bookings/email/to_studio_payment_confirmed.txt'
             ).render(ctx),
             settings.DEFAULT_FROM_EMAIL,
-            [request.user.email],
+            [settings.DEFAULT_STUDIO_EMAIL],
             fail_silently=False)
     except Exception as e:
         # send mail to tech support with Exception
