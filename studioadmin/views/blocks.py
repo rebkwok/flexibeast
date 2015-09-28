@@ -206,3 +206,23 @@ class BlockAdminCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
     def get_success_url(self):
         return reverse('studioadmin:blocks')
 
+
+@login_required
+@staff_required
+def single_block_bookings_view(request, block_id):
+    block = get_object_or_404(Block, id=block_id)
+
+    block_bookings = block.bookings.all()
+
+    block_users = set(
+        [booking.user for booking in block_bookings if booking.status == 'OPEN']
+    )
+
+
+    template = 'studioadmin/single_block_bookings.html'
+    return TemplateResponse(
+        request, template, {
+            'block_users': block_users,
+            'sidenav_selection': 'blocks'
+        }
+    )

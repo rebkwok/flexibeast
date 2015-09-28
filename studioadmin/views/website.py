@@ -56,9 +56,12 @@ class PageListView(LoginRequiredMixin, StaffUserMixin, ListView):
             for form in pages_forms:
                 if form.has_changed() and 'DELETE' in form.changed_data:
                     page = Page.objects.get(id=form.instance.id)
+
                     # delete associated subsections and pictures
+                    # loop to delete pics so we call delete() on each instance
                     SubSection.objects.filter(page=page).delete()
-                    Picture.objects.filter(page=page).delete()
+                    [pic.delete() for pic in Picture.objects.filter(page=page)]
+
                     deleted_page_names.append(page.name)
                     # delete page
                     page.delete()

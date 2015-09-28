@@ -16,6 +16,7 @@
                 <h2 class="panel-title">Adding new page</h2>
                 {% endif %}
             </div>
+
             <div class="panel-body">
                 {% if form.errors %}
                     <div class="form-error">
@@ -27,6 +28,11 @@
                         </ul>
                     </div>
                     {% endif %}
+
+                {% if page.name == "about" %}
+                    <p><strong>This is the "about" page, which will be the home page.  Leave the menu name blank and select "No images" as the layout.
+                    This page will be linked from the menu logo and has custom slideshow images.</strong></p>
+                {% endif %}
 
                 <form class="form-horizontal" enctype="multipart/form-data" method="post" action="">
                     {% csrf_token %}
@@ -57,18 +63,16 @@
                                         <h4>Add new subsection:</h4>
                                     </div>
                                 {% endif %}
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-2">{% if subsection.subheading.field.required %}*{% endif %}{{ subsection.subheading.label }}</label>
-                                        <div class="col-sm-9">{{ subsection.subheading }}<p class="studioadmin-help">{{ subsection.heading.help_text }}</p></div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-2">{% if subsection.index.field.required %}*{% endif %}{{ subsection.index.label }}</label>
-                                        <div class="col-sm-9">{{ subsection.index }}<p class="studioadmin-help">{{ subsection.index.help_text }}</p></div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-2">{% if subsection.content.field.required %}*{% endif %}{{ subsection.content.label }}</label>
-                                        <div class="col-sm-9">{{ subsection.content }}<p class="studioadmin-help">{{ subsection.content.help_text }}</p></div>
-                                    </div>
+
+                                    {% for field in subsection %}
+                                        {% if field.name != 'DELETE' and field.name != 'id' and field.name != 'page' %}
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-2">{% if field.field.required %}*{% endif %}{{ field.label }}</label>
+                                                <div class="col-sm-9">{{ field }}<p class="studioadmin-help">{{ field.help_text }}</p></div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+
                                     {% if subsection.instance.id %}
                                         <div class="form-group">
                                             <label class="control-label delete-label col-sm-2">{{ subsection.DELETE.label }}</label>

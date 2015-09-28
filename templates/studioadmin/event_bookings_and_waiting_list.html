@@ -17,18 +17,17 @@
                         <div class="table-responsive">
                             <table class="table">
                                 <tr class="success">
-                                    <th>User</th>
+                                    <th>User</br><span class="studioadmin-help">Click to see all user's bookings</span></th>
                                     <th>Username</th>
                                 </tr>
 
                                 {% for bkuser in booking_users %}
                                 <tr>
-                                    <td class="studioadmin-tbl">{{ bkuser.first_name }} {{ bkuser.last_name }}</td>
-                                    <td class="studioadmin-tbl">{{ bkuser.username }}
-{#                                        <a href="{% url 'studioadmin:user_bookings_list' wluser.user.id 'future_open' %}">#}
-{#                                        {{ wluser.user.username }}#}
-{#                                        </a>#}
+                                    <td class="studioadmin-tbl">
+                                        <a href="{% url 'studioadmin:user_bookings_list' bkuser.id 'future_open' %}">
+                                            {{ bkuser.first_name }} {{ bkuser.last_name }}</a>
                                     </td>
+                                    <td class="studioadmin-tbl">{{ bkuser.username }}</td>
                                 </tr>
                                 {% endfor %}
                             </table>
@@ -52,18 +51,18 @@
                         <table class="table">
                             <tr class="success">
                                 <th>User</th>
-                                <th>Username</th>
+                                <th>Username</br><span class="studioadmin-help">Click to see all user's bookings</span></th>
                                 <th>Date joined</th>
                             </tr>
 
                             {% for wluser in waiting_list_users %}
                             <tr>
-                                <td class="studioadmin-tbl">{{ wluser.user.first_name }} {{ wluser.user.last_name }}</td>
                                 <td class="studioadmin-tbl">
                                     <a href="{% url 'studioadmin:user_bookings_list' wluser.user.id 'future_open' %}">
-                                    {{ wluser.user.username }}
+                                    {{ wluser.user.first_name }} {{ wluser.user.last_name }}
                                     </a>
                                 </td>
+                                <td class="studioadmin-tbl">{{ wluser.user.username }}</td>
                                 <td class="studioadmin-tbl">{{ wluser.date_joined|formatted_uk_date }}</td>
                             </tr>
                             {% endfor %}

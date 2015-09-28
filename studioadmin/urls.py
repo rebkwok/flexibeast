@@ -68,8 +68,13 @@ urlpatterns = patterns('',
         r'activitylog/$', ActivityLogListView.as_view(), name='activitylog'
     ),
     url(
-        r'^waitinglists/(?P<event_id>\d+)$',
+        r'^bookings-waitinglists/(?P<event_id>\d+)$',
         'studioadmin.views.waitinglist.event_waiting_list_view', name='event_waiting_list'
+    ),
+    url(
+        r'^blocks/(?P<block_id>\d+)/bookings/$',
+        'studioadmin.views.blocks.single_block_bookings_view',
+        name='single_block_bookings'
     ),
     url(
         r'^website-pages/$',

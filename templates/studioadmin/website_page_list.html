@@ -1,6 +1,6 @@
 {% extends "studioadmin/base.html" %}
 {% load static %}
-{% load bookingtags %}
+{% load bookingtags websitetags %}
 
 {% block studioadmincontent %}
 
@@ -17,7 +17,7 @@
                         <table class="table tablesorter" id="sortTable">
                             <thead>
                             <tr class="success">
-                                <th>Page name</th>
+                                <th>Page name</br><span class="studioadmin-help">Click to edit</span></th>
                                 <th>Page heading</th>
                                 <th>Menu name</th>
                                 <th>Menu location</th>
@@ -34,8 +34,8 @@
                                     <td class="studioadmin-tbl"><a href="{% url 'studioadmin:edit_page' page.instance.name %}">{{ page.instance.name }}</a></td>
                                     <td class="studioadmin-tbl">{{ page.instance.heading }}</td>
                                     <td class="studioadmin-tbl">{{ page.instance.menu_name }}</td>
-                                    <td class="studioadmin-tbl">{{ page.instance.menu_location }}</td>
-                                    <td class="studioadmin-tbl">{{ page.instance.layout }}</td>
+                                    <td class="studioadmin-tbl">{{ page.instance.menu_location | format_menu }}</td>
+                                    <td class="studioadmin-tbl">{{ page.instance.layout | format_layout }}</td>
                                     <td class="studioadmin-tbl table-center">{{ page.DELETE }}<label for={{ page.DELETE_id }}></label>
                                 </tr>
                             {% endfor %}

@@ -278,6 +278,10 @@ class BlockBaseForm(forms.ModelForm):
             bookings = Booking.objects.filter(
                 status='OPEN', block=self.instance
             )
+
+            block_users = set([booking.user for booking in bookings])
+            self.booked_user_count = len(block_users)
+
             if bookings.count() > 0:
                 self.fields['DELETE'] = forms.BooleanField(
                     widget=forms.CheckboxInput(attrs={
@@ -1197,7 +1201,7 @@ class SubsectionBaseFormset(BaseInlineFormSet):
 SubsectionFormset = inlineformset_factory(
     Page,
     SubSection,
-    fields=('subheading', 'content', 'index'),
+    fields=('index', 'subheading', 'content'),
     formset=SubsectionBaseFormset,
     can_delete=True,
     extra=1,

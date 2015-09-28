@@ -236,7 +236,9 @@ class Booking(models.Model):
     # cost will be set to either event cost or block item_cost
     cost = models.DecimalField(default=7, max_digits=8, decimal_places=2)
 
-    block = models.ForeignKey(Block, blank=True, null=True, related_name='bookings')
+    block = models.ForeignKey(
+        Block, blank=True, null=True, related_name='bookings'
+    )
 
     class Meta:
         unique_together = (('user', 'event'))

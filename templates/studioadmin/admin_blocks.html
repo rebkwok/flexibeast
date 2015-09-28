@@ -26,9 +26,8 @@
                     <div class="table-responsive">
                         <table class="table">
                             <tr class="success">
-                                <th class="">Block</th>
-                                <th class="table-center">Edit</th>
-                                <th class="table-center">Bookings</th>
+                                <th class="">Block</br><span class="studioadmin-help">Click to edit</span></th>
+                                <th class="table-center">Bookings</br><span class="studioadmin-help">Click to view</span></th>
                                 <th class="table-center">Booking open</th>
                                 <th class="table-center">Individual Booking Open</th>
                                 <th class="table-center">Delete</th>
@@ -37,12 +36,11 @@
                             {% for block in blockformset %}
                             <tr>
                                 <span class="hide">{{ block.id }}</span>
-                                <td class="studioadmin-tbl">{{ block.instance.name }}</td>
-                                <td class="table-center studioadmin-tbl">
-                                    <a href="{% url 'studioadmin:edit_block' block.instance.pk %}"><span class="fa fa-pencil-square-o fa-lg"></span>
+                                <td class="studioadmin-tbl">
+                                    <a href="{% url 'studioadmin:edit_block' block.instance.pk %}">{{ block.instance.name }}
                                 </td>
                                 <td class="table-center studioadmin-tbl">
-                                    Pending
+                                    <a href="{% url 'studioadmin:single_block_bookings' block.instance.pk %}">{{ block.booked_user_count }}
                                 </td>
                                 <td class="table-center studioadmin-tbl">{{ block.booking_open }}<label for={{ block.booking_open_id }}></label></td>
                                 <td class="table-center studioadmin-tbl">{{ block.individual_booking_date }}</td>

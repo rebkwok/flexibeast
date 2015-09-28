@@ -10,6 +10,10 @@ PAGE_LAYOUT_CHOICES = (
     ('img-col-right', 'Multiple small images in column, right of text'),
 )
 
+MENU_CHOICES = (
+    ('main', 'Separate link in main menu'),
+    ('dropdown', 'Displayed under "More" dropdown menu')
+)
 
 class Page(models.Model):
 
@@ -25,14 +29,12 @@ class Page(models.Model):
     )
     menu_location = models.CharField(
         max_length=8,
-        choices=(
-            ('main', 'Separate link in main menu'),
-            ('dropdown', 'Displayed under "More" dropdown menu')
-        ),
+        choices=MENU_CHOICES,
         default='dropdown',
         help_text='Choose where to display the menu link.  Note that all '
                   'options appear under the "More" dropdown at small screen '
-                  'sizes'
+                  'sizes. Note that too many main menu links will cause the '
+                  'menu bar to become double normal height.'
     )
     heading = models.CharField(max_length=255, null=True, blank=True)
     layout = models.CharField(

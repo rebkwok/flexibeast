@@ -184,7 +184,7 @@ if EMAIL_HOST_PASSWORD is None:
     print("No email host password provided!")
 EMAIL_PORT = 587
 DEFAULT_FROM_EMAIL = 'flexibeast.web@gmail.com'
-DEFAULT_STUDIO_EMAIL = 'flexibeasttest@hotmail.com'
+DEFAULT_STUDIO_EMAIL = env('DEFAULT_STUDIO_EMAIL')
 SUPPORT_EMAIL = 'rebkwok@gmail.com'
 
 # #####LOGGING######

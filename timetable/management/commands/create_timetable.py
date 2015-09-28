@@ -13,7 +13,9 @@ class Command(BaseCommand):
         """
         self.stdout.write('Creating timetable sessions.')
 
-        yc, _ = EventType.objects.get_or_create(event_type='CL', subtype='Yoga')
+        yc, _ = EventType.objects.get_or_create(
+            event_type='CL', subtype='Yoga class'
+        )
 
         # Wednesday classes
         Session.objects.get_or_create(
