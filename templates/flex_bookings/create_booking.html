@@ -60,7 +60,7 @@
                                 <p>Booking this block will book you in to the following classes:</p>
 
                                 <ul>
-                                {% for block_event in block.events.all %}
+                                {% for block_event in block_obj.events.all %}
                                     <li>{% if block_event == event %}<strong>{{ block_event }}</strong>{% else %}{{ block_event }}{% endif %}</li>
                                 {% endfor %}
                                 </ul>
