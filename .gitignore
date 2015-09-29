@@ -14,3 +14,4 @@ lib/
 local/
 .DS_Store
 media/
+htmlcov/

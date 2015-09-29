@@ -407,9 +407,6 @@ class BlockAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(BlockAdminForm, self).__init__(*args, **kwargs)
 
-        event_choices = [(event.id, event) for event in
-             Event.objects.filter(date__gt=timezone.now())]
-
         if self.instance.id and self.instance.events.exists():
             past_events = [
                 event for event in self.instance.events.all().order_by('-date')
@@ -418,10 +415,10 @@ class BlockAdminForm(forms.ModelForm):
             for event in past_events:
                 event_choices.insert(0, (event.id, event))
 
-        self.fields['events'] = forms.MultipleChoiceField(
+        self.fields['events'] = forms.ModelMultipleChoiceField(
             label="Select classes",
             widget=forms.CheckboxSelectMultiple,
-            choices=event_choices,
+            queryset=Event.objects.filter(date__gt=timezone.now()),
         )
 
     def clean_individual_booking_date(self):
@@ -676,7 +673,7 @@ class SessionAdminForm(forms.ModelForm):
             'name': forms.TextInput(
                 attrs={'class': "form-control",
                        'placeholder': 'Name of session e.g. '
-                                      '"Flexibility for splits'},
+                                      'Flexibility for Splits'},
             ),
             'location': forms.TextInput(
                 attrs={'class': "form-control"}
@@ -729,6 +726,17 @@ class SessionAdminForm(forms.ModelForm):
 
 
 class UploadTimetableForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super(UploadTimetableForm, self).__init__(*args, **kwargs)
+        self.fields['sessions'] = forms.ModelMultipleChoiceField(
+            widget=forms.CheckboxSelectMultiple(),
+            label="Choose sessions to upload",
+            queryset=Session.objects.all(),
+            initial=[session.pk for session in Session.objects.all()],
+            required=True
+        )
+
     start_date = forms.DateField(
         label="Start Date",
         widget=forms.DateInput(
@@ -750,14 +758,6 @@ class UploadTimetableForm(forms.Form):
             format='%a %d %b %Y'
         ),
         required=True,
-    )
-
-    sessions = forms.MultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple(),
-        label="Choose sessions to upload",
-        choices=[(session.id, session) for session in Session.objects.all()],
-        initial=[session.id for session in Session.objects.all()],
-        required=True
     )
 
     def clean(self):
@@ -814,7 +814,6 @@ class UserBlockBaseFormset(BaseFormSet):
 
     def add_fields(self, form, index):
         super(UserBlockBaseFormset, self).add_fields(form, index)
-
         if form.initial:
             form.user_instance = User.objects.get(id=form.initial['user'])
             form.block_instance = Block.objects.get(id=form.initial['block'])
@@ -822,6 +821,7 @@ class UserBlockBaseFormset(BaseFormSet):
             form.block_status = 'CANCELLED'
             for booking in Booking.objects.filter(
                     block=form.block_instance, user=form.user_instance):
+
                 if booking.status == 'OPEN':
                     form.block_status = 'OPEN'
 
@@ -840,10 +840,13 @@ class UserBlockBaseFormset(BaseFormSet):
 
         else:
             bookable_blocks = [
-                block.id for block in Block.objects.all() if (not block.is_past and
-                block.booking_open and not
-                block.has_full_class and not
-                block.has_started)
+                block.id for block in Block.objects.all() if (
+                    not block.is_past and
+                    block.events.exists() and
+                    block.booking_open and
+                    not block.has_full_class and
+                    not block.has_started
+                )
             ]
 
             form.fields['block'] = forms.ModelChoiceField(

@@ -6,21 +6,17 @@ from django.conf import settings
 from django.test import TestCase
 from django.utils import timezone
 
-from booking.models import Event, EventType, Block, BlockType
+from flex_bookings.models import Event, EventType, Block
 from studioadmin.forms import (
-    BlockStatusFilter,
-    ChooseUsersFormSet,
-    ConfirmPaymentForm,
+    # ChooseUsersFormSet,
     DAY_CHOICES,
-    EmailUsersForm,
+    # EmailUsersForm,
     EventFormSet,
     EventAdminForm,
-    SimpleBookingRegisterFormSet,
-    StatusFilter,
     TimetableSessionFormSet,
     SessionAdminForm,
     UploadTimetableForm,
-    UserFilterForm,
+    # UserFilterForm,
     UserBookingFormSet,
     UserBlockFormSet
 )
@@ -30,9 +26,13 @@ from timetable.models import Session
 class EventFormSetTests(TestCase):
 
     def setUp(self):
-        self.event = mommy.make_recipe('booking.future_EV')
-        self.event1 = mommy.make_recipe('booking.future_EV')
-        mommy.make_recipe('booking.booking', event=self.event1)
+        self.event = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True
+        )
+        self.event1 = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True
+        )
+        mommy.make_recipe('flex_bookings.booking', event=self.event1)
 
     def formset_data(self, extra_data={}):
 
@@ -42,7 +42,6 @@ class EventFormSetTests(TestCase):
             'form-0-id': str(self.event.id),
             'form-0-max-participants': '10',
             'form-0-booking_open': 'on',
-            'form-0-payment_open': 'on',
             'form-0-advance_payment_required': 'on',
             }
 
@@ -64,7 +63,6 @@ class EventFormSetTests(TestCase):
             'form-1-cost': '7',
             'form-1-max-participants': '10',
             'form-1-booking_open': 'on',
-            'form-1-payment_open': 'on',
             }
         formset = EventFormSet(data=self.formset_data(extra_data))
         self.assertEqual(len(formset.deleted_forms), 1)
@@ -83,7 +81,6 @@ class EventFormSetTests(TestCase):
             'form-1-cost': '7',
             'form-1-max-participants': '10',
             'form-1-booking_open': 'on',
-            'form-1-payment_open': 'on',
             'form-1-DELETE': 'on',
             }
         formset = EventFormSet(data=self.formset_data(extra_data))
@@ -107,9 +104,8 @@ class EventFormSetTests(TestCase):
 class EventAdminFormTests(TestCase):
 
     def setUp(self):
-        self.event_type = mommy.make_recipe('booking.event_type_PC')
-        self.event_type_ev = mommy.make_recipe('booking.event_type_OE')
-        self.event_type_oc = mommy.make_recipe('booking.event_type_OC')
+        self.event_type = mommy.make_recipe('flex_bookings.event_type_YC')
+        self.event_type_ev = mommy.make_recipe('flex_bookings.event_type_WS')
 
     def form_data(self, extra_data={}):
         data = {
@@ -169,12 +165,10 @@ class EventAdminFormTests(TestCase):
             data=self.form_data(), ev_type='CL')
         ev_type_field = form.fields['event_type']
         self.assertEqual(
-            set(EventType.objects.filter(
-                id__in=[self.event_type.id, self.event_type_oc.id]
-            )),
+            set(EventType.objects.filter(id=self.event_type.id)),
             set(ev_type_field.queryset)
         )
-        self.assertEquals(len(ev_type_field.queryset), 2)
+        self.assertEquals(len(ev_type_field.queryset), 1)
 
     def test_invalid_date(self):
         form = EventAdminForm(
@@ -213,140 +207,13 @@ class EventAdminFormTests(TestCase):
         name_field = form.fields['name']
         self.assertEquals(
             name_field.widget.attrs['placeholder'],
-            'Name of event e.g. Workshop')
+            'Name of event e.g. Splits Workshop')
 
         form = EventAdminForm(data=self.form_data(), ev_type='CL')
         name_field = form.fields['name']
         self.assertEquals(
             name_field.widget.attrs['placeholder'],
-            'Name of class e.g. Pole Level 1')
-
-class SimpleBookingRegisterFormSetTests(TestCase):
-
-    def setUp(self):
-        self.event = mommy.make_recipe('booking.future_EV')
-        self.user = mommy.make_recipe('booking.user')
-        self.block_type = mommy.make_recipe('booking.blocktype',
-                                       event_type=self.event.event_type,)
-        self.active_block = mommy.make_recipe('booking.block',
-                                       block_type=self.block_type,
-                                       user=self.user,
-                                       paid=True)
-        self.booking = mommy.make_recipe(
-            'booking.booking', event=self.event, user=self.user
-        )
-
-    def formset_data(self, extra_data={}):
-
-        data = {
-            'bookings-TOTAL_FORMS': 1,
-            'bookings-INITIAL_FORMS': 1,
-            'bookings-0-id': self.booking.id,
-            'bookings-0-user': self.user.id,
-            'bookings-0-block': self.active_block.id,
-            'bookings-0-paid': 'on',
-            'bookings-0-attended': 'off'
-            }
-
-        for key, value in extra_data.items():
-            data[key] = value
-
-        return data
-
-    def test_form_valid(self):
-        formset = SimpleBookingRegisterFormSet(data=self.formset_data(),
-                                               instance=self.event)
-        self.assertTrue(formset.is_valid(), formset.errors)
-
-    def test_additional_data_in_form(self):
-        formset = SimpleBookingRegisterFormSet(data=self.formset_data(),
-                                               instance=self.event)
-        form = formset.forms[0]
-        self.assertEquals(form.index, 1)
-        self.assertEquals(form.available_block, self.active_block)
-        self.assertEquals(form.checkbox_paid_id, 'checkbox_paid_0')
-        self.assertEquals(form.checkbox_attended_id, 'checkbox_attended_0')
-
-    def test_block_queryset_with_other_event_types(self):
-        """
-        Only blocks with the same event type as the event instance should
-        appear in the block dropdown
-        """
-        mommy.make_recipe('booking.block', user=self.user, paid=True,
-                          _quantity=5)
-        formset = SimpleBookingRegisterFormSet(data=self.formset_data(),
-                                               instance=self.event)
-        form = formset.forms[0]
-        self.assertEquals(Block.objects.filter(user=self.user).count(), 6)
-        block_field = form.fields['block']
-        self.assertEquals(set(block_field.queryset), {self.active_block})
-
-    def test_block_queryset_with_other_user_blocks(self):
-        """
-        Only blocks for this user should appear in the block dropdown
-        """
-        users = mommy.make_recipe('booking.user', _quantity=5)
-        for user in users:
-            mommy.make_recipe('booking.block', user=user, paid=True,
-                              block_type=self.block_type)
-        formset = SimpleBookingRegisterFormSet(data=self.formset_data(),
-                                               instance=self.event)
-        form = formset.forms[0]
-        self.assertEquals(Block.objects.filter(
-            block_type=self.block_type
-        ).count(), 6)
-        block_field = form.fields['block']
-        self.assertEquals(set(block_field.queryset), {self.active_block})
-
-    def test_block_queryset_with_inactive_block(self):
-        """
-        Only active blocks for this user should appear in the block dropdown
-        """
-        self.active_block.paid = False
-        self.active_block.save()
-
-        formset = SimpleBookingRegisterFormSet(data=self.formset_data(),
-                                               instance=self.event)
-        form = formset.forms[0]
-        self.assertEquals(Block.objects.filter(user=self.user).count(), 1)
-        block_field = form.fields['block']
-        self.assertFalse(block_field.queryset)
-
-    def test_block_queryset_with_expired_block(self):
-        """
-        Only active blocks for this user should appear in the block dropdown
-        """
-        self.block_type.duration = 2
-        self.block_type.save()
-        expired_block = mommy.make_recipe(
-            'booking.block', user=self.user, paid=True,
-            block_type=self.block_type,
-            start_date=timezone.now()-timedelta(365)
-        )
-        self.assertFalse(expired_block.active_block())
-
-        formset = SimpleBookingRegisterFormSet(data=self.formset_data(),
-                                               instance=self.event)
-        form = formset.forms[0]
-        self.assertEquals(Block.objects.filter(user=self.user).count(), 2)
-        block_field = form.fields['block']
-        self.assertEquals(set(block_field.queryset), {self.active_block})
-
-
-class StatusFilterTests(TestCase):
-
-    def test_form_valid(self):
-        form = StatusFilter({'status_choice': 'OPEN'})
-        self.assertTrue(form.is_valid())
-
-
-class ConfirmPaymentFormTests(TestCase):
-
-    def test_form_valid(self):
-        user = mommy.make_recipe('booking.user')
-        event = mommy.make_recipe('booking.future_PC')
-        form = ConfirmPaymentForm(data={'paid': 'true'})
-        self.assertTrue(form.is_valid())
+            'Name of class e.g. Flexibility for Splits')
 
 
 class TimetableSessionFormSetTests(TestCase):
@@ -363,7 +230,6 @@ class TimetableSessionFormSetTests(TestCase):
             'form-0-cost': '7',
             'form-0-max-participants': '10',
             'form-0-booking_open': 'on',
-            'form-0-payment_open': 'on',
             }
 
         for key, value in extra_data.items():
@@ -381,7 +247,6 @@ class TimetableSessionFormSetTests(TestCase):
         form =formset.forms[0]
         self.assertEquals(form.formatted_day, DAY_CHOICES[self.session.day])
         self.assertEquals(form.booking_open_id, 'booking_open_0')
-        self.assertEquals(form.payment_open_id, 'payment_open_0')
 
     def test_can_delete(self):
         session_to_delete = mommy.make(Session)
@@ -393,7 +258,6 @@ class TimetableSessionFormSetTests(TestCase):
             'form-1-cost': '7',
             'form-1-max-participants': '10',
             'form-1-booking_open': 'on',
-            'form-1-payment_open': 'on',
             }
         formset = TimetableSessionFormSet(data=self.formset_data(extra_data),
                                queryset=Session.objects.all())
@@ -405,9 +269,9 @@ class TimetableSessionFormSetTests(TestCase):
 class SessionAdminFormTests(TestCase):
 
     def setUp(self):
-        self.event_type = mommy.make_recipe('booking.event_type_PC')
-        self.event_type_ev = mommy.make_recipe('booking.event_type_OE')
-        self.event_type_oc = mommy.make_recipe('booking.event_type_OC')
+        self.event_type = mommy.make_recipe('flex_bookings.event_type_YC')
+        self.event_type_ev = mommy.make_recipe('flex_bookings.event_type_WS')
+        self.event_type_yc = mommy.make_recipe('flex_bookings.event_type_YC')
 
     def form_data(self, extra_data={}):
         data = {
@@ -469,7 +333,7 @@ class SessionAdminFormTests(TestCase):
         ev_type_field = form.fields['event_type']
         self.assertEqual(
             set(EventType.objects.filter(
-                id__in=[self.event_type.id, self.event_type_oc.id]
+                id__in=[self.event_type.id, self.event_type_yc.id]
             )),
             set(ev_type_field.queryset)
         )
@@ -487,15 +351,20 @@ class SessionAdminFormTests(TestCase):
         name_field = form.fields['name']
         self.assertEquals(
             name_field.widget.attrs['placeholder'],
-            'Name of session e.g. Pole Level 1')
+            'Name of session e.g. Flexibility for Splits')
 
 
 class UploadTimetableFormTests(TestCase):
+
+    def setUp(self):
+
+        self.session = mommy.make_recipe('flex_bookings.mon_session')
 
     def form_data(self, extra_data={}):
         data = {
             'start_date': 'Mon 08 Jun 2015',
             'end_date': 'Mon 15 Jun 2015',
+            'sessions': [self.session.id]
         }
 
         for key, value in extra_data.items():
@@ -509,6 +378,7 @@ class UploadTimetableFormTests(TestCase):
             2015, 6, 6, 12, 0, tzinfo=timezone.utc
             )
         form = UploadTimetableForm(data=self.form_data())
+
         self.assertTrue(form.is_valid())
 
     @patch('studioadmin.forms.timezone')
@@ -517,7 +387,7 @@ class UploadTimetableFormTests(TestCase):
             2015, 6, 6, 12, 0, tzinfo=timezone.utc
             )
         form = UploadTimetableForm(
-            data={}
+            data={'sessions': [self.session.id]}
         )
         self.assertFalse(form.is_valid())
         self.assertEquals(len(form.errors), 2)
@@ -583,133 +453,127 @@ class UploadTimetableFormTests(TestCase):
         )
 
 
-class ChooseUsersFormSetTests(TestCase):
-
-    def setUp(self):
-        self.user = mommy.make_recipe('booking.user')
-
-    def formset_data(self, extra_data={}):
-
-        data = {
-            'form-TOTAL_FORMS': 1,
-            'form-INITIAL_FORMS': 1,
-            'form-0-id': str(self.user.id),
-            }
-
-        for key, value in extra_data.items():
-            data[key] = value
-
-        return data
-
-    def test_choose_users_formset_valid(self):
-        formset = ChooseUsersFormSet(data=self.formset_data())
-        self.assertTrue(formset.is_valid())
-
-
-class EmailUsersFormTests(TestCase):
-
-    def setUp(self):
-        pass
-
-    def form_data(self, extra_data={}):
-        data = {
-            'subject': 'Test subject',
-            'from_address': settings.DEFAULT_FROM_EMAIL,
-            'message': 'Test message'
-        }
-
-        for key, value in extra_data.items():
-            data[key] = value
-
-        return data
-
-    def test_form_valid(self):
-        form = EmailUsersForm(data=self.form_data())
-        self.assertTrue(form.is_valid())
-
-    def test_missing_from_address(self):
-        form = EmailUsersForm(
-            data=self.form_data({'from_address': ''})
-        )
-        self.assertFalse(form.is_valid())
-        self.assertEquals(
-            form.errors['from_address'],
-            ['This field is required.']
-        )
-
-    def test_missing_message(self):
-        form = EmailUsersForm(
-            data=self.form_data({'message': ''})
-        )
-        self.assertFalse(form.is_valid())
-        self.assertEquals(
-            form.errors['message'],
-            ['This field is required.']
-        )
-
-
-class UserFilterFormTests(TestCase):
-
-    def setUp(self):
-        events = mommy.make_recipe(
-            'booking.future_EV',
-            _quantity=3
-            )
-        classes = mommy.make_recipe(
-            'booking.future_PC',
-            _quantity=4)
-
-    def test_events_dropdown(self):
-        form = UserFilterForm()
-        event_field = form.fields['events']
-        event_choices = [
-            choice for choice in event_field.widget.choices
-            ]
-        # number of choices is one more than number of events, to account
-        # for the placeholder for None Selected
-        self.assertEquals(len(event_choices), 4)
-        # first id will be ('', '---None selected---')
-        event_ids = [id for (id, name) in event_choices][1:]
-        event_type = set([
-            event.event_type.event_type
-            for event in Event.objects.filter(id__in=event_ids)
-            ])
-        self.assertEquals(event_type, set(['EV']))
-
-    def test_lessons_dropdown(self):
-        form = UserFilterForm()
-        lesson_field = form.fields['lessons']
-        lesson_choices = [
-            choice for choice in lesson_field.widget.choices
-            ]
-        # number of choices is one more than number of events, to account
-        # for the placeholder for None Selected
-        self.assertEquals(len(lesson_choices), 5)
-        # first id will be ('', '---None selected---')
-        lesson_ids = [id for (id, name) in lesson_choices][1:]
-        event_type = set([
-            event.event_type.event_type
-            for event in Event.objects.filter(id__in=lesson_ids)
-            ])
-        self.assertEquals(event_type, set(['CL']))
-
-
+# class ChooseUsersFormSetTests(TestCase):
+#
+#     def setUp(self):
+#         self.user = mommy.make_recipe('flex_bookings.user')
+#
+#     def formset_data(self, extra_data={}):
+#
+#         data = {
+#             'form-TOTAL_FORMS': 1,
+#             'form-INITIAL_FORMS': 1,
+#             'form-0-id': str(self.user.id),
+#             }
+#
+#         for key, value in extra_data.items():
+#             data[key] = value
+#
+#         return data
+#
+#     def test_choose_users_formset_valid(self):
+#         formset = ChooseUsersFormSet(data=self.formset_data())
+#         self.assertTrue(formset.is_valid())
+#
+#
+# class EmailUsersFormTests(TestCase):
+#
+#     def setUp(self):
+#         pass
+#
+#     def form_data(self, extra_data={}):
+#         data = {
+#             'subject': 'Test subject',
+#             'from_address': settings.DEFAULT_FROM_EMAIL,
+#             'message': 'Test message'
+#         }
+#
+#         for key, value in extra_data.items():
+#             data[key] = value
+#
+#         return data
+#
+#     def test_form_valid(self):
+#         form = EmailUsersForm(data=self.form_data())
+#         self.assertTrue(form.is_valid())
+#
+#     def test_missing_from_address(self):
+#         form = EmailUsersForm(
+#             data=self.form_data({'from_address': ''})
+#         )
+#         self.assertFalse(form.is_valid())
+#         self.assertEquals(
+#             form.errors['from_address'],
+#             ['This field is required.']
+#         )
+#
+#     def test_missing_message(self):
+#         form = EmailUsersForm(
+#             data=self.form_data({'message': ''})
+#         )
+#         self.assertFalse(form.is_valid())
+#         self.assertEquals(
+#             form.errors['message'],
+#             ['This field is required.']
+#         )
+#
+#
+# class UserFilterFormTests(TestCase):
+#
+#     def setUp(self):
+#         events = mommy.make_recipe(
+#             'flex_bookings.future_EV',
+#             _quantity=3
+#             )
+#         classes = mommy.make_recipe(
+#             'flex_bookings.future_PC',
+#             _quantity=4)
+#
+#     def test_events_dropdown(self):
+#         form = UserFilterForm()
+#         event_field = form.fields['events']
+#         event_choices = [
+#             choice for choice in event_field.widget.choices
+#             ]
+#         # number of choices is one more than number of events, to account
+#         # for the placeholder for None Selected
+#         self.assertEquals(len(event_choices), 4)
+#         # first id will be ('', '---None selected---')
+#         event_ids = [id for (id, name) in event_choices][1:]
+#         event_type = set([
+#             event.event_type.event_type
+#             for event in Event.objects.filter(id__in=event_ids)
+#             ])
+#         self.assertEquals(event_type, set(['EV']))
+#
+#     def test_lessons_dropdown(self):
+#         form = UserFilterForm()
+#         lesson_field = form.fields['lessons']
+#         lesson_choices = [
+#             choice for choice in lesson_field.widget.choices
+#             ]
+#         # number of choices is one more than number of events, to account
+#         # for the placeholder for None Selected
+#         self.assertEquals(len(lesson_choices), 5)
+#         # first id will be ('', '---None selected---')
+#         lesson_ids = [id for (id, name) in lesson_choices][1:]
+#         event_type = set([
+#             event.event_type.event_type
+#             for event in Event.objects.filter(id__in=lesson_ids)
+#             ])
+#         self.assertEquals(event_type, set(['CL']))
+#
+#
 class UserBookingFormSetTests(TestCase):
 
     def setUp(self):
-        self.event = mommy.make_recipe('booking.future_EV')
-        self.user = mommy.make_recipe('booking.user')
-        self.block_type = mommy.make_recipe('booking.blocktype',
-                                       event_type=self.event.event_type)
-        # 5 active blocks for other users
-        mommy.make_recipe(
-                    'booking.block',
-                    block_type=self.block_type,
-                    paid=True,
-                    _quantity=5
-                    )
+        self.event = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True
+        )
+        self.user = mommy.make_recipe('flex_bookings.user')
+
         self.booking = mommy.make_recipe(
-            'booking.booking', event=self.event, user=self.user
+            'flex_bookings.booking', event=self.event, user=self.user
         )
 
     def formset_data(self, extra_data={}):
@@ -731,137 +595,19 @@ class UserBookingFormSetTests(TestCase):
         formset = UserBookingFormSet(data=self.formset_data(),
                                      instance=self.user,
                                      user=self.user)
-        self.assertTrue(formset.is_valid(), formset.errors)
-
-    def test_additional_data_in_form(self):
-        active_user_block = mommy.make_recipe('booking.block',
-                                        block_type=self.block_type,
-                                        user=self.user,
-                                        paid=True)
-
-        formset = UserBookingFormSet(data=self.formset_data(),
-                                     instance=self.user,
-                                     user=self.user)
-        form = formset.forms[0]
-        self.assertTrue(form.has_available_block)
-        self.assertEquals(form.paid_id, 'paid_0')
-
-    def test_block_queryset_with_new_form(self):
-        """
-        New form should show all active user blocks
-        """
-        active_user_block = mommy.make_recipe('booking.block',
-                                        block_type=self.block_type,
-                                        user=self.user,
-                                        paid=True)
-        active_user_block_diff_type = mommy.make_recipe('booking.block',
-                                         user=self.user,
-                                         paid=True)
-
-        formset = UserBookingFormSet(instance=self.user,
-                                     user=self.user)
-        # get the last form, which will be the new empty one
-        form = formset.forms[-1]
-        block = form.fields['block']
-        # queryset shows only the two active blocks for this user
-        self.assertEquals(2, block.queryset.count())
-
-    def test_block_queryset_with_existing_booking_with_active_user_block(self):
-        """
-        Existing booking should show only user's active blocks for the
-        same event type.
-        """
-        active_user_block = mommy.make_recipe('booking.block',
-                                        block_type=self.block_type,
-                                        user=self.user,
-                                        paid=True)
-        active_user_block_diff_type = mommy.make_recipe('booking.block',
-                                         user=self.user,
-                                         paid=True)
-
-        formset = UserBookingFormSet(data=self.formset_data(),
-                                     instance=self.user,
-                                     user=self.user)
-        # get the first form
-        form = formset.forms[0]
-        block = form.fields['block']
-        # queryset shows only the active blocks for this user and event type
-        self.assertEquals(1, block.queryset.count())
-
-        # empty_label shows the "choose block" instruction
-        self.assertEquals(
-            block.empty_label,
-            "---Choose from user's available active blocks---",
-             block.empty_label
-             )
-
-        # assign this block to the user's booking
-        self.booking.block = active_user_block
-        self.booking.save()
-
-        formset = UserBookingFormSet(data=self.formset_data(),
-                                     instance=self.user,
-                                     user=self.user)
-        # get the first form
-        form = formset.forms[0]
-        block = form.fields['block']
-        # queryset still only shows active blocks for this user and event type
-        self.assertEquals(1, block.queryset.count())
-
-        # empty_label shows the "Unselect block" instruction
-        self.assertEquals(
-            block.empty_label,
-            "---Unselect block (change booking to unpaid)---",
-            block.empty_label
-        )
-
-    def test_block_queryset_with_existing_booking_no_active_user_block(self):
-
-        active_user_block_diff_type = mommy.make_recipe('booking.block',
-                                         user=self.user,
-                                         paid=True)
-        formset = UserBookingFormSet(data=self.formset_data(),
-                                     instance=self.user,
-                                     user=self.user)
-        # get the first form
-        form = formset.forms[0]
-        block = form.fields['block']
-        # no active blocks for this user and event type
-        self.assertEquals(0, block.queryset.count())
-
-    def test_block_choice_label_format(self):
-        active_user_block = mommy.make_recipe('booking.block',
-                                        block_type=self.block_type,
-                                        user=self.user,
-                                        paid=True)
-
-        formset = UserBookingFormSet(data=self.formset_data(),
-                                     instance=self.user,
-                                     user=self.user)
-        # get the first form
-        form = formset.forms[0]
-        block = form.fields['block']
-        # queryset shows only the active blocks for this user and event type
-        self.assertEquals(1, block.queryset.count())
-        self.assertEquals(
-                    "Block type: {}; {} left".format(
-                        active_user_block.block_type.event_type,
-                        active_user_block.block_type.size - active_user_block.bookings_made()),
-                    block.label_from_instance(active_user_block)
-                    )
 
     def test_event_choices_with_new_form(self):
         """
         New form should show all events the user is not booked for
         """
-
-        events = mommy.make_recipe('booking.future_PC', _quantity=5)
+        events = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True,  _quantity=5
+        )
         formset = UserBookingFormSet(instance=self.user,
                                      user=self.user)
         # get the last form, which will be the new empty one
         form = formset.forms[-1]
         event = form.fields['event']
-        # queryset shows only the two active blocks for this user
         self.assertEquals(6, Event.objects.count())
         self.assertEquals(5, event.queryset.count())
         self.assertFalse(self.event in event.queryset)
@@ -871,7 +617,9 @@ class UserBookingFormSetTests(TestCase):
         Existing booking should show all events in event choices
         ).
         """
-        events = mommy.make_recipe('booking.future_PC', _quantity=5)
+        events = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True, _quantity=5
+        )
         formset = UserBookingFormSet(data=self.formset_data(),
                                      instance=self.user,
                                      user=self.user)
@@ -885,20 +633,25 @@ class UserBookingFormSetTests(TestCase):
 class UserBlockFormSetTests(TestCase):
 
     def setUp(self):
-        event_type = mommy.make_recipe('booking.event_type_PC')
-        self.user = mommy.make_recipe('booking.user')
-        self.block_type = mommy.make_recipe(
-            'booking.blocktype', event_type=event_type)
-        self.block = mommy.make_recipe('booking.block', block_type=self.block_type, user=self.user, paid=True)
-
+        self.user = mommy.make_recipe('flex_bookings.user')
+        self.block = mommy.make_recipe(
+            'flex_bookings.block', booking_open=True
+        )
+        event = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True
+        )
+        self.block.events.add(event)
+        mommy.make_recipe(
+            'flex_bookings.booking', block=self.block, event=event,
+            user=self.user
+        )
     def formset_data(self, extra_data={}):
 
         data = {
-            'blocks-TOTAL_FORMS': 1,
-            'blocks-INITIAL_FORMS': 1,
-            'blocks-0-id': self.block.id,
-            'blocks-0-block_type': self.block.block_type.id,
-            'blocks-0-start_date': self.block.start_date
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 1,
+            'form-0-user': self.user.id,
+            'form-0-block': self.block.id,
             }
 
         for key, value in extra_data.items():
@@ -907,53 +660,171 @@ class UserBlockFormSetTests(TestCase):
         return data
 
     def test_form_valid(self):
-        formset = UserBlockFormSet(data=self.formset_data(),
-                                     instance=self.user,
-                                     user=self.user)
+        formset = UserBlockFormSet(
+            data=self.formset_data(),
+            initial=[{'user': self.user.id, 'block': self.block.id}]
+        )
         self.assertTrue(formset.is_valid(), formset.errors)
 
     def test_additional_data_in_form(self):
-        event_type = mommy.make_recipe('booking.event_type_OE')
-        available_block_type = mommy.make_recipe('booking.blocktype',
-                                               event_type=event_type)
-        formset = UserBlockFormSet(data=self.formset_data(),
-                                     instance=self.user,
-                                     user=self.user)
+        formset = UserBlockFormSet(
+            data=self.formset_data(),
+            initial=[{'user': self.user.id, 'block': self.block.id}]
+        )
         form = formset.forms[0]
-        self.assertTrue(form.can_buy_block)
-        self.assertEquals(form.paid_id, 'paid_0')
+        self.assertEqual(form.block_status, 'OPEN')
+        self.assertEqual(form.user_instance, self.user)
+        self.assertEqual(form.block_instance, self.block)
 
-    def test_block_type_queryset_for_new_form(self):
+    def test_bookable_blocks_block_booking_open(self):
         """
-        Block_type choices should not include blocktypes for which the user
-        already has an active block
+        blocks appear in the choice dropdown in an empty form if they are:
+         - open
+         - have events
+         - not past (i.e. all events in the past)
+         - no event on the block is full
+         - block hasn't started yet
+        :return:
         """
-        available_block_type = mommy.make_recipe('booking.blocktype',
-                                               _quantity=5)
-        self.assertEquals(BlockType.objects.all().count(), 6)
-        formset = UserBlockFormSet(instance=self.user, user=self.user)
-        form = formset.forms[-1]
-        block_type_queryset = form.fields['block_type'].queryset
-        self.assertEquals(block_type_queryset.count(), 5)
-        self.assertFalse(self.block_type in block_type_queryset)
 
-        # blocktypes of unpaid blocks which are otherwise active are also not
-        # included in the choices
-        self.block.paid = False
-        self.block.save()
-        formset = UserBlockFormSet(instance=self.user, user=self.user)
-        form = formset.forms[-1]
-        block_type_queryset = form.fields['block_type'].queryset
-        self.assertEquals(block_type_queryset.count(), 5)
-        self.assertFalse(self.block_type in block_type_queryset)
-        # blocktypes of expired blocks are included in the choices
-        self.block.start_date = timezone.now() - timedelta(100)
-        self.block_type.duration = 2
-        self.block_type.save()
-        self.block.save()
-        self.assertTrue(self.block.expired)
-        formset = UserBlockFormSet(instance=self.user, user=self.user)
-        form = formset.forms[-1]
-        block_type_queryset = form.fields['block_type'].queryset
-        self.assertEquals(block_type_queryset.count(), 6)
-        self.assertIn(self.block_type, block_type_queryset)
+        block = mommy.make_recipe(
+            'flex_bookings.block', booking_open=False
+        )
+        event = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True
+        )
+        block.events.add(event)
+
+        self.assertFalse(block.booking_open)
+        self.assertTrue(block.events.exists())
+        self.assertFalse(block.is_past)
+        self.assertFalse(block.has_full_class)
+        self.assertFalse(block.has_started)
+
+        formset = UserBlockFormSet(
+            # data=self.formset_data({'form-TOTAL-FORMS': 2}),
+            initial=[{'user': self.user.id, 'block': self.block.id}]
+        )
+        form = formset.forms[1] # get the second (empty) form
+        block_qset = form.fields['block'].queryset
+        # block dropdown only has self.block
+        self.assertEqual(block_qset.count(), 1)
+        self.assertEqual(block_qset[0].id, self.block.id)
+
+    def test_bookable_blocks_block_no_events(self):
+        """
+        blocks appear in the choice dropdown in an empty form if they are:
+         - open
+         - have events
+         - not past (i.e. all events in the past)
+         - no event on the block is full
+         - block hasn't started yet
+        :return:
+        """
+
+        block = mommy.make_recipe(
+            'flex_bookings.block', booking_open=True
+        )
+
+        self.assertTrue(block.booking_open)
+        self.assertFalse(block.events.exists())
+        self.assertFalse(block.is_past)
+        self.assertFalse(block.has_full_class)
+        self.assertFalse(block.has_started)
+
+        formset = UserBlockFormSet(
+            # data=self.formset_data({'form-TOTAL-FORMS': 2}),
+            initial=[{'user': self.user.id, 'block': self.block.id}]
+        )
+        form = formset.forms[1] # get the second (empty) form
+        block_qset = form.fields['block'].queryset
+        # block dropdown only has self.block
+        self.assertEqual(block_qset.count(), 1)
+        self.assertEqual(block_qset[0].id, self.block.id)
+
+    def test_bookable_blocks_past(self):
+        """
+        blocks appear in the choice dropdown in an empty form if they are:
+         - open
+         - have events
+         - not past (i.e. all events in the past)
+         - no event on the block is full
+         - block hasn't started yet
+        :return:
+        """
+
+        block = mommy.make_recipe(
+            'flex_bookings.block', booking_open=True
+        )
+        event = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True,
+            date=timezone.now() - timedelta(5)
+        )
+        block.events.add(event)
+
+        self.assertTrue(block.booking_open)
+        self.assertTrue(block.events.exists())
+        self.assertTrue(block.is_past)
+        self.assertFalse(block.has_full_class)
+        self.assertTrue(block.has_started)
+
+        formset = UserBlockFormSet(
+            # data=self.formset_data({'form-TOTAL-FORMS': 2}),
+            initial=[{'user': self.user.id, 'block': self.block.id}]
+        )
+        form = formset.forms[1] # get the second (empty) form
+        block_qset = form.fields['block'].queryset
+        # block dropdown only has self.block
+        self.assertEqual(block_qset.count(), 1)
+        self.assertEqual(block_qset[0].id, self.block.id)
+
+    def test_bookable_blocks_event_full(self):
+        """
+        blocks appear in the choice dropdown in an empty form if they are:
+         - open
+         - have events
+         - not past (i.e. all events in the past)
+         - no event on the block is full
+         - block hasn't started yet
+        :return:
+        """
+
+        block = mommy.make_recipe(
+            'flex_bookings.block', booking_open=True
+        )
+        event = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True, max_participants=1
+        )
+        event1 = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True,
+        )
+        block.events.add(event)
+        block.events.add(event1)
+        mommy.make_recipe('flex_bookings.booking', event=event)
+
+        self.assertTrue(block.booking_open)
+        self.assertTrue(block.events.exists())
+        self.assertFalse(block.is_past)
+        self.assertTrue(block.has_full_class)
+        self.assertFalse(block.has_started)
+
+        formset = UserBlockFormSet(
+            # data=self.formset_data({'form-TOTAL-FORMS': 2}),
+            initial=[{'user': self.user.id, 'block': self.block.id}]
+        )
+        form = formset.forms[1] # get the second (empty) form
+        block_qset = form.fields['block'].queryset
+        # block dropdown only has self.block
+        self.assertEqual(block_qset.count(), 1)
+        self.assertEqual(block_qset[0].id, self.block.id)
+
+    def test_bookable_blocks_has_started(self):
+        """
+        blocks appear in the choice dropdown in an empty form if they are:
+         - open
+         - have events
+         - not past (i.e. all events in the past)
+         - no event on the block is full
+         - block hasn't started yet
+        :return:
+        """

@@ -175,7 +175,7 @@ class Block(models.Model):
         if self.events.exists():
             last_event_date = self.events.last().date
             return last_event_date < timezone.now()
-        return True
+        return False
 
     @property
     def has_full_class(self):
