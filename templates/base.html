@@ -125,7 +125,7 @@
                     <ul class="nav navbar-nav pull-right">
                         {% block admin-nav %}
                             {% if request.user.is_staff %}
-                               <li class="active-nav"><a href="{% url 'studioadmin:activitylog' %}">Studio Admin</a></li>
+                               <li class="active-nav"><a href="{% url 'studioadmin:activitylog' %}">Admin</a></li>
                             {% endif %}
                         {% endblock admin-nav %}
                         {% if request.user.is_authenticated %}
