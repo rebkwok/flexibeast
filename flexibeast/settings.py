@@ -72,7 +72,9 @@ INSTALLED_APPS = (
     'paypal.standard.ipn',
     'payments',
     'activitylog',
-    'website'
+    'website',
+    'gallery',
+    'reviews',
 )
 
 INTERNAL_IPS = ('127.0.0.1', '0.0.0.0')
@@ -133,6 +135,7 @@ ACCOUNT_SIGNUP_FORM_CLASS = 'accounts.forms.SignupForm'
 SOCIALACCOUNT_QUERY_EMAIL = True
 
 TEMPLATE_DIRS = (root('templates'),)
+APP_DIRS = True
 
 ROOT_URLCONF = 'flexibeast.urls'
 

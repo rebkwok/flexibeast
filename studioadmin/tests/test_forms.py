@@ -13,15 +13,19 @@ from studioadmin.forms import (
     # EmailUsersForm,
     EventFormSet,
     EventAdminForm,
+    PageForm,
+    PagesFormset,
+    PictureFormset,
     TimetableSessionFormSet,
     SessionAdminForm,
+    SubsectionFormset,
     UploadTimetableForm,
     # UserFilterForm,
     UserBookingFormSet,
     UserBlockFormSet
 )
 from timetable.models import Session
-
+from website.models import Page, SubSection, Picture
 
 class EventFormSetTests(TestCase):
 
@@ -828,3 +832,136 @@ class UserBlockFormSetTests(TestCase):
          - block hasn't started yet
         :return:
         """
+        block = mommy.make_recipe(
+            'flex_bookings.block', booking_open=True
+        )
+        event = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True,
+            date=timezone.now() - timedelta(1)
+        )
+        event1 = mommy.make_recipe(
+            'flex_bookings.future_EV', booking_open=True,
+        )
+        block.events.add(event)
+        block.events.add(event1)
+
+        self.assertTrue(block.booking_open)
+        self.assertTrue(block.events.exists())
+        self.assertFalse(block.is_past)
+        self.assertFalse(block.has_full_class)
+        self.assertTrue(block.has_started)
+
+        formset = UserBlockFormSet(
+            # data=self.formset_data({'form-TOTAL-FORMS': 2}),
+            initial=[{'user': self.user.id, 'block': self.block.id}]
+        )
+        form = formset.forms[1] # get the second (empty) form
+        block_qset = form.fields['block'].queryset
+        # block dropdown only has self.block
+        self.assertEqual(block_qset.count(), 1)
+        self.assertEqual(block_qset[0].id, self.block.id)
+
+
+class PagesFormSetTests(TestCase):
+
+    def setUp(self):
+        self.page = mommy.make(Page)
+
+    def formset_data(self, extra_data={}):
+        data = {
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 1,
+            'form-0-id': self.page.id,
+            }
+
+        for key, value in extra_data.items():
+            data[key] = value
+
+        return data
+
+    def test_formset_valid(self):
+        formset = PagesFormset(data=self.formset_data())
+        self.assertTrue(formset.is_valid())
+
+
+class PageFormTests(TestCase):
+
+    def setUp(self):
+        self.page = mommy.make(Page)
+
+    def form_data(self, extra_data={}):
+        data = {
+            'id': self.page.id,
+            'name': self.page.name,
+            'heading': self.page.heading,
+            'menu_name': self.page.menu_name,
+            'menu_location': self.page.menu_location,
+            'layout': self.page.layout
+            }
+
+        for key, value in extra_data.items():
+            data[key] = value
+
+        return data
+
+    def test_form_valid(self):
+        form = PageForm(data=self.form_data(), instance=self.page)
+        self.assertTrue(form.is_valid())
+
+    def test_new_form_with_duplicate_page_name(self):
+        data = {
+            'name': self.page.name,
+            'heading': 'Test Heading',
+            'menu_name': 'test_name',
+            'menu_location': 'main',
+            'layout': 'no-img'
+        }
+        form = PageForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors, "{'name': 'Page with this name already exists'}",
+            form.errors
+        )
+
+
+    def test_required_fields(self):
+        pass
+
+class SubsectionFormsetTests(TestCase):
+
+    def setUp(self):
+        self.subsection = mommy.make(SubSection)
+
+    def formset_data(self, extra_data={}):
+        data = {
+            'subsections-TOTAL_FORMS': 1,
+            'subsections-INITIAL_FORMS': 1,
+            'subsections-0-id': self.subsection.id,
+            'subsections-0-content': self.subsection.content,
+            }
+
+        for key, value in extra_data.items():
+            data[key] = value
+
+        return data
+
+    def test_formset_valid(self):
+        formset = SubsectionFormset(data=self.formset_data())
+        self.assertTrue(formset.is_valid())
+
+    def test_content_field_required(self):
+        formset = SubsectionFormset(
+            data=self.formset_data({'subsections-0-content': ''})
+        )
+        self.assertFalse(formset.is_valid())
+
+        form = formset.forms[0]
+        self.assertIn(
+            'This field is required', str(form.errors['content']),
+            form.errors
+        )
+
+
+class PictureFormsetTests(TestCase):
+
+    pass

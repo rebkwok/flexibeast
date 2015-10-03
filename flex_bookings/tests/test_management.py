@@ -213,6 +213,56 @@ class EmailReminderAndWarningTests(TestCase):
         for booking in Booking.objects.filter(status='CANCELLED'):
             self.assertFalse(booking.reminder_sent)
 
+    @patch('flex_bookings.management.commands.email_reminders.timezone')
+    def test_email_reminders_not_sent_if_no_cancellation_period(self, mock_tz):
+        mock_tz.now.return_value = datetime(
+            2015, 2, 12, 19, 0, tzinfo=timezone.utc
+            )
+
+        # 0 cancellation period
+        event = mommy.make_recipe(
+            'flex_bookings.future_EV',
+            date=datetime(2015, 2, 13, 12, 0, tzinfo=timezone.utc),
+            booking_open=True,
+            cost=10,
+            cancellation_period=0)
+        mommy.make_recipe(
+            'flex_bookings.booking', event=event, status='OPEN', _quantity=5
+            )
+
+        management.call_command('email_reminders')
+        self.assertEquals(len(mail.outbox), 0)
+        for booking in Booking.objects.all():
+            self.assertFalse(booking.reminder_sent)
+
+    @patch('flex_bookings.management.commands.email_reminders.timezone')
+    def test_email_reminders_sent_due_date_no_cancellation(self, mock_tz):
+        """
+        If there is a payment due date but no cancellation period, reminders
+        are still sent
+        """
+        mock_tz.now.return_value = datetime(
+            2015, 2, 12, 19, 0, tzinfo=timezone.utc
+            )
+
+        # 0 cancellation period
+        event = mommy.make_recipe(
+            'flex_bookings.future_EV',
+            date=datetime(2015, 2, 13, 12, 0, tzinfo=timezone.utc),
+            booking_open=True,
+            cost=10,
+            payment_due_date=datetime(2015, 2, 12, 12, 0, tzinfo=timezone.utc),
+            cancellation_period=0)
+        mommy.make_recipe(
+            'flex_bookings.booking', event=event, status='OPEN', _quantity=5
+            )
+
+        management.call_command('email_reminders')
+        self.assertEquals(len(mail.outbox), 5)
+        for booking in Booking.objects.all():
+            self.assertTrue(booking.reminder_sent)
+
+
     @patch('flex_bookings.management.commands.email_warnings.timezone')
     def test_email_warnings(self, mock_tz):
         """
@@ -420,6 +470,62 @@ class EmailReminderAndWarningTests(TestCase):
         booking2.refresh_from_db()
         self.assertTrue(booking1.warning_sent)
         self.assertFalse(booking2.warning_sent)
+
+    @patch('flex_bookings.management.commands.email_warnings.timezone')
+    def test_email_warnings_not_sent_if_no_cancellation_period(self, mock_tz):
+        mock_tz.now.return_value = datetime(
+            2015, 2, 12, 19, 0, tzinfo=timezone.utc
+            )
+
+        # 0 cancellation period
+        event = mommy.make_recipe(
+            'flex_bookings.future_EV',
+            date=datetime(2015, 2, 13, 12, 0, tzinfo=timezone.utc),
+            booking_open=True,
+            cost=10,
+            cancellation_period=0)
+        mommy.make_recipe(
+            'flex_bookings.booking', event=event, status='OPEN',
+            warning_sent=False,
+            date_booked=datetime(2015, 2, 11, 19, 0, tzinfo=timezone.utc),
+            _quantity=5
+            )
+
+        management.call_command('email_warnings')
+        self.assertEquals(len(mail.outbox), 0)
+        for booking in Booking.objects.all():
+            self.assertFalse(booking.warning_sent)
+
+
+    @patch('flex_bookings.management.commands.email_warnings.timezone')
+    def test_email_warnings_sent_due_date_no_cancellation(self, mock_tz):
+        """
+        If there is a payment due date but no cancellation period, reminders
+        are still sent
+        """
+        mock_tz.now.return_value = datetime(
+            2015, 2, 12, 19, 0, tzinfo=timezone.utc
+            )
+
+        # 0 cancellation period
+        event = mommy.make_recipe(
+            'flex_bookings.future_EV',
+            date=datetime(2015, 2, 13, 12, 0, tzinfo=timezone.utc),
+            booking_open=True,
+            cost=10,
+            payment_due_date=datetime(2015, 2, 12, 12, 0, tzinfo=timezone.utc),
+            cancellation_period=0)
+
+        mommy.make_recipe(
+            'flex_bookings.booking', event=event, status='OPEN',
+            date_booked=datetime(2015, 2, 11, 19, 0, tzinfo=timezone.utc),
+            _quantity=5
+            )
+
+        management.call_command('email_warnings')
+        self.assertEquals(len(mail.outbox), 5)
+        for booking in Booking.objects.all():
+            self.assertTrue(booking.warning_sent)
 
 
 class CancelUnpaidBookingsTests(TestCase):

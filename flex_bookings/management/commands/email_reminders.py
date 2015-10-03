@@ -23,11 +23,19 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         events = [
             event for event in Event.objects.all() if
+            (event.cancellation_period or event.payment_due_date) and
             event.date >= timezone.now() and
-            (event.date - timedelta(hours=(event.cancellation_period + 24)))
-            <= timezone.now()
+            (
+                (
+                    (event.date - timedelta(hours=(event.cancellation_period + 24)))
+                    <= timezone.now()
+                ) or
+                (
+                    (event.payment_due_date - timedelta(hours=24))
+                     <= timezone.now()
+                )
+                )
         ]
-
         upcoming_bookings = Booking.objects.filter(
             event__in=events,
             status='OPEN',
