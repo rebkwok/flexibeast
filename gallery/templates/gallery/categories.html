@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}<link rel="stylesheet" href="{% static 'gallery/css/gallery.css' %}">{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="page-header col-sm-12">
+        <h1>
+            Gallery Categories
+        </h1>
+    </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-success">
+                    <form class="form-horizontal" method="post" action="">
+                    {% csrf_token %}
+                    <div class="table-responsive">
+                        <table class="table tablesorter" id="sortTable">
+                            <thead>
+                            <tr class="success">
+                                <th>Category Name</th>
+                                <th class="table-center">Number of images</th>
+                                <th class="table-center">Add images</th>
+                                <th class="table-center">Delete category and all attached images</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            {{ categories_formset.management_form }}
+                            {% for category in categories_formset %}
+                                <span class=hide>{{ category.id }}</span>
+                                <tr>
+                                    <td class="studioadmin-tbl">{{ category.name }}</td>
+                                    <td class="studioadmin-tbl table-center">{{ category.image_count }}</td>
+                                    <td class="studioadmin-tbl table-center">
+{#                                        <a href="{% url 'studioadmin:edit_category' category.name %}">#}
+                                            Pending link
+{#                                        </a>#}
+                                    </td>
+                                    <td class="studioadmin-tbl table-center">{{ category.DELETE }}<label for={{ category.DELETE_id }}></label>
+                                </tr>
+                            {% endfor %}
+                            <tr>
+                                <td class="studioadmin-tbl" colspan="6"><input class="btn btn-success" name="formset_submitted" type="submit" value="Save changes" /></td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </form>
+
+                    </div>
+                </div>
+            </div>
+         </div>
+
+</div>
+
+
+
+{%  endblock %}
+
+
+{% block extra_scripts %}
+    <script src="{% static 'gallery/js/gallery.js' %}"></script>
+{% endblock %}

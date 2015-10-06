@@ -64,7 +64,7 @@ $(document).ready(function(){
             tempImage1.src = $img.attr('src');
             tempImage1.onload = function() {
                 var ratio = tempImage1.width / tempImage1.height;
-                if(!isNaN(ratio) && ratio < 1) $img.addClass('portait');
+                if(!isNaN(ratio) && ratio < 1) $img.addClass('portrait');
             }
         }).each(function () {
             if (this.complete) $(this).load();

@@ -404,3 +404,6 @@ if env('TRAVIS') or env('HEROKU'):
             },
         },
     }
+
+# for gallery app
+PERMISSION_DENIED_URL = 'flexbookings:permission_denied'

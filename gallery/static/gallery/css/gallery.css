@@ -1,10 +1,14 @@
-.thumbnail {
-  position: relative;
-  width: 200px;
-  height: 200px;
-  overflow: hidden;
+.thumbnail-container {
+    width: 180px;
+    height: 180px;
+    overflow: hidden;
+    margin: 10px;
+    position: relative;
+    border: 2px solid white;
 }
-.thumbnail img {
+
+
+div.thumbnail-container > img {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -14,7 +18,7 @@
       -ms-transform: translate(-50%,-50%);
           transform: translate(-50%,-50%);
 }
-.thumbnail img.portrait {
+div.thumbnail-container > img.portrait {
   width: 100%;
   height: auto;
 }

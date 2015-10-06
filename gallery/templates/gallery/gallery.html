@@ -42,9 +42,11 @@
                            data-caption="{{ image.caption }}"
                            data-image="{{ MEDIA_URL }}{{ image.photo.name }}"
                            data-target="#image-gallery">
-                            <img class="thumbnail"
-                                 src="{{ MEDIA_URL }}{{ image.photo.name }}"
-                                 alt="Short alt text">
+                            <div class="thumbnail-container">
+                                <img
+                                     src="{{ MEDIA_URL }}{{ image.photo.name }}"
+                                     alt="Short alt text">
+                            </div>
                         </a>
                     </div>
                     {% endfor %}
