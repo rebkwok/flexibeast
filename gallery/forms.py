@@ -1,9 +1,15 @@
 from django import forms
-from django.forms.models import modelformset_factory, BaseModelFormSet
+from django.forms.models import modelformset_factory, BaseModelFormSet, \
+    inlineformset_factory, formset_factory, BaseFormSet, BaseInlineFormSet
+from django.utils.translation import ugettext_lazy as _
 
 from floppyforms import ClearableFileInput
 
-from gallery.models import Category
+from gallery.models import Category, Image
+
+
+class ImageThumbnailFileInput(ClearableFileInput):
+    template_name = 'gallery/image_thumbnail.html'
 
 
 class CategoriesBaseFormSet(BaseModelFormSet):
@@ -11,17 +17,21 @@ class CategoriesBaseFormSet(BaseModelFormSet):
     def add_fields(self, form, index):
         super(CategoriesBaseFormSet, self).add_fields(form, index)
 
-        if form.instance:
-            form.fields['DELETE'] = forms.BooleanField(
-                widget=forms.CheckboxInput(attrs={
-                    'class': 'delete-checkbox',
-                    'id': 'DELETE_{}'.format(index)
-                }),
-                required=False
-            )
-            form.DELETE_id = 'DELETE_{}'.format(index)
+        if form.instance.id:
+            delete_class = 'delete-checkbox'
+        else:
+            delete_class = 'hide'
 
-            form.image_count = form.instance.images.count()
+        form.fields['DELETE'] = forms.BooleanField(
+            widget=forms.CheckboxInput(attrs={
+                'class': delete_class,
+                'id': 'DELETE_{}'.format(index)
+            }),
+            required=False
+        )
+        form.DELETE_id = 'DELETE_{}'.format(index)
+
+        form.image_count = form.instance.images.count()
 
         form.fields['name'] = forms.CharField(
             widget=forms.TextInput(
@@ -33,6 +43,50 @@ CategoriesFormset = modelformset_factory(
     Category,
     fields=('id', 'name'),
     formset=CategoriesBaseFormSet,
-    extra=0,
+    extra=2,
     can_delete=True
 )
+
+class ImageBaseFormset(BaseInlineFormSet):
+
+    def add_fields(self, form, index):
+        super(ImageBaseFormset, self).add_fields(form, index)
+
+        if form.instance.id:
+            form.fields['DELETE'] = forms.BooleanField(
+                widget=forms.CheckboxInput(attrs={
+                    'class': 'delete-checkbox',
+                    'id': 'DELETE_{}'.format(index)
+                }),
+                required=False,
+                help_text="Tick box and click Save to delete this image"
+            )
+            form.DELETE_id = 'DELETE_{}'.format(index)
+
+        form.fields['photo'] = forms.ImageField(
+            label=_(''),
+            error_messages={'invalid':_("Image files only")},
+            widget=ImageThumbnailFileInput,
+            required=False
+        )
+
+        form.fields['caption'] = forms.CharField(
+            widget=forms.TextInput(attrs={'class': 'form-control'})
+        )
+
+
+ImageFormset = inlineformset_factory(
+    Category,
+    Image,
+    formset=ImageBaseFormset,
+    fields=('photo', 'caption'),
+    can_delete=True,
+    extra=1,
+)
+
+
+class CategoryForm(forms.ModelForm):
+
+    class Meta:
+        model = Category
+        fields = '__all__'

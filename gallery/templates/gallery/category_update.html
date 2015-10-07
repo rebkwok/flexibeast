@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load static %}
+{% load gallerytags %}
+
+{% block content %}
+
+{{ form.media }}
+
+<div class="extra-top-margin container-fluid row">
+    <div class="col-sm-12">
+       <div class="panel panel-success">
+            <div class="panel-heading">
+                <h2 class="panel-title">Category: {{ category.name }}</h2>
+            </div>
+
+            <div class="panel-body">
+                {% if form.errors %}
+                    <div class="form-error">
+                        <p>The operation could not be performed because one or more error(s) occurred.<br />Please resubmit the form after making the following changes:</p>
+                        <ul>
+                        {% for field in form %}
+                        {% if field.errors %}<li>{{ field.name|format_field_name }}: {{ field.errors|striptags }}</li>{% endif %}
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                <form class="form-horizontal" enctype="multipart/form-data" method="post" action="">
+                    {% csrf_token %}
+
+                    <span class="hide">{{ form }}</span>
+
+                    <div>
+
+                        {{ image_formset.management_form }}
+
+                        {% for image in image_formset %}
+                            <div class="form-group">
+                                <span class="hide">{{ image.id }}</span>
+                                {% if not image.instance.id %}
+                                    <span class="divider"></span>
+                                    <div class="new-inline-label">
+                                        <h4>Add new picture:</h4>
+                                    </div>
+                                {% endif %}
+                            </div>
+                                    <div class="form-group">
+                                        <div col-xs-2 col-xs-offset-1>{{ image.photo }}{{ image.photo.help_text }}</div>
+                                        <div col-xs-2 col-xs-offset-1>{{ image.caption.label }}{{ image.caption }}{{ image.caption.help_text }}</div>
+                                        {% if image.instance.id %}
+                                        <div class="form-group">
+                                            <label class="control-label delete-label col-sm-2">{{ image.DELETE.label }}</label>
+                                            <div class="col-sm-9 delete-label">{{ image.DELETE }}<label class="delete-label" for={{ image.DELETE_id }}></label>
+                                            <span class="studioadmin-help delete-label">{{ image.DELETE.help_text }}</span>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                            </div>
+                        {% endfor %}
+                </div>
+                    <div class="form-group">
+                        <div class="col-sm-9">
+                            <button type="submit" class="btn btn-success">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+ </div>
+
+{% endblock content %}

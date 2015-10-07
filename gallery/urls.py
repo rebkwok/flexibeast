@@ -1,5 +1,5 @@
 from django.conf.urls import include, patterns, url
-from gallery.views import CategoryListView
+from gallery.views import CategoryListView, CategoryUpdateView
 
 urlpatterns = patterns('',
     url(r'^$', 'gallery.views.view_gallery', name='view'),
@@ -12,5 +12,5 @@ urlpatterns = patterns('',
     # name and delete of entire category, add new category, links to category detail views
     url(r'^categories/$', CategoryListView.as_view(), name='categories'),
     # Category detail view, show all images for edit/delete/add
-    # url(r'^categories/(?P<pk>\d+)$', CategoryDetailView.as_view(), name='edit_category'),
+    url(r'^categories/(?P<pk>\d+)$', CategoryUpdateView.as_view(), name='edit_category'),
 )

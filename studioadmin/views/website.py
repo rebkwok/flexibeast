@@ -106,7 +106,7 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
         context['picture_formset'] = picture_formset
         return context
 
-    def post(self,request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         name = self.kwargs['name']
         page = Page.objects.get(name=name)
         form = PageForm(request.POST, instance=page)
