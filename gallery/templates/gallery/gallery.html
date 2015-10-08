@@ -19,14 +19,23 @@
                 <form method="get">
                     <div class="btn-group-vertical" role="group">
                         <button class="btn btn-gallery {% if cat_selection == 'All' %}btn-gallery-active{% else %}btn-default{% endif %}"
-                                                       type="submit" name="category" value="All">All <span class="badge">{{ total_image_count }}</span>
+                                                       type="submit" name="category" value="All">All  <span class="gallery-count badge pull-right">{{ total_image_count }}</span>
                         </button>
                         {% for category in categories %}
                             <button class="btn btn-gallery {% if cat_selection == category.id %}btn-gallery-active{% else %}btn-default{% endif %}"
-                                    type="submit" name="category" value="{{ category.id }}">{{ category.name}} <span class="badge">{{ category.image_set.count }}</span></button>
+                                    type="submit" name="category" value="{{ category.id }}">{{ category.name}}  <span class="gallery-count badge pull-right">{{ category.images.count }} </span></button>
                         {% endfor %}
                     </div>
                 </form>
+
+            <span class="divider"></span>
+            {% if user.is_staff %}
+                <div>
+                    <h3>For Admin Users</h3>
+                    <p><a href="{% url 'gallery:categories' %}">View and edit Gallery</a></p>
+
+                </div>
+            {% endif %}
             </div>
 
 

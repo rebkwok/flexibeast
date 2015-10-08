@@ -3,6 +3,8 @@
 {% load static %}
 {% load gallerytags %}
 
+{% block extra_head %}<link rel="stylesheet" href="{% static 'gallery/css/gallery.css' %}">{% endblock %}
+
 {% block content %}
 
 {{ form.media }}
@@ -45,21 +47,22 @@
                                     </div>
                                 {% endif %}
                             </div>
-                                    <div class="form-group">
+                                    <div class="row container-fluid">
                                         <div col-xs-2 col-xs-offset-1>{{ image.photo }}{{ image.photo.help_text }}</div>
                                         <div col-xs-2 col-xs-offset-1>{{ image.caption.label }}{{ image.caption }}{{ image.caption.help_text }}</div>
                                         {% if image.instance.id %}
                                         <div class="form-group">
-                                            <label class="control-label delete-label col-sm-2">{{ image.DELETE.label }}</label>
-                                            <div class="col-sm-9 delete-label">{{ image.DELETE }}<label class="delete-label" for={{ image.DELETE_id }}></label>
-                                            <span class="studioadmin-help delete-label">{{ image.DELETE.help_text }}</span>
+                                            <label class="col-xs-2">{{ image.DELETE.label }}</label>
+                                            <div class="col-xs-9 delete-label">{{ image.DELETE }}<label class="delete-label" for={{ image.DELETE_id }}></label>
+                                            <span class="gallery-help delete-label">{{ image.DELETE.help_text }}</span>
                                             </div>
                                         </div>
                                         {% endif %}
                                     </div>
 
-                            </div>
+
                         {% endfor %}
+                    </div>
                 </div>
                     <div class="form-group">
                         <div class="col-sm-9">

@@ -43,7 +43,7 @@ CategoriesFormset = modelformset_factory(
     Category,
     fields=('id', 'name'),
     formset=CategoriesBaseFormSet,
-    extra=2,
+    extra=1,
     can_delete=True
 )
 
@@ -71,7 +71,8 @@ class ImageBaseFormset(BaseInlineFormSet):
         )
 
         form.fields['caption'] = forms.CharField(
-            widget=forms.TextInput(attrs={'class': 'form-control'})
+            widget=forms.TextInput(attrs={'class': 'form-control'}),
+            required=False
         )
 
 

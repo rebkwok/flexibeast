@@ -27,7 +27,8 @@ class Image(models.Model):
             this = Image.objects.get(id=self.id)
             if this.photo != self.photo:
                 this.photo.delete(save=False)
-        except: pass # when new photo then we do nothing, normal case
+        except Image.DoesNotExist:
+            pass  # when new photo then we do nothing, normal case
         super(Image, self).save(*args, **kwargs)
 
 

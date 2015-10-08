@@ -2,7 +2,7 @@ from django.conf.urls import include, patterns, url
 from gallery.views import CategoryListView, CategoryUpdateView
 
 urlpatterns = patterns('',
-    url(r'^$', 'gallery.views.view_gallery', name='view'),
+    url(r'^$', 'gallery.views.view_gallery', name='gallery'),
     ##### VIEWS FOR STAFF USER ONLY #####
     # images list, allow editing of image name and category, delete image, filter by category
     # url(r'^images/', ImageListView.as_view(), name='images'),

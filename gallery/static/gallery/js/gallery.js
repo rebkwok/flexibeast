@@ -71,4 +71,6 @@ $(document).ready(function(){
         });
     });
 
+    //http://tablesorter.com/docs/
+    jQuery("#sortTable").tablesorter();
 });

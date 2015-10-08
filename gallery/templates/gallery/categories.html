@@ -33,18 +33,20 @@
                             {% for category in categories_formset %}
                                 <span class=hide>{{ category.id }}</span>
                                 <tr>
-                                    <td class="studioadmin-tbl">{{ category.name }}</td>
-                                    <td class="studioadmin-tbl table-center">{{ category.image_count }}</td>
-                                    <td class="studioadmin-tbl table-center">
-{#                                        <a href="{% url 'studioadmin:edit_category' category.name %}">#}
-                                            Pending link
-{#                                        </a>#}
+                                    <td class="gallery-tbl">{% if not category.instance.id %}<strong>Add New Category:</strong>{% endif %}{{ category.name }}</td>
+                                    <td class="gallery-tbl table-center">{% if category.instance.id %}{{ category.image_count }}{% endif %}</td>
+                                    <td class="gallery-tbl table-center">
+                                        {% if category.instance.id %}
+                                            <a href="{% url 'gallery:edit_category' category.instance.id %}">
+                                             Add
+                                            </a>
+                                        {% endif %}
                                     </td>
-                                    <td class="studioadmin-tbl table-center">{{ category.DELETE }}<label for={{ category.DELETE_id }}></label>
+                                    <td class="gallery-tbl table-center">{{ category.DELETE }}<label for={{ category.DELETE_id }}></label>
                                 </tr>
                             {% endfor %}
                             <tr>
-                                <td class="studioadmin-tbl" colspan="6"><input class="btn btn-success" name="formset_submitted" type="submit" value="Save changes" /></td>
+                                <td class="gallery-tbl" colspan="6"><input class="btn btn-success" name="formset_submitted" type="submit" value="Save changes" /></td>
                             </tr>
 
                             </tbody>

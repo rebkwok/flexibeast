@@ -117,7 +117,7 @@ class CategoryListView(StaffUserMixin, ListView):
         return reverse('gallery:categories')
 
 
-class CategoryUpdateView(UpdateView):
+class CategoryUpdateView(StaffUserMixin, UpdateView):
 
     model = Category
     template_name = 'gallery/category_update.html'
