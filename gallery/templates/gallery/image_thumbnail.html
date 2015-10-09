@@ -26,15 +26,16 @@
             {% if value.url %}
                 <div class="row">
                     <div class="col-md-12">
+                        <label>File name:</label> {{ value }}</br>
                         <img src="{{ value.url }}"
                             alt="{{ value }}" class="img-thumbnail gallery-update-thumbnail"/>
                     </div>
                 </div>
- 
+
             {% else %}
                 <div class="row">
 
-                    <div class="form-inline">
+                    <div class="form-inline ">
                         <input type="{{ type }}" name="{{ name }}"
                             {% if required %}required{% endif %}
                             class="filestyle"

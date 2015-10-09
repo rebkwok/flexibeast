@@ -100,10 +100,10 @@
                                     </div>
                                 {% endif %}
                                     <div class="form-group">
-                                        <div class="{% if picture.instance.id %}col-xs-2{% else %}col-xs-3{% endif %} col-xs-offset-1">{{ picture.image }}</div>
+                                        <div class="{% if picture.instance.id %}col-xs-2{% else %}col-xs-4{% endif %} col-xs-offset-1">{{ picture.image }}</div>
 
                                         {% if not picture.instance.id %}
-                                            <div class="col-xs-5 aligned-label-container"><label class="aligned-label">{{ picture.main.label }}</label>
+                                            <div class="col-xs-5 aligned-label-container"><label class="aligned-label">{{ picture.main.label }}</label></br>
                                                 {{ picture.main }}
                                                 <label class="aligned-label" for={{ picture.main_id }}></label>
                                                 <span class="studioadmin-help">{{ picture.main.help_text }}</span>
