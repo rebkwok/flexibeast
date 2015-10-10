@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load staticfiles %}
 {% load static %}
 {% load gallerytags %}
 
@@ -59,7 +58,7 @@
                                     </div>
                                 {% endif %}
                             </div>
-
+                            </div>
                         {% endfor %}
 
                     <div class="form-group gallery-update-group">
@@ -75,3 +74,7 @@
     </div>
 
 {% endblock content %}
+
+{% block extra_scripts %}
+        <script type="text/javascript" src="{% static 'gallery/js/bootstrap-filestyle.min.js' %}"> </script>
+{% endblock %}
