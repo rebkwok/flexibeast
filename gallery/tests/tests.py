@@ -1,13 +1,17 @@
-from django.test import TestCase, override_settings
+import os
+
+from django.conf import settings
+from django.test import RequestFactory, TestCase, override_settings
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.test.client import Client
+from django.contrib.messages.storage.fallback import FallbackStorage
+
+from model_mommy import mommy
 
 from gallery.models import Category, Image
 from gallery.tests.helpers import set_up_fb
-
-
-import os
-import sys
-from django.conf import settings
+from gallery.views import CategoryListView, CategoryUpdateView, view_gallery
 
 
 def create_image(photo, category):
@@ -46,10 +50,30 @@ class GalleryModelTests(TestCase):
 
 
 @override_settings(MEDIA_ROOT=os.path.join(TEST_ROOT, 'gallery/testdata/'))
-class GalleryViewsTests(TestCase):
+class GalleryViewTests(TestCase):
 
     def setUp(self):
         set_up_fb()
+        self.client = Client()
+        self.factory = RequestFactory()
+        self.user = mommy.make(User)
+        self.staff_user = mommy.make(User)
+        self.staff_user.is_staff = True
+        self.staff_user.save()
+
+    def _get_response(self, user):
+        url = reverse('gallery:gallery')
+        request = self.factory.get(url)
+        request.user = user
+        return view_gallery(request)
+
+    def test_login_not_required(self):
+        """
+        test that page is accessible if there is no user logged in
+        """
+        url = reverse('gallery:gallery')
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
 
     def test_gallery_view(self):
         '''
@@ -77,4 +101,64 @@ class GalleryViewsTests(TestCase):
         testimg = create_image('hoop.jpg', 'category1')
         response = self.client.get(reverse('gallery:gallery'))
         self.assertEqual(response.status_code, 200)
-        self.assertQuerysetEqual(response.context['images'], ['<Image: Photo id: {}>'.format(testimg.id)])
+        self.assertQuerysetEqual(
+            response.context['images'],
+            ['<Image: Photo id: {}>'.format(testimg.id)]
+        )
+
+    def test_gallery_view_with_logged_in_user(self):
+        """
+        With logged in (not staff) user, the edit gallery links are still
+        not shown
+        """
+        response = self._get_response(self.user)
+        self.assertNotIn('View and edit Gallery', str(response.content))
+
+    def test_gallery_view_with_logged_in_staff_user(self):
+        """
+        With staff user, the edit gallery links are shown
+        """
+        response = self._get_response(self.staff_user)
+        self.assertIn('View and edit Gallery', str(response.content))
+
+
+@override_settings(MEDIA_ROOT=os.path.join(TEST_ROOT, 'gallery/testdata/'))
+class CategoryListViewTests(TestCase):
+
+    def setUp(self):
+        set_up_fb()
+        self.client = Client()
+        self.factory = RequestFactory()
+        self.user = mommy.make(User)
+        self.staff_user = mommy.make(User)
+        self.staff_user.is_staff = True
+        self.staff_user.save()
+
+    def _get_response(self, user):
+        url = reverse('gallery:categories')
+        request = self.factory.get(url)
+        request.user = user
+        view = CategoryListView.as_view()
+        return view(request)
+
+    def _post_response(self, user, data):
+        url = reverse('gallery:categories')
+        request = self.factory.ost(url, data)
+        request.user = user
+        view = CategoryListView.as_view()
+        return view(request)
+
+    def test_staff_user_require(self):
+        # no logged in user
+        response = self.client.get(reverse('gallery:gallery'))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse(settings.PERMISSION_DENIED_URL))
+
+        # logged in non-staff user
+        response = self._get_response(self.user)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse(settings.PERMISSION_DENIED_URL))
+
+        # logged in staff user
+        response = self._get_response(self.staff_user)
+        self.assertEqual(response.status_code, 200)

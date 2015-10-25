@@ -6,11 +6,14 @@
 {% block content %}
 
 <div class="container">
-            <div class="page-header col-sm-12">
-                <h1>
-                    Gallery
-                </h1>
-            </div>
+    <div class="page-header col-sm-12">
+        <h1>
+            Gallery
+        </h1>
+        {% if user.is_staff %}
+            <p><a href="{% url 'gallery:categories' %}">View and edit Gallery</a></p>
+        {% endif %}
+    </div>
 
     {% if categories %}
 
@@ -27,18 +30,7 @@
                         {% endfor %}
                     </div>
                 </form>
-
-            <span class="divider"></span>
-            {% if user.is_staff %}
-                <div>
-                    <h3>For Admin Users</h3>
-                    <p><a href="{% url 'gallery:categories' %}">View and edit Gallery</a></p>
-
-                </div>
-            {% endif %}
             </div>
-
-
             <div class="col-sm-8 col-md-9">
 
                     {% for image in images %}
