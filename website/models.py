@@ -72,8 +72,7 @@ class SubSection(models.Model):
     page = models.ForeignKey(Page, related_name='subsections')
 
     class Meta:
-        ordering = ['index']
-        unique_together = [('page', 'index'),]
+        ordering = ['index', 'id']
 
     def __str__(self):
         return "{} page - subsection {} {}".format(

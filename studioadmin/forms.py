@@ -1187,7 +1187,8 @@ class SubsectionBaseFormset(BaseInlineFormSet):
                attrs={'class': 'form-control'}
             ),
             help_text="Use this to change the order subsections "
-                      "are displayed on the page",
+                      "are displayed on the page. Subsections with the same "
+                      "index are displayed in the order they were created.",
             required=False
         )
 
