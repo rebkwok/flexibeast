@@ -39,9 +39,16 @@ class CategoriesBaseFormSet(BaseModelFormSet):
             )
         )
 
+
+        form.fields['description'] = forms.CharField(
+            widget=forms.Textarea(
+                attrs={'class': 'form-control', 'rows': 2}
+            )
+        )
+
 CategoriesFormset = modelformset_factory(
     Category,
-    fields=('id', 'name'),
+    fields=('id', 'name', 'description'),
     formset=CategoriesBaseFormSet,
     extra=1,
     can_delete=True
@@ -82,7 +89,7 @@ ImageFormset = inlineformset_factory(
     formset=ImageBaseFormset,
     fields=('photo', 'caption'),
     can_delete=True,
-    extra=1,
+    extra=3,
 )
 
 
@@ -90,4 +97,4 @@ class CategoryForm(forms.ModelForm):
 
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ('name', 'description')

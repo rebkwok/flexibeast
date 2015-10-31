@@ -22,6 +22,7 @@
                             <thead>
                             <tr class="success">
                                 <th>Category Name</th>
+                                <th>Description</th>
                                 <th class="table-center">Number of images</th>
                                 <th class="table-center">Add/edit images</th>
                                 <th class="table-center">Delete category and all attached images</th>
@@ -34,6 +35,7 @@
                                 <span class=hide>{{ category.id }}</span>
                                 <tr>
                                     <td class="gallery-tbl">{% if not category.instance.id %}<strong>Add New Category:</strong>{% endif %}{{ category.name }}</td>
+                                    <td class="gallery-tbl">{{ category.description }}</td>
                                     <td class="gallery-tbl table-center">{% if category.instance.id %}{{ category.image_count }}{% endif %}</td>
                                     <td class="gallery-tbl table-center">{% if category.instance.id %}
                                         <a href="{% url 'gallery:edit_category' category.instance.id %}">

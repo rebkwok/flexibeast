@@ -2,9 +2,12 @@ from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
+from imagekit.models import ProcessedImageField
+
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -14,7 +17,14 @@ class Category(models.Model):
 
 
 class Image(models.Model):
-    photo = models.ImageField(upload_to='gallery')
+
+    photo = ProcessedImageField(
+        upload_to='gallery',
+        format='JPEG',
+        options={'quality': 70},
+        null=True, blank=True,
+    )
+
     category = models.ForeignKey(Category, related_name='images')
     caption = models.CharField(max_length=255, null=True, blank=True)
 

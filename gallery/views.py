@@ -18,7 +18,7 @@ def view_gallery(request):
         cat_selection = 'All'
     else:
         images = Image.objects.filter(category__id=int(category_choice))
-        cat_selection = int(category_choice)
+        cat_selection = Category.objects.get(id=int(category_choice))
 
     return render(
         request,
@@ -51,6 +51,7 @@ class CategoryListView(StaffUserMixin, ListView):
             deleted_categories = []
             updated_categories = {}
             new_categories = []
+            update_desc_msg = ""
 
             for form in categories_formset:
                 if form.has_changed():
@@ -59,16 +60,26 @@ class CategoryListView(StaffUserMixin, ListView):
                         deleted_categories.append(category.name)
                         category.delete()
                     else:
+                        new = False
+                        try:
+                            old_cat = Category.objects.get(id=form.instance.id)
+                            new_cat = form.save(commit=False)
+                        except Category.DoesNotExist:  # creating a new category
+                            new = True
+
                         if 'name' in form.changed_data:
-                            try:
-                                old_cat = Category.objects.get(id=form.instance.id)
+                            if new:
                                 old_name = old_cat.name
-                                new_cat = form.save(commit=False)
                                 new_name = new_cat.name
                                 updated_categories['category.id'] = [old_name, new_name]
-                            except Category.DoesNotExist:  # creating a new category
-                                cat = form.save(commit=False)
-                                new_categories.append(cat.name)
+                            else:
+                                new_categories.append(new_cat.name)
+                        elif 'description' in form.changed_data:
+                            if not new:
+                                update_desc_msg = "Category {}'s description " \
+                                                  "has been updated".format(
+                                    new_cat.name
+                                )
                         form.save()
 
             del_msg = ""
@@ -103,6 +114,7 @@ class CategoryListView(StaffUserMixin, ListView):
                     "{}{}{}".format(
                         "{}</br>".format(del_msg) if del_msg else "",
                         "{}</br>".format(upd_msg) if del_msg else "",
+                        "{}</br>".format(update_desc_msg) if update_desc_msg else "",
                         "{}".format(new_msg)
                     )
                 )

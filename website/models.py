@@ -1,5 +1,9 @@
 from django.db import models
 from django.utils import timezone
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
+from imagekit.models import ProcessedImageField
+
 
 PAGE_LAYOUT_CHOICES = (
     ('no-img', 'No images'),
@@ -95,8 +99,12 @@ class SubSection(models.Model):
 
 
 class Picture(models.Model):
-    image = models.ImageField(
-        upload_to='website_pages', null=True, blank=True,
+
+    image = ProcessedImageField(
+        upload_to='website_pages',
+        format='JPEG',
+        options={'quality': 70},
+        null=True, blank=True,
     )
     page = models.ForeignKey(Page, related_name='pictures')
     main = models.BooleanField(default=False)

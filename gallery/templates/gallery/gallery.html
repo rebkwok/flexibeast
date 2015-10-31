@@ -10,6 +10,8 @@
         <h1>
             Gallery
         </h1>
+
+            <h4>{% if cat_selection != "All" and cat_selection.description %}{{ cat_selection.description }}{% endif %}</h4>
         {% if user.is_staff %}
             <p><a href="{% url 'gallery:categories' %}">View and edit Gallery</a></p>
         {% endif %}
@@ -25,7 +27,7 @@
                                                        type="submit" name="category" value="All">All  <span class="gallery-count badge pull-right">{{ total_image_count }}</span>
                         </button>
                         {% for category in categories %}
-                            <button class="btn btn-gallery {% if cat_selection == category.id %}btn-gallery-active{% else %}btn-default{% endif %}"
+                            <button class="btn btn-gallery {% if cat_selection.id == category.id %}btn-gallery-active{% else %}btn-default{% endif %}"
                                     type="submit" name="category" value="{{ category.id }}">{{ category.name}}  <span class="gallery-count badge pull-right">{{ category.images.count }} </span></button>
                         {% endfor %}
                     </div>
