@@ -66,34 +66,15 @@
                     <ul class="nav navbar-nav pull-left">
                         {% block left-nav-items %}
 
-                        <li class="dropdown">
-                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Timetables<span class="caret"></span></a>
-                          <ul class="dropdown-menu">
-                            <li class="active-nav"><a href="{% url 'flexbookings:lessons' %}">Classes</a></li>
-                            <li class="active-nav"><a href="{% url 'flexbookings:events' %}">Workshops</a></li>
-                          </ul>
-                        </li>
-
                         {% for page in website_pages %}
                             {% if page.menu_name and page.menu_location == 'main' %}
                             <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'website:page' page.name %}">{{ page.menu_name }}</a></li>
                             {% endif %}
                         {% endfor %}
 
-                        {% if request.user.is_authenticated %}
-
-                        <li class="dropdown">
-                              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Bookings<b class="caret"></b></a>
-                              <ul class="dropdown-menu">
-                                <li class="active-nav"><a href="{% url 'flexbookings:bookings' %}">Your bookings</a></li>
-                                <li class="active-nav"><a href="{% url 'flexbookings:booking_history' %}">Booking history</a></li>
-                                <li class="active-nav"><a href="{% url 'flexbookings:payments_pending' %}">Pending payments</a></li>
-                              </ul>
-                            </li>
-                        {% endif %}
                         <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
 
-                            {% if more_menu_options %}
+                        {% if more_menu_options %}
                             <li class="dropdown hidden-sm hidden-xs">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">More<span class="caret"></span></a>
                                 <ul class="dropdown-menu">
@@ -106,6 +87,19 @@
                             </li>
                         {% endif %}
 
+                        <li class="dropdown">
+                          <a href="#" class="dropdown-toggle timetable" data-toggle="dropdown">Timetables</br>& Booking<span class="caret"></span></a>
+                          <ul class="dropdown-menu">
+                            <li class="active-nav"><a href="{% url 'flexbookings:lessons' %}">Classes</a></li>
+                            <li class="active-nav"><a href="{% url 'flexbookings:events' %}">Workshops</a></li>
+                            {% if user.is_authenticated %}
+                                <li class="active-nav"><a href="{% url 'flexbookings:bookings' %}">Your bookings</a></li>
+                                <li class="active-nav"><a href="{% url 'flexbookings:booking_history' %}">Booking history</a></li>
+                                <li class="active-nav"><a href="{% url 'flexbookings:payments_pending' %}">Pending payments</a></li>
+                            {% endif %}
+                          </ul>
+                        </li>
+
                         {% if menu_options %}
                             <li class="dropdown visible-sm visible-xs">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">More<span class="caret"></span></a>
@@ -115,6 +109,7 @@
                                         <li class="active-nav"><a href="{% url 'website:page' page.name %}">{{ page.menu_name }}</a></li>
                                     {% endif %}
                                 {% endfor %}
+                                <li class="active-nav"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
                               </ul>
                             </li>
                         {% endif %}
@@ -128,6 +123,7 @@
                                <li class="active-nav"><a href="{% url 'studioadmin:activitylog' %}">Admin</a></li>
                             {% endif %}
                         {% endblock admin-nav %}
+
                         {% if request.user.is_authenticated %}
                             <li class="dropdown hidden-md hidden-sm hidden-xs">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Your Account<b class="caret"></b></a>

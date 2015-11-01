@@ -394,6 +394,14 @@ color: #000;
 .navbar .navbar-nav>.active-nav>a:hover {background-color: #088A08; color: #fff}
 .navbar .navbar-nav>li>a:hover {background-color: #088A08; color: #fff}
 
+li > a.dropdown-toggle.timetable {
+    padding-top: 3px;
+    padding-bottom: 0px;
+}
+
+a.navbar-brand {
+    padding-top: 13px;
+}
 .nav-user {
     padding-top: 15px;
     color: green;
