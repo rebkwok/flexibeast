@@ -291,6 +291,12 @@ SUIT_CONFIG = {
             'icon': 'icon-calendar',
         },
         {
+            'app': 'gallery'
+        },
+        {
+            'app': 'reviews'
+        },
+        {
             'app': 'auth',
             'label': 'Users',
             'models': ('user',),

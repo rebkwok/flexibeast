@@ -5,8 +5,8 @@ from django.utils import timezone
 
 class Review(models.Model):
 
-    user = models.ForeignKey(User)
-    user_display_name = models.CharField(max_length=255)
+    user = models.ForeignKey(User, verbose_name='author')
+    user_display_name = models.CharField(max_length=255, verbose_name='display name')
     submission_date = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=255, null=True, blank=True)
     review = models.TextField()
@@ -14,7 +14,7 @@ class Review(models.Model):
     published = models.BooleanField(default=False)
 
     previous_review = models.TextField(null=True, blank=True)
-    previous_rating = models.IntegerField(default=5)
+    previous_rating = models.IntegerField(null=True, blank=True)
     previous_title = models.CharField(max_length=255, null=True, blank=True)
     edited = models.BooleanField(default=False)
     update_published = models.BooleanField(default=False)
