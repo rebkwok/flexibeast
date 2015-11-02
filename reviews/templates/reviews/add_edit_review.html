@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}<link rel="stylesheet" href="{% static 'reviews/css/reviews.css' %}">{% endblock %}
+
+{% block content %}
+
+<div class="row container">
+    <div class="page-header col-sm-12">
+        <h1>
+            {% if review %}
+                Edit testimonial
+            {% else %}
+                Add new testimonial
+            {% endif %}
+        </h1>
+        <form method="post" action="">
+            {{ form.as_p }}
+            <input class="btn btn-success reviews-btn" value="Submit"/>
+        </form>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}{% endblock %}

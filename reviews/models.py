@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+from django_extensions.db.fields import AutoSlugField
+
 
 class Review(models.Model):
 
@@ -21,6 +23,9 @@ class Review(models.Model):
     edited_date = models.DateTimeField(default=timezone.now)
 
     reviewed = False  # flag for notifications to admin users
+
+    slug = AutoSlugField(populate_from='title', max_length=40, unique=True)
+
 
     class Meta:
         ordering = ('-submission_date',)

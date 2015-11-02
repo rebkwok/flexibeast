@@ -1,0 +1,9 @@
+.btn.reviews-btn {
+    padding-top: 0;
+    padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
+    line-height: 1.5;
+	width: 9.6em;
+	color: #fff !important;
+}

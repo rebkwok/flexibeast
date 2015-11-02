@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
-{% block extra_head %}{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'reviews/css/reviews.css' %}">{% endblock %}
 
 {% block content %}
 
@@ -10,6 +10,7 @@
         <h1>
             Testimonials
         </h1>
+    </div>
 
     {% if reviews %}
         {% for review in reviews %}
@@ -44,14 +45,18 @@
             </div>
             {% if review in user_reviews %}
                     <div class="col-sm-12">
-                <a href="#"><div class="btn btn-success">Edit</div></a>
+                <a href="{% url 'reviews:edit_review' review.slug %}"><div class="pull-right btn btn-warning reviews-btn">Edit</div></a>
                 </div>
             {% endif %}
         {% endfor %}
     {% else %}
-        <div class="col-sm-12">Coming soon</div>
+        <div class="col-sm-12">No testimonials available to view.</div>
     {% endif %}
 
+    <div class="col-sm-12">
+        <br>
+        <a href="{% url 'reviews:add_review' %}"><div class="btn btn-success reviews-btn">Add a testimonial</div></a>
+    </div>
 </div>
 
 {% endblock %}
