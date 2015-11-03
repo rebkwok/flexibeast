@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load reviewtags %}
 
 {% block extra_head %}<link rel="stylesheet" href="{% static 'reviews/css/reviews.css' %}">{% endblock %}
 
@@ -22,25 +23,25 @@
                 {% endif %}
             </h4></div>
             <div class="col-sm-2">
-                <p>{{ review.user_display_name }}<br>
-                    {% if not review.edited %}
-                        {{ review.submission_date }}<br>
-                        {{ review.rating }}
+                <p>{% if not review.edited %}
+                        {% show_rating review.rating %}<br>
+                        {{ review.submission_date|date:'d M Y' }}<br>
                     {% else %}
                         {% if review.update_published %}
-                            {{ review.edited_date }}<br>
-                            {{ review.rating }}
+                            {% show_rating review.rating %}<br>
+                            {{ review.edited_date|date:'d M Y' }}<br>
                         {% else %}
-                            {{ review.submission_date }}<br>
-                            {{ review.previous_rating }}
+                            {% show_rating review.previous_rating %}<br>
+                            {{ review.submission_date|date:'d M Y' }}<br>
                         {% endif %}
                     {% endif %}
+                <span class="fa fa-user"></span> {{ review.user_display_name }}
                 </p></div>
-            <div class="col-sm-10">
+            <div class="col-sm-10 review">
                 {% if not review.edited or review.update_published %}
-                        {{ review.review }}
+                    <span class="fa fa-quote-left fa-lg fa-pull-left fa-border"></span>{{ review.review }}
                 {% else %}
-                    {{ review.previous_review }}
+                    <span class="fa fa-quote-left fa-lg fa-pull-left fa-border"></span>{{ review.previous_review }}
                 {% endif %}
             </div>
             {% if review in user_reviews %}
