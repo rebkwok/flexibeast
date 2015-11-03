@@ -22,7 +22,7 @@ class Review(models.Model):
     update_published = models.BooleanField(default=False)
     edited_date = models.DateTimeField(default=timezone.now)
 
-    reviewed = False  # flag for notifications to admin users
+    reviewed = models.BooleanField(default=False)  # flag for notifications to admin users
 
     slug = AutoSlugField(populate_from='title', max_length=40, unique=True)
 
@@ -32,10 +32,7 @@ class Review(models.Model):
 
     def publish(self):
         self.published = True
-        self.save()
-
-    def publish_update(self):
-        self.update_published = True
+        self.reviewed = True
         self.save()
 
     def approve(self):
@@ -43,7 +40,7 @@ class Review(models.Model):
             self.published = True
         elif not self.update_published:
             self.update_published = True
-        reviewed = True
+        self.reviewed = True
 
     def reject(self):
         self.reviewed = True
@@ -57,9 +54,6 @@ class Review(models.Model):
         if self.pk is not None:
             already_exists = True
             orig = Review.objects.get(pk=self.pk)
-
-        # call super to save new object
-        super(Review, self).save()
 
         # on save, check if review, rating or title have changed; if so, we
         # set edited to True, and copy the current values to previous
@@ -75,7 +69,9 @@ class Review(models.Model):
                 self.previous_rating = orig.rating
                 self.previous_title = orig.title
                 self.reviewed = False
-                self.save()
+
+        # call super to save new object
+        super(Review, self).save(*args, **kwargs)
 
     def __str__(self):
         return "{} - {}".format(

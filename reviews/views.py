@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 
 from braces.views import LoginRequiredMixin
 
-from reviews.forms import ReviewForm
+from reviews.forms import ReviewForm, ReviewFormSet
 from reviews.models import Review
 from reviews.utils import StaffUserMixin, staff_required
 
@@ -51,7 +51,58 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ReviewForm
 
     def form_valid(self, form):
-         messages.success(self.request, 'Your testimonial has been updated and '
+        form.save()
+        messages.success(self.request, 'Your testimonial has been updated and '
                                         'will be displayed on the site shortly')
 
-         return HttpResponseRedirect(reverse('reviews:reviews'))
+        return HttpResponseRedirect(reverse('reviews:reviews'))
+
+
+class StaffReviewListView(StaffUserMixin, ListView):
+
+    template_name = 'reviews/staff_reviews.html'
+    context_object_name = 'reviews'
+    model = Review
+
+    def get_queryset(self):
+        return Review.objects.filter(reviewed=False)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(StaffReviewListView, self).get_context_data()
+        context['review_formset'] = ReviewFormSet()
+        return context
+
+    def post(self, request):
+        review_formset = ReviewFormSet(request.POST)
+
+        if review_formset.has_changed():
+            for form in review_formset:
+                if form.is_valid():
+                    if form.has_changed() and 'decision' in form.changed_data:
+                        review = form.save(commit=False)
+                        decision = form.cleaned_data.get('decision')
+                        if decision == 'approve':
+                            review.approve()
+                            messages.success(
+                                request, 'Review from user {} {} has been '
+                                         'approved'.format(
+                                    review.user.first_name,
+                                    review.user.last_name
+                                )
+                            )
+                        elif decision == 'reject':
+                            review.reject()
+                            messages.success(
+                                request, 'Review from user {} {} has been '
+                                         'rejected'.format(
+                                    review.user.first_name,
+                                    review.user.last_name
+                                )
+                            )
+                        review.save()
+
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('reviews:staff_reviews')

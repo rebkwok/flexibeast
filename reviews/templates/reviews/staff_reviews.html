@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load reviewtags %}
+
+{% block extra_head %}<link rel="stylesheet" href="{% static 'reviews/css/reviews.css' %}">{% endblock %}
+
+{% block content %}
+
+<div class="row container">
+    <div class="page-header col-sm-12">
+        <h1>
+            Testimonials for Review
+        </h1>
+    </div>
+
+    {% if reviews %}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-success">
+                    <form class="form-horizontal" method="post" action="">
+                    {% csrf_token %}
+                    <div class="table-responsive">
+                        <table class="table tablesorter" id="sortTable">
+                            <thead>
+                            <tr class="success">
+                                <th class="table-center">User (display name)</th>
+                                <th class="table-center">Title</th>
+                                <th class="table-center">Rating</th>
+                                <th class="table-center">Review</th>
+                                <th class="table-center">Previous Title</th>
+                                <th class="table-center">Previous Rating</th>
+                                <th class="table-center">Previous Review</th>
+                                <th class class="table-center">Decision</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            {{ review_formset.management_form }}
+                            {% for review in review_formset %}
+                                <span class=hide>{{ review.id }}</span>
+                                <tr>
+                                    <td class="table-center">{{ review.instance.user.first_name }} {{ review.instance.user.last_name }} ({{ review.instance.user_display_name }})</td>
+                                    <td class="table-center">{{ review.instance.title }}</td>
+                                    <td class="table-center">{{ review.instance.rating }}</td>
+                                    <td>{{ review.instance.review }}</td>
+                                    <td class="table-center">{{ review.instance.previous_title }}</td>
+                                    <td class="table-center">{{ review.instance.previous_title }}</td>
+                                    <td class="table-center">{{ review.instance.previous_title }}</td>
+                                    <td>{{ review.decision }}</td>
+                                </tr>
+                            {% endfor %}
+                            <tr>
+                                <td colspan="8"><input class="btn btn-success" name="formset_submitted" type="submit" value="Save" /></td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </form>
+
+                    </div>
+                </div>
+            </div>
+         </div>
+    {% else %}
+        <div class="col-sm-12">No testimonals pending review</div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}{% endblock %}

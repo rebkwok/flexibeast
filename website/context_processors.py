@@ -1,5 +1,7 @@
 from website.models import Page
 
+from reviews.models import Review
+
 
 def website_pages(request):
     pages = Page.objects.all()
@@ -28,3 +30,9 @@ def menu_options(request):
     pages = Page.objects.all()
     menu_options = [True for page in pages if page.menu_name]
     return {'menu_options': True if menu_options else False}
+
+
+def reviews_pending(request):
+    if request.user.is_staff:
+        reviews_pending = Review.objects.filter(reviewed=False).count()
+        return {'reviews_pending': reviews_pending}

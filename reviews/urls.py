@@ -1,6 +1,7 @@
 from django.conf.urls import include, patterns, url
 
-from reviews.views import ReviewListView, ReviewCreateView, ReviewUpdateView
+from reviews.views import ReviewListView, ReviewCreateView, \
+    ReviewUpdateView, StaffReviewListView
 
 
 urlpatterns = patterns('',
@@ -14,4 +15,5 @@ urlpatterns = patterns('',
     ),
     ##### VIEWS FOR STAFF USER ONLY #####
     # listview for all reviews, button to publish/reject
+    url(r'^staff-review$', StaffReviewListView.as_view(), name='staff_reviews')
 )

@@ -11,6 +11,11 @@
         <h1>
             Testimonials
         </h1>
+
+        {% if user.is_staff %}
+            <p><a href="{% url 'reviews:staff_reviews' %}">Review and approve submitted testimonials</a></p>
+        {% endif %}
+
     </div>
 
     {% if reviews %}

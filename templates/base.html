@@ -73,7 +73,11 @@
                             {% endif %}
                         {% endfor %}
                         <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
-                        <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
+                        <li class="active-nav hidden-sm hidden-xs">
+                            <a href="{% url 'reviews:reviews' %}">Testimonials
+                                {% if reviews_pending %}<span class="label label-testimonial label-as-badge"><span class="fa fa-bell-o"></span> {{ reviews_pending }}</span>{% endif %}
+                            </a>
+                        </li>
 
 {#                       More dropdown shows only those pages selected to in the More dropdown at larger screen sizes #}
                         {% if more_menu_options %}
@@ -114,7 +118,9 @@
                                     {% endif %}
                                 {% endfor %}
                                 <li class="active-nav"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
-                                <li class="active-nav"><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
+                                <li class="active-nav"><a href="{% url 'reviews:reviews' %}">Testimonials
+                                    {% if reviews_pending %}<span class="label label-testimonial label-as-badge"><span class="fa fa-bell-o"></span> {{ reviews_pending }}</span>{% endif %}
+                                </a></li>
                               </ul>
                             </li>
                         {% endif %}

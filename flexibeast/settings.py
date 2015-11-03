@@ -105,6 +105,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "website.context_processors.website_pages",
     "website.context_processors.more_menu_options",
     "website.context_processors.menu_options",
+    "website.context_processors.reviews_pending",
 
 )
 
