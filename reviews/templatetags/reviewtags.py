@@ -4,7 +4,7 @@ from django.conf import settings
 register = template.Library()
 
 
-@register.inclusion_tag('reviews/include/ratings.html')
+@register.inclusion_tag('reviews/ratings.html')
 def show_rating(rating):
     rating_list = []
     for i in range(rating):

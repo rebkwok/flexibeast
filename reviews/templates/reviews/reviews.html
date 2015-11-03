@@ -56,7 +56,11 @@
 
     <div class="col-sm-12">
         <br>
-        <a href="{% url 'reviews:add_review' %}"><div class="btn btn-success reviews-btn">Add a testimonial</div></a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'reviews:add_review' %}"><div class="btn btn-success reviews-btn">Add a testimonial</div></a>
+        {% else %}
+            <a class="btn btn-success reviews-btn" href="{% url 'account_login' %}?next={{request.get_full_path}}">Sign in</a> to add a testimonial
+        {% endif %}
     </div>
 </div>
 

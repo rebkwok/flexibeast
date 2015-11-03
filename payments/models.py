@@ -201,7 +201,8 @@ def payment_not_received(sender, **kwargs):
         'WARNING! Invalid Payment Notification received from PayPal',
         'PayPal sent an invalid transaction notification while '
         'attempting to process payment for booking id {}'.format(booking.id),
-        settings.DEFAULT_FROM_EMAIL, [settings.DEFAULT_STUDIO_EMAIL],
+        settings.DEFAULT_FROM_EMAIL,
+        [settings.DEFAULT_STUDIO_EMAIL, settings.SUPPORT_EMAIL],
         fail_silently=False)
     logger.warning('Invalid Payment Notification received from PayPal for '
                    'booking id {}'.format(booking.id))
