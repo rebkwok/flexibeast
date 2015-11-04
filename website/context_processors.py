@@ -36,3 +36,5 @@ def reviews_pending(request):
     if request.user.is_staff:
         reviews_pending = Review.objects.filter(reviewed=False).count()
         return {'reviews_pending': reviews_pending}
+    else:
+        return {}

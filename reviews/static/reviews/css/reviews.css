@@ -12,3 +12,7 @@
 	font-size: medium;
 	font-style: italic;
 }
+
+.review-changed {
+	color: red;
+}

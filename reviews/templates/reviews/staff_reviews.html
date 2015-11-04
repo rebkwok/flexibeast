@@ -6,65 +6,83 @@
 
 {% block content %}
 
-<div class="row container">
     <div class="page-header col-sm-12">
         <h1>
             Testimonials for Review
         </h1>
     </div>
+    <div class="col-sm-12"><p>Changed data is shown in <span class="review-changed">red</span></p></div>
 
-    {% if reviews %}
         <div class="row">
             <div class="col-sm-12">
-                <div class="panel panel-success">
-                    <form class="form-horizontal" method="post" action="">
+                <form class="form-horizontal" method="post" action="">
                     {% csrf_token %}
-                    <div class="table-responsive">
-                        <table class="table tablesorter" id="sortTable">
-                            <thead>
-                            <tr class="success">
-                                <th class="table-center">User (display name)</th>
-                                <th class="table-center">Title</th>
-                                <th class="table-center">Rating</th>
-                                <th class="table-center">Review</th>
-                                <th class="table-center">Previous Title</th>
-                                <th class="table-center">Previous Rating</th>
-                                <th class="table-center">Previous Review</th>
-                                <th class class="table-center">Decision</th>
-                            </tr>
-                            </thead>
-                            <tbody>
+                    <div>
+                        <div>
+                            <a class="btn btn-warning reviews-btn {% if showing_previous == 'approved' %}disabled{% endif %}" href="{% url 'reviews:staff_reviews' %}?view=approved">View approved</a>
+                            <a class="btn btn-warning reviews-btn {% if showing_previous == 'rejected' %}disabled{% endif %}" href="{% url 'reviews:staff_reviews' %}?view=rejected">View rejected</a>
+                            <a class="btn btn-warning reviews-btn {% if not showing_previous %}disabled{% endif %}" href="{% url 'reviews:staff_reviews' %}">View pending</a>
+                        </div>
+                        {{ review_formset.management_form }}
+                        {% for review in review_formset %}
+                            <span class=hide>{{ review.id }}</span>
+                            <h3>Testimonial from {{ review.instance.user.first_name }} {{ review.instance.user.last_name }} ({{ review.instance.user.username }})</h3>
+                            <div class="col-sm-6">
+                            <h3>Previous review</h3>
+                            {% if review.instance.previous_title %}
+                                <label>Author's display name:</label><p>{{ review.instance.previous_user_display_name }}</p>
+                                <label>Title:</label><p>{{ review.instance.previous_title }}</p>
+                                <label>Rating:</label><p>{% show_rating review.instance.previous_rating %}</p>
+                                <label>Testimonial content:</label><p>{{ review.instance.previous_review }}</p>
+                            {% else %}
+                                <p>N/A</p>
+                            {% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                            <h3>{% if showing_previous %}Approved/rejected review{% else %}New review{% endif %}</h3>
+                                <label>Author's display name:</label>
+                                <p>
+                                    <span {% if review.instance.user_display_name != review.instance.previous_user_display_name %}class="review-changed"{% endif %}>{{ review.instance.user_display_name }}</span>
+                                </p>
+                                <label>Title:</label>
+                                    <p>
+                                        <span {% if review.instance.title != review.instance.previous_title %}class="review-changed"{% endif %}>{{ review.instance.title }}</span>
+                                    </p>
+                                <label>Rating:</label>
+                                    <p>
+                                        <span {% if review.instance.rating != review.instance.previous_rating %}class="review-changed"{% endif %}>{% show_rating review.instance.rating %}</span>
+                                    </p>
+                                <label>Testimonial content:</label>
+                                    <p>
+                                        <span {% if review.instance.review != review.instance.previous_review %}class="review-changed"{% endif %}>{{ review.instance.review }}</span>
+                                    </p>
+                            </div>
+                            <div><label>Approve/Reject: </label><br>{{ review.decision }}</div>
+                            <span class="divider"></span>
+                        {% endfor %}
+                        {% if review_formset.forms %}<div><input class="btn btn-success" name="formset_submitted" type="submit" value="Save" /></div>{% endif %}
 
-                            {{ review_formset.management_form }}
-                            {% for review in review_formset %}
-                                <span class=hide>{{ review.id }}</span>
-                                <tr>
-                                    <td class="table-center">{{ review.instance.user.first_name }} {{ review.instance.user.last_name }} ({{ review.instance.user_display_name }})</td>
-                                    <td class="table-center">{{ review.instance.title }}</td>
-                                    <td class="table-center">{{ review.instance.rating }}</td>
-                                    <td>{{ review.instance.review }}</td>
-                                    <td class="table-center">{{ review.instance.previous_title }}</td>
-                                    <td class="table-center">{{ review.instance.previous_title }}</td>
-                                    <td class="table-center">{{ review.instance.previous_title }}</td>
-                                    <td>{{ review.decision }}</td>
-                                </tr>
-                            {% endfor %}
-                            <tr>
-                                <td colspan="8"><input class="btn btn-success" name="formset_submitted" type="submit" value="Save" /></td>
-                            </tr>
 
-                            </tbody>
-                        </table>
-                    </form>
-
+                    {% if not review_formset.forms %}
+                        <br><br>
+                        <div class="col-sm-12">
+                            {% if showing_previous == 'rejected' %}
+                                No rejected testimonals to display
+                            {% elif showing_previous == 'approved' %}
+                                No approved testimonals to display
+                            {% else %}
+                                No testimonials pending review
+                            {% endif %}
+                        </div>
+                    {% endif %}
                     </div>
-                </div>
-            </div>
-         </div>
-    {% else %}
-        <div class="col-sm-12">No testimonals pending review</div>
-    {% endif %}
-</div>
+
+                </form>
+             </div>
+
+
+        </div>
+
 
 {% endblock %}
 

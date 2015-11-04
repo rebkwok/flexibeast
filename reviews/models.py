@@ -15,6 +15,9 @@ class Review(models.Model):
     rating = models.IntegerField(default=5)
     published = models.BooleanField(default=False)
 
+    previous_user_display_name = models.CharField(
+        max_length=255, null=True, blank=True
+    )
     previous_review = models.TextField(null=True, blank=True)
     previous_rating = models.IntegerField(null=True, blank=True)
     previous_title = models.CharField(max_length=255, null=True, blank=True)
@@ -44,6 +47,10 @@ class Review(models.Model):
 
     def reject(self):
         self.reviewed = True
+        if self.published and not self.edited:
+            self.published = False
+        elif self.update_published:
+            self.update_published = False
 
     def save(self, *args, **kwargs):
         # if no user_display_name on save, make it the user's first name
@@ -62,9 +69,11 @@ class Review(models.Model):
         if already_exists:
             if self.review != orig.review or \
                             self.rating != orig.rating or \
-                            self.title != orig.title:
+                            self.title != orig.title or \
+                            self.user_display_name != orig.user_display_name:
                 self.edited = True
                 self.update_published = False
+                self.previous_user_display_name = orig.user_display_name
                 self.previous_review = orig.review
                 self.previous_rating = orig.rating
                 self.previous_title = orig.title
