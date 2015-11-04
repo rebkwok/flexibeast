@@ -974,3 +974,18 @@ a > span.fa.fa-print {
 .label-as-badge {
     border-radius: 1em;
 }
+
+li.notification-menu-item > a,
+li.notification-menu-item > a:hover,
+.navbar .navbar-nav>.active-nav.notification-menu-item>a:hover,
+.navbar .navbar-nav>li.notification-menu-item>a:hover {
+    background-color: transparent;
+    padding-left: 0;
+    margin-left: 0px;
+    margin-top: 3px;
+}
+
+li.testimonials-menu-item > a {
+    padding-right: 5px;
+
+}

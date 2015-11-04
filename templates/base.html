@@ -73,12 +73,14 @@
                             {% endif %}
                         {% endfor %}
                         <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
-                        <li class="active-nav hidden-sm hidden-xs">
-                            <a href="{% url 'reviews:reviews' %}">Testimonials
-                                {% if reviews_pending %}<span class="label label-testimonial label-as-badge"><span class="fa fa-bell-o"></span> {{ reviews_pending }}</span>{% endif %}
-                            </a>
-                        </li>
-
+                        <li class="active-nav hidden-sm hidden-xs testimonials-menu-item"><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
+                        {% if reviews_pending %}
+                            <li class="active-nav hidden-sm hidden-xs notification-menu-item">
+                                <a href="{% url 'reviews:staff_reviews' %}">
+                                    <span class="label label-testimonial label-as-badge"><span class="fa fa-bell-o"></span>{{ reviews_pending }}</span>
+                                </a>
+                            </li>
+                        {% endif %}
 {#                       More dropdown shows only those pages selected to in the More dropdown at larger screen sizes #}
                         {% if more_menu_options %}
                             <li class="dropdown hidden-sm hidden-xs">
@@ -108,7 +110,7 @@
                         </li>
 
 {#                       More dropdown shows all options other than Timetable and booking if small screen size #}
-                        {% if menu_options %}
+{#                        {% if menu_options %}#}
                             <li class="dropdown visible-sm visible-xs">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">More<span class="caret"></span></a>
                                 <ul class="dropdown-menu">
@@ -118,12 +120,17 @@
                                     {% endif %}
                                 {% endfor %}
                                 <li class="active-nav"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
-                                <li class="active-nav"><a href="{% url 'reviews:reviews' %}">Testimonials
-                                    {% if reviews_pending %}<span class="label label-testimonial label-as-badge"><span class="fa fa-bell-o"></span> {{ reviews_pending }}</span>{% endif %}
-                                </a></li>
+                                <li class="active-nav"><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
+                                {% if reviews_pending %}
+                                     <li class="active-nav">
+                                        <a href="{% url 'reviews:staff_reviews' %}">
+                                            <span class="label label-testimonial label-as-badge"><span class="fa fa-bell-o"></span> {{ reviews_pending }}</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
                               </ul>
                             </li>
-                        {% endif %}
+{#                        {% endif %}#}
 
                         {% endblock %}
                     </ul>
