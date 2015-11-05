@@ -394,9 +394,11 @@ color: #000;
 .navbar .navbar-nav>.active-nav>a:hover {background-color: #088A08; color: #fff}
 .navbar .navbar-nav>li>a:hover {background-color: #088A08; color: #fff}
 
+
+
 li > a.dropdown-toggle.timetable {
     padding-top: 3px;
-    padding-bottom: 0px;
+    padding-bottom: 7px;
 }
 
 a.navbar-brand {
@@ -971,21 +973,38 @@ a > span.fa.fa-print {
     background-color: #088A08;
 }
 
+a:hover > .label-testimonial {
+    background-color: #fff;
+    color: #088A08;
+    border: 1px solid #088A08;
+}
+
 .label-as-badge {
     border-radius: 1em;
 }
 
-li.notification-menu-item > a,
-li.notification-menu-item > a:hover,
-.navbar .navbar-nav>.active-nav.notification-menu-item>a:hover,
-.navbar .navbar-nav>li.notification-menu-item>a:hover {
-    background-color: transparent;
-    padding-left: 0;
-    margin-left: 0px;
-    margin-top: 3px;
+.navbar .navbar-nav>li>a, .navbar .navbar-nav>li>a:hover {
+    padding-left: 12px;
+    padding-right: 12px;
 }
 
-li.testimonials-menu-item > a {
+li.notification-menu-item > a,
+li.notification-menu-item > a:hover,
+.navbar .navbar-nav>li.active-nav.notification-menu-item>a,
+.navbar .navbar-nav>li.active-nav.notification-menu-item>a:hover,
+.navbar .navbar-nav>li.notification-menu-item>a
+.navbar .navbar-nav>li.notification-menu-item>a:hover {
+    background-color: transparent;
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 4px;
+}
+
+.navbar .navbar-nav>li.admin-menu-item>a,
+.navbar .navbar-nav>li.admin-menu-item>a:hover {
     padding-right: 5px;
+    padding-left: 5px;
 
 }

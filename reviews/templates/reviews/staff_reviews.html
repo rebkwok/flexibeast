@@ -11,8 +11,7 @@
             Testimonials for Review
         </h1>
     </div>
-    <div class="col-sm-12"><p>Changed data is shown in <span class="review-changed">red</span></p></div>
-
+    <div class="col-sm-12"><p>Changed/new data is shown in <span class="review-changed">red</span></p></div>
         <div class="row">
             <div class="col-sm-12">
                 <form class="form-horizontal" method="post" action="">
@@ -23,13 +22,16 @@
                             <a class="btn btn-warning reviews-btn {% if showing_previous == 'rejected' %}disabled{% endif %}" href="{% url 'reviews:staff_reviews' %}?view=rejected">View rejected</a>
                             <a class="btn btn-warning reviews-btn {% if not showing_previous %}disabled{% endif %}" href="{% url 'reviews:staff_reviews' %}">View pending</a>
                         </div>
+                        <span class="divider"></span>
+
                         {{ review_formset.management_form }}
                         {% for review in review_formset %}
                             <span class=hide>{{ review.id }}</span>
-                            <h3>Testimonial from {{ review.instance.user.first_name }} {{ review.instance.user.last_name }} ({{ review.instance.user.username }})</h3>
+                            <h4>Testimonial from {{ review.instance.user.first_name }} {{ review.instance.user.last_name }} ({{ review.instance.user.username }})</h4>
+                            <p>Last submission on {% if review.instance.edited_date %}{{ review.instance.edited_date | date:'d M Y' }}{% else %}{{ review.instance.submission_date | date:'d M Y' }}{% endif %}</p>
                             <div class="col-sm-6">
-                            <h3>Previous review</h3>
-                            {% if review.instance.previous_title %}
+                            <h4>{% if showing_previous == 'approved' %}Previous version{% else %}Last approved version{% endif %}</h4>
+                            {% if review.instance.previous_rating %}
                                 <label>Author's display name:</label><p>{{ review.instance.previous_user_display_name }}</p>
                                 <label>Title:</label><p>{{ review.instance.previous_title }}</p>
                                 <label>Rating:</label><p>{% show_rating review.instance.previous_rating %}</p>
@@ -39,7 +41,8 @@
                             {% endif %}
                             </div>
                             <div class="col-sm-6">
-                            <h3>{% if showing_previous %}Approved/rejected review{% else %}New review{% endif %}</h3>
+                            <h4>{% if showing_previous == 'approved' %}Current approved version{% elif showing_previous == 'rejected' %}Rejected version
+                                {% elif review.instance.previous_rating %}New version{% else %}New submission{% endif %}</h4>
                                 <label>Author's display name:</label>
                                 <p>
                                     <span {% if review.instance.user_display_name != review.instance.previous_user_display_name %}class="review-changed"{% endif %}>{{ review.instance.user_display_name }}</span>

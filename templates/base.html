@@ -73,14 +73,7 @@
                             {% endif %}
                         {% endfor %}
                         <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
-                        <li class="active-nav hidden-sm hidden-xs testimonials-menu-item"><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
-                        {% if reviews_pending %}
-                            <li class="active-nav hidden-sm hidden-xs notification-menu-item">
-                                <a href="{% url 'reviews:staff_reviews' %}">
-                                    <span class="label label-testimonial label-as-badge"><span class="fa fa-bell-o"></span>{{ reviews_pending }}</span>
-                                </a>
-                            </li>
-                        {% endif %}
+                        <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
 {#                       More dropdown shows only those pages selected to in the More dropdown at larger screen sizes #}
                         {% if more_menu_options %}
                             <li class="dropdown hidden-sm hidden-xs">
@@ -121,13 +114,6 @@
                                 {% endfor %}
                                 <li class="active-nav"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
                                 <li class="active-nav"><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
-                                {% if reviews_pending %}
-                                     <li class="active-nav">
-                                        <a href="{% url 'reviews:staff_reviews' %}">
-                                            <span class="label label-testimonial label-as-badge"><span class="fa fa-bell-o"></span> {{ reviews_pending }}</span>
-                                        </a>
-                                    </li>
-                                {% endif %}
                               </ul>
                             </li>
 {#                        {% endif %}#}
@@ -138,11 +124,18 @@
                     <ul class="nav navbar-nav pull-right">
                         {% block admin-nav %}
                             {% if request.user.is_staff %}
-                               <li class="active-nav"><a href="{% url 'studioadmin:activitylog' %}">Admin</a></li>
+                               <li class="active-nav admin-menu-item"><a href="{% url 'studioadmin:activitylog' %}">Admin</a></li>
                             {% endif %}
                         {% endblock admin-nav %}
 
                         {% if request.user.is_authenticated %}
+                        {% if reviews_pending %}
+                            <li class="active-nav notification-menu-item">
+                                <a href="{% url 'reviews:staff_reviews' %}">
+                                    <span class="label label-testimonial label-as-badge"><span class="fa fa-bell-o"></span>{{ reviews_pending }}</span>
+                                </a>
+                            </li>
+                            {% endif %}
                             <li class="dropdown hidden-md hidden-sm hidden-xs">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Your Account<b class="caret"></b></a>
                               <ul class="dropdown-menu">

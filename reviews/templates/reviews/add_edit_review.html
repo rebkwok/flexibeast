@@ -18,7 +18,8 @@
             {% csrf_token %}
             {% for field in form %}
             <label>{{ field.label }}{% if field.field.required %}*{% endif %}</label>{{ field }}<br>
-                {% if field.errors %}{% for err in field.errors %}{{ err }}<br>{% endfor %}{% endif %}
+                {% if field.errors %}{% for err in field.errors %}{{ err }}{% endfor %}{% endif %}
+                <div class="review-help">{{ field.help_text }}</div><br>
             {% endfor %}
             <button type="submit" class="btn btn-success reviews-btn">Submit</button>
         </form>

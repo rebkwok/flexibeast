@@ -8,10 +8,14 @@ from django_extensions.db.fields import AutoSlugField
 class Review(models.Model):
 
     user = models.ForeignKey(User, verbose_name='author')
-    user_display_name = models.CharField(max_length=255, verbose_name='username that will be displayed on the site')
+    user_display_name = models.CharField(
+        max_length=255, blank=True,
+        verbose_name='username that will be displayed on the site',
+        help_text='If not provided, your first name will be used'
+    )
     submission_date = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=255, null=True, blank=True  )
-    review = models.TextField()
+    review = models.TextField(verbose_name='testimonial')
     rating = models.IntegerField(default=5)
     published = models.BooleanField(default=False)
 

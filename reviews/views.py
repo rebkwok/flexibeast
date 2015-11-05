@@ -92,7 +92,9 @@ class StaffReviewListView(StaffUserMixin, ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(StaffReviewListView, self).get_context_data()
-        context['review_formset'] = ReviewFormSet(queryset=self.get_queryset())
+        context['review_formset'] = ReviewFormSet(
+            queryset=self.get_queryset(), previous=self.previous
+        )
         context['showing_previous'] = self.previous
         return context
 

@@ -16,3 +16,9 @@
 .review-changed {
 	color: red;
 }
+
+.review-help {
+	font-style: italic;
+	font-size: smaller;
+	margin-top: -17px;
+}

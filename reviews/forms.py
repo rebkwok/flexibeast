@@ -31,12 +31,26 @@ class ReviewForm(forms.ModelForm):
 
 class BaseReviewFormSet(BaseModelFormSet):
 
+    def __init__(self, *args, **kwargs):
+        self.previous = kwargs.pop('previous', '')
+        super(BaseReviewFormSet, self).__init__(*args, **kwargs)
+        for form in self.forms:
+            form.empty_permitted = True
+
     def add_fields(self, form, index):
         super(BaseReviewFormSet, self).add_fields(form, index)
+
+        if self.previous == 'approved':
+            initial = 'approve'
+        elif self.previous == 'rejected':
+            initial = 'reject'
+        else:
+            initial = 'undecided'
+
         form.fields['decision'] = forms.ChoiceField(
             widget=forms.RadioSelect(renderer=HorizontalRadioRenderer),
             choices=REVIEW_CHOICES,
-            initial='undecided',
+            initial=initial,
             required=False
         )
 
