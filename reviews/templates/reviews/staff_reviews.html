@@ -18,9 +18,9 @@
                     {% csrf_token %}
                     <div>
                         <div>
-                            <a class="btn btn-warning reviews-btn {% if showing_previous == 'approved' %}disabled{% endif %}" href="{% url 'reviews:staff_reviews' %}?view=approved">View approved</a>
-                            <a class="btn btn-warning reviews-btn {% if showing_previous == 'rejected' %}disabled{% endif %}" href="{% url 'reviews:staff_reviews' %}?view=rejected">View rejected</a>
-                            <a class="btn btn-warning reviews-btn {% if not showing_previous %}disabled{% endif %}" href="{% url 'reviews:staff_reviews' %}">View pending</a>
+                            <a class="btn btn-warning reviews-btn filter-btn {% if showing_previous == 'approved' %}disabled{% endif %}" href="{% url 'reviews:staff_reviews' %}?view=approved">View approved</a>
+                            <a class="btn btn-warning reviews-btn filter-btn {% if showing_previous == 'rejected' %}disabled{% endif %}" href="{% url 'reviews:staff_reviews' %}?view=rejected">View rejected</a>
+                            <a class="btn btn-warning reviews-btn filter-btn {% if not showing_previous %}disabled{% endif %}" href="{% url 'reviews:staff_reviews' %}">View pending</a>
                         </div>
                         <span class="divider"></span>
 

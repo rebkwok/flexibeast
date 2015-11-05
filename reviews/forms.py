@@ -2,12 +2,27 @@ from django import forms
 from django.forms.models import modelformset_factory, BaseModelFormSet
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
-from django.conf import settings
+
 
 from reviews.models import Review
 
 
 class ReviewForm(forms.ModelForm):
+
+    rating = forms.IntegerField(
+        widget=forms.NumberInput(
+            attrs={
+                'class': 'rating fa-lg',
+                'data-max': '5',
+                'data-min': '1',
+                'data-icon-lib': 'fa',
+                'data-active-icon': 'fa-star fa-lg',
+                'data-inactive-icon': 'fa-star-o fa-lg',
+                'name': 'rating'
+            }
+        ),
+        initial=5
+    )
 
     class Meta:
         model = Review
@@ -19,14 +34,26 @@ class ReviewForm(forms.ModelForm):
             'title': forms.TextInput(
                 attrs={'class': 'form-control'}
             ),
-            'rating': forms.Select(
-                choices=((i, i) for i in range(1, 6)),
-                attrs={'class': 'form-control'}
-            ),
             'review': forms.Textarea(
                 attrs={'class': 'form-control'}
             ),
         }
+
+
+class ReviewSortForm(forms.Form):
+
+    order_choices = (
+        ('-submission_date', 'Date submitted (most recent first)'),
+        ('submission_date', 'Date submitted (earliest first)'),
+        ('-rating', 'Rating (high to low)'),
+        ('rating', 'Rating (low to high)'),
+        ('user', 'Author name')
+    )
+    order = forms.ChoiceField(
+        widget=forms.Select(attrs={'onchange': 'form.submit()'}),
+        choices=order_choices,
+        required=False
+    )
 
 
 class BaseReviewFormSet(BaseModelFormSet):

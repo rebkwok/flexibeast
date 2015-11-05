@@ -27,7 +27,7 @@ class Review(models.Model):
     previous_title = models.CharField(max_length=255, null=True, blank=True)
     edited = models.BooleanField(default=False)
     update_published = models.BooleanField(default=False)
-    edited_date = models.DateTimeField(default=timezone.now)
+    edited_date = models.DateTimeField(null=True, blank=True)
 
     reviewed = models.BooleanField(default=False)  # flag for notifications to admin users
 
@@ -76,6 +76,7 @@ class Review(models.Model):
                             self.title != orig.title or \
                             self.user_display_name != orig.user_display_name:
                 self.edited = True
+                self.edited_date = timezone.now()
                 self.update_published = False
                 self.previous_user_display_name = orig.user_display_name
                 self.previous_review = orig.review

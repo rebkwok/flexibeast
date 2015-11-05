@@ -6,7 +6,6 @@
 
 {% block content %}
 
-<div class="row container">
     <div class="page-header col-sm-12">
         <h1>
             Testimonials
@@ -18,16 +17,21 @@
 
         <div>
             {% if user.is_authenticated %}
-                <a href="{% url 'reviews:add_review' %}"><div class="btn btn-success reviews-btn">Add a testimonial</div></a>
+                <a href="{% url 'reviews:add_review' %}"><div class="btn btn-success reviews-btn filter-btn">Add a testimonial</div></a>
             {% else %}
-                <a class="btn btn-success reviews-btn" href="{% url 'account_login' %}?next={{request.get_full_path}}">Sign in</a> to add a testimonial
+                <a class="btn btn-success reviews-btn filter-btn" href="{% url 'account_login' %}?next={{request.get_full_path}}">Sign in</a> to add a testimonial
             {% endif %}
         </div>
     </div>
 
+    <div class="col-sm-12">
+        <form class="filter-row" action="" method="get">
+            <strong>Sort testimonials by: {{ order_sort_form.order }}</strong>
+        </form>
+    </div>
     {% if reviews %}
         {% for review in reviews %}
-            <div class="col-sm-12"><h4>
+            <div class="col-sm-10 col-sm-offset-2"><h4>
                 {% if not review.edited or review.update_published %}
                         {{ review.title }}
                 {% else %}
@@ -35,39 +39,30 @@
                 {% endif %}
             </h4></div>
             <div class="col-sm-2">
-                <p>{% if not review.edited %}
-                        {% show_rating review.rating %}<br>
-                        {{ review.submission_date|date:'d M Y' }}<br>
-                    {% else %}
-                        {% if review.update_published %}
-                            {% show_rating review.rating %}<br>
-                            {{ review.edited_date|date:'d M Y' }}<br>
-                        {% else %}
-                            {% show_rating review.previous_rating %}<br>
-                            {{ review.submission_date|date:'d M Y' }}<br>
-                        {% endif %}
+                <p>
+                    {% show_rating review.rating %}<br>
+                    <span class="fa fa-user"></span> {{ review.user_display_name }}<br>
+                    <span class="review-date">Submitted: {{ review.submission_date|date:'d M Y' }}<br>
+                    {% if review.edited and review.update_published %}Edited: {{ review.edited_date|date:'d M Y' }}<br>{% endif %}</span>
+
+                    {% if review in user_reviews %}
+                        <div><a href="{% url 'reviews:edit_review' review.slug %}"><div class="btn btn-warning reviews-btn">Edit</div></a></div>
                     {% endif %}
-                <span class="fa fa-user"></span> {{ review.user_display_name }}
-                </p></div>
+                </p>
+            </div>
             <div class="col-sm-10 review">
                 {% if not review.edited or review.update_published %}
-                    <span class="fa fa-quote-left fa-lg fa-pull-left fa-border"></span>{{ review.review }}
+                    <span class="fa fa-quote-left fa-pull-left fa-border"></span>{{ review.review|linebreaksbr }}
                 {% else %}
-                    <span class="fa fa-quote-left fa-lg fa-pull-left fa-border"></span>{{ review.previous_review }}
+                    <span class="fa fa-quote-left fa-pull-left fa-border"></span>{{ review.previous_review|linebreaksbr }}
                 {% endif %}
             </div>
-            {% if review in user_reviews %}
-                    <div class="col-sm-12">
-                <a href="{% url 'reviews:edit_review' review.slug %}"><div class="pull-right btn btn-warning reviews-btn">Edit</div></a>
-                </div>
-            {% endif %}
 
         {% endfor %}
     {% else %}
         <div class="col-sm-12">No testimonials available to view.</div>
     {% endif %}
 
-</div>
 
 {% endblock %}
 

@@ -3,16 +3,26 @@
     padding-bottom: 0;
 	padding-left: 0;
 	padding-right: 0;
-    line-height: 1.5;
-	width: 9.6em;
+    width: 6em;
+	line-height: 1;
+	font-size: 90%;
 	color: #fff !important;
 }
 
-.review {
-	font-size: medium;
-	font-style: italic;
+.btn.reviews-btn.filter-btn {
+	line-height: 1.5;
+	width: 9.6em;
 }
 
+.review {
+	font-size: small;
+	font-style: italic;
+	padding-bottom: 20px;
+}
+
+.review-date {
+	font-size: x-small;
+}
 .review-changed {
 	color: red;
 }
@@ -21,4 +31,8 @@
 	font-style: italic;
 	font-size: smaller;
 	margin-top: -17px;
+}
+
+.fa.fa-star, .fa.fa-star-o {
+	color: orange;
 }

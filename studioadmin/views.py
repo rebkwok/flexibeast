@@ -165,24 +165,29 @@ logger = logging.getLogger(__name__)
 #                 # do this per email address so recipients are not visible to
 #                 # each
 #                 email_addresses = [user.email for user in users_to_email]
-#                 if cc:
-#                     email_addresses.append(from_address)
+#
 #                 for email_address in email_addresses:
 #                     try:
-#                         send_mail(subject, message, from_address,
-#                               [email_address],
-#                               html_message=get_template(
-#                                   'studioadmin/email/email_users.html').render(
+#                         msg = EmailMultiAlternatives(
+#                             subject, message, from_address, [email_address],
+#                             cc=[from_address] if cc else [], reply_to=[from_address]
+#                         )
+#                         msg.attach_alternative(
+#                             get_template(
+#                                 'studioadmin/email/email_users.html').render(
 #                                   Context({
 #                                       'subject': subject,
 #                                       'message': message})
 #                               ),
-#                               fail_silently=False)
+#                             "text/html"
+#                         )
+#                         msg.send(fail_silently=False)
 #                     except Exception as e:
 #                         # send mail to tech support with Exception
 #                         send_support_email(e, __name__, "Bulk Email to students")
 #                         ActivityLog.objects.create(log="Possible error with "
 #                             "sending bulk email; notification sent to tech support")
+#
 #                 ActivityLog.objects.create(
 #                     log='Bulk email with subject "{}" sent to users {} by '
 #                         'admin user {}'.format(

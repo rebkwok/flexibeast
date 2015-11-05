@@ -21,10 +21,14 @@
                 {% if field.errors %}{% for err in field.errors %}{{ err }}{% endfor %}{% endif %}
                 <div class="review-help">{{ field.help_text }}</div><br>
             {% endfor %}
+
             <button type="submit" class="btn btn-success reviews-btn">Submit</button>
         </form>
 </div>
 
 {% endblock %}
 
-{% block extra_scripts %}{% endblock %}
+{% block extra_scripts %}
+    <script src="{% static 'reviews/js/bootstrap-rating-input.min.js' %}" type="text/javascript"></script>
+    <script src="{% static 'reviews/js/reviews.js' %}" type="text/javascript"></script>
+{% endblock %}

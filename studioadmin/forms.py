@@ -931,10 +931,11 @@ UserBlockFormSet = formset_factory(
 #                               widget=forms.TextInput(
 #                                   attrs={'class': 'form-control'}))
 #     from_address = forms.EmailField(max_length=255,
-#                                     initial=settings.DEFAULT_FROM_EMAIL,
+#                                     initial=settings.DEFAULT_STUDIO_EMAIL,
 #                                     required=True,
 #                                     widget=forms.TextInput(
-#                                         attrs={'class': 'form-control'}))
+#                                         attrs={'class': 'form-control'}),
+#                                     help_text='This will be the reply-to address')
 #     cc = forms.BooleanField(
 #         widget=forms.CheckboxInput(attrs={
 #                 'class': "regular-checkbox studioadmin-list",

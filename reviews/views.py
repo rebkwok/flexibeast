@@ -6,7 +6,7 @@ from django.db.models import Q
 
 from braces.views import LoginRequiredMixin
 
-from reviews.forms import ReviewForm, ReviewFormSet
+from reviews.forms import ReviewForm, ReviewFormSet, ReviewSortForm
 from reviews.models import Review
 from reviews.utils import StaffUserMixin, staff_required
 
@@ -18,13 +18,19 @@ class ReviewListView(ListView):
     model = Review
 
     def get_queryset(self):
-        return Review.objects.filter(published=True)
+        return Review.objects.filter(published=True).order_by('-submission_date')
 
     def get_context_data(self, *args, **kwargs):
         context = super(ReviewListView, self).get_context_data()
         if not self.request.user.is_anonymous():
             user_reviews = Review.objects.filter(user=self.request.user)
             context['user_reviews'] = user_reviews
+
+        order = self.request.GET.get('order', '')
+        form = ReviewSortForm(initial={'order': order})
+        context['order_sort_form'] = form
+        if order:
+            context['reviews'] = self.get_queryset().order_by(order)
         return context
 
 
