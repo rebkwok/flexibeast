@@ -36,3 +36,11 @@
 .fa.fa-star, .fa.fa-star-o {
 	color: orange;
 }
+
+.review-changed > .fa.fa-star, .review-changed > .fa.fa-star-o {
+	color: red;
+}
+
+div .section-end {
+	margin-bottom: 20px;
+}

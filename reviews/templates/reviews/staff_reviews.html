@@ -60,8 +60,8 @@
                                         <span {% if review.instance.review != review.instance.previous_review %}class="review-changed"{% endif %}>{{ review.instance.review }}</span>
                                     </p>
                             </div>
-                            <div><label>Approve/Reject: </label><br>{{ review.decision }}</div>
-                            <span class="divider"></span>
+                            <div class="col-sm-12 section-end"><label>Approve/Reject: </label><br>{{ review.decision }}</div>
+                            <div class="divider"></div>
                         {% endfor %}
                         {% if review_formset.forms %}<div><input class="btn btn-success" name="formset_submitted" type="submit" value="Save" /></div>{% endif %}
 

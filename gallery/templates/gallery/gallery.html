@@ -8,7 +8,7 @@
 <div class="row container">
     <div class="page-header col-sm-12">
         <h1>
-            Gallery
+            Gallery{% if cat_selection != "All" %}: {{ cat_selection }}{% endif %}
         </h1>
 
             <h4>{% if cat_selection != "All" and cat_selection.description %}{{ cat_selection.description }}{% endif %}</h4>
