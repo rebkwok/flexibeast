@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.org/rebkwok/flexibeast.svg?branch=master)](https://travis-ci.org/rebkwok/flexibeast)
-[![Coverage Status](https://coveralls.io/repos/rebkwok/flexibeast/badge.svg)](https://coveralls.io/r/rebkwok/flexibeast)
-
+[![Coverage Status](https://coveralls.io/repos/rebkwok/flexibeast/badge.svg?branch=master&service=github)](https://coveralls.io/github/rebkwok/flexibeast?branch=master)
 ## Flexibeast website
 
 # Required settings

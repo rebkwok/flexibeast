@@ -18,7 +18,7 @@ before_script:
   - python manage.py migrate
 
 script:
-  - coverage run --source=flexibeast,flex_bookings,timetable,accounts,studioadmin --omit=../*migrations*,../*tests*,../*wsgi*,../*__init__* manage.py test
+  - coverage run --source=flexibeast,flex_bookings,timetable,payments,gallery,reviews,studioadmin,accounts --omit=../*migrations*,../*tests*,../*wsgi*,../*__init__* manage.py test
 
 after_success:
   coveralls
