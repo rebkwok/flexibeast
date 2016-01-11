@@ -143,21 +143,21 @@ class CategoryListViewTests(TestCase):
 
     def _post_response(self, user, data):
         url = reverse('gallery:categories')
-        request = self.factory.ost(url, data)
+        request = self.factory.post(url, data)
         request.user = user
         view = CategoryListView.as_view()
         return view(request)
 
-    def test_staff_user_require(self):
+    def test_staff_user_required(self):
         # no logged in user
-        response = self.client.get(reverse('gallery:gallery'))
+        response = self.client.get(reverse('gallery:categories'))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse(settings.PERMISSION_DENIED_URL))
+        self.assertIn(reverse(settings.PERMISSION_DENIED_URL), response.url)
 
         # logged in non-staff user
         response = self._get_response(self.user)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse(settings.PERMISSION_DENIED_URL))
+        self.assertIn(reverse(settings.PERMISSION_DENIED_URL), response.url)
 
         # logged in staff user
         response = self._get_response(self.staff_user)

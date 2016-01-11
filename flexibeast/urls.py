@@ -19,6 +19,8 @@ urlpatterns = patterns('',
     (r'^ckeditor/', include('ckeditor_uploader.urls')),
     (r'^payments/ipn-paypal-notify/', include('paypal.standard.ipn.urls')),
     url(r'payments/', include('payments.urls', namespace='payments')),
+    url(r'^page-not-available/$', 'website.views.permission_denied',
+        name='permission_denied'),
     url(r'^favicon.ico/$',
         RedirectView.as_view(url=settings.STATIC_URL+'favicon.ico',
                              permanent=False)),
@@ -32,6 +34,6 @@ if settings.DEBUG:
 
 if settings.BOOKING_ON:
     urlpatterns += patterns('',
-        url(r'^bookings', include('flex_bookings.urls', namespace='flexbookings')),
+        url(r'^bookings/', include('flex_bookings.urls', namespace='flexbookings')),
     )
 

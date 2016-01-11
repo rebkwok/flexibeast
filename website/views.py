@@ -178,3 +178,7 @@ def contact(request, template_name='website/contact.html'):
     return render(
         request, template_name, {'section': 'contact', 'form': form}
     )
+
+
+def permission_denied(request):
+    return render(request, 'website/permission_denied.html')

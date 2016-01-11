@@ -290,60 +290,6 @@ class BookingCreateViewTests(TestCase):
         self.assertEqual('OPEN', booking.status)
         self.assertFalse(booking.payment_confirmed)
 
-    # def test_booking_page_has_active_user_block_context(self):
-    #     """
-    #     Test that a user with an active block can book using their block
-    #     """
-    #     event_type = mommy.make_recipe('flex_bookings.event_type_PC')
-    #     event = mommy.make_recipe('flex_bookings.future_PC', event_type=event_type)
-    #     blocktype = mommy.make_recipe(
-    #         'flex_bookings.blocktype5', event_type=event_type
-    #     )
-    #     block = mommy.make_recipe(
-    #         'flex_bookings.block', block_type=blocktype, user=self.user, paid=True
-    #     )
-    #     self.assertTrue(block.active_block())
-    #     resp = self._get_response(self.user, event)
-    #     self.assertIn('active_user_block', resp.context_data)
-
-
-    # def test_booking_page_has_unpaid_user_block_context(self):
-    #     """
-    #     Test that a user with an active block can book using their block
-    #     """
-    #     event_type = mommy.make_recipe('flex_bookings.event_type_PC')
-    #     event = mommy.make_recipe('flex_bookings.future_PC', event_type=event_type)
-    #     blocktype = mommy.make_recipe(
-    #         'flex_bookings.blocktype5', event_type=event_type
-    #     )
-    #     block = mommy.make_recipe(
-    #         'flex_bookings.block', block_type=blocktype, user=self.user, paid=False
-    #     )
-    #     resp = self._get_response(self.user, event)
-    #     self.assertFalse('active_user_block' in resp.context_data)
-    #     self.assertIn('active_user_block_unpaid', resp.context_data)
-
-    # def test_creating_booking_with_active_user_block(self):
-    #     """
-    #     Test that a user with an active block can book using their block
-    #     """
-    #     event_type = mommy.make_recipe('flex_bookings.event_type_PC')
-    #
-    #     event = mommy.make_recipe('flex_bookings.future_PC', event_type=event_type)
-    #     blocktype = mommy.make_recipe(
-    #         'flex_bookings.blocktype5', event_type=event_type
-    #     )
-    #     block = mommy.make_recipe(
-    #         'flex_bookings.block', block_type=blocktype, user=self.user, paid=True
-    #     )
-    #     self.assertTrue(block.active_block())
-    #     form_data = {'block_book': True}
-    #     resp = self._post_response(self.user, event, form_data)
-    #
-    #     bookings = Booking.objects.filter(user=self.user)
-    #     self.assertEqual(bookings.count(), 1)
-    #     self.assertEqual(bookings[0].block, block)
-
 
 class BookingErrorRedirectPagesTests(TestCase):
 
@@ -485,38 +431,6 @@ class BookingDeleteViewTests(TestCase):
                                       event=event_with_cost)
         self.assertEqual('CANCELLED', booking.status)
         self.assertFalse(booking.payment_confirmed)
-    #
-    # def test_cancelling_booking_with_block(self):
-    #     """
-    #     Test that cancelling a booking bought with a block removes the
-    #     booking and updates the block
-    #     """
-    #     event_type = mommy.make_recipe('flex_bookings.event_type_PC')
-    #
-    #     event = mommy.make_recipe('flex_bookings.future_PC', event_type=event_type)
-    #     blocktype = mommy.make_recipe(
-    #         'flex_bookings.blocktype5', event_type=event_type
-    #     )
-    #     block = mommy.make_recipe(
-    #         'flex_bookings.block', block_type=blocktype, user=self.user
-    #     )
-    #     booking = mommy.make_recipe(
-    #         'flex_bookings.booking', event=event, user=self.user, block=block
-    #     )
-    #     booking.confirm_space()
-    #     block = Block.objects.get(user=self.user)
-    #     self.assertEqual(block.bookings_made(), 1)
-    #
-    #     # cancel booking
-    #     self._get_response(self.user, booking)
-    #
-    #     booking = Booking.objects.get(user=self.user, event=event)
-    #     self.assertEqual('CANCELLED', booking.status)
-    #     self.assertFalse(booking.block)
-    #     self.assertFalse(booking.paid)
-    #
-    #     block = Block.objects.get(user=self.user)
-    #     self.assertEqual(block.bookings_made(), 0)
 
     @patch("flex_bookings.views.timezone")
     def test_cannot_cancel_after_cancellation_period(self, mock_tz):

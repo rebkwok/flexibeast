@@ -15,8 +15,8 @@ from django.utils import timezone
 from activitylog.models import ActivityLog
 from flex_bookings.models import Event, Booking, Block
 from flex_bookings.tests.helpers import set_up_fb, _create_session, setup_view
-from studioadmin.forms import SimpleBookingRegisterFormSet
-from studioadmin.views import (
+# from studioadmin.forms import SimpleBookingRegisterFormSet
+# from studioadmin.views import (
     # ActivityLogListView,
     # ConfirmPaymentView,
     # ConfirmRefundView,
@@ -37,7 +37,7 @@ from studioadmin.views import (
     # user_blocks_view,
     # user_bookings_view,
     # url_with_querystring
-    )
+    # )
 
 from timetable.models import Session
 

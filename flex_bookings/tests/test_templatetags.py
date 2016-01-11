@@ -110,7 +110,7 @@ class RegisterExtraLinesTagsTests(TestCase):
         # 1 bookings; should have 2 extra lines. Look for extra_checkbox_# ids
         for cbx_id in ['extra_checkbox_{}'.format(i) for i in range(2)]:
             self.assertIn(cbx_id, resp.rendered_content)
-        self.assertNotIn('extra_checkbox_2', resp.rendered_content)
+        self.assertNotIn('"extra_checkbox_2"', resp.rendered_content)
 
     def test_get_index_open(self):
         event = mommy.make_recipe(

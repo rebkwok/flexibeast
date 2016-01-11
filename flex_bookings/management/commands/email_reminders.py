@@ -21,21 +21,22 @@ class Command(BaseCommand):
     help = 'email reminders for upcoming bookings'
 
     def handle(self, *args, **options):
-        events = [
+
+        cancellation_events = [
             event for event in Event.objects.all() if
-            (event.cancellation_period or event.payment_due_date) and
-            event.date >= timezone.now() and
-            (
-                (
-                    (event.date - timedelta(hours=(event.cancellation_period + 24)))
-                    <= timezone.now()
-                ) or
-                (
-                    (event.payment_due_date - timedelta(hours=24))
-                     <= timezone.now()
-                )
-                )
+            event.cancellation_period and event.date >= timezone.now() and
+            (event.date - timedelta(hours=(event.cancellation_period + 24)))
+            <= timezone.now()
         ]
+
+        payment_due_events = [
+            event for event in Event.objects.all() if
+            event.payment_due_date and event.date >= timezone.now() and
+            (event.payment_due_date - timedelta(hours=24)) <= timezone.now()
+        ]
+
+        events = set(cancellation_events + payment_due_events)
+
         upcoming_bookings = Booking.objects.filter(
             event__in=events,
             status='OPEN',

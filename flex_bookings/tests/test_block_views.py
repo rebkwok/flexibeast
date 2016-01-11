@@ -31,12 +31,11 @@ class UpdateBlockViewTests(TestCase):
         self._set_session(user, request)
         return update_block(request)
 
-    # def _post_response(self, user, form_data):
-    #     url = reverse('booking:add_block')
-    #     request = self.factory.post(url, form_data)
-    #     self._set_session(user, request)
-    #     view = BlockCreateView.as_view()
-    #     return view(request)
+    def _post_response(self, user, form_data):
+        url = reverse('booking:update_block', args=[block.id])
+        request = self.factory.post(url, form_data)
+        self._set_session(user, request)
+        return update_block(request)
 
     def test_update_block(self):
         """

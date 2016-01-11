@@ -29,11 +29,10 @@ class PaypalBookingTransactionAdmin(admin.ModelAdmin):
 
 class PaypalBlockTransactionAdmin(admin.ModelAdmin):
 
-    list_display = ('id', 'get_user', 'get_blocktype', 'invoice_id',
+    list_display = ('id', 'get_user', 'invoice_id',
                     'transaction_id')
-    readonly_fields = ('block', 'id', 'get_user', 'get_blocktype', 'invoice_id',
-                    'transaction_id', 'get_block_id', 'cost', 'block_start',
-                    'block_expiry')
+    readonly_fields = ('block', 'id', 'get_user', 'invoice_id',
+                    'transaction_id', 'get_block_id', 'cost', 'block_expiry')
 
 
     def get_block_id(self, obj):
@@ -42,24 +41,15 @@ class PaypalBlockTransactionAdmin(admin.ModelAdmin):
 
     def get_user(self, obj):
         return "{} {}".format(
-            obj.block.user.first_name, obj.block.user.last_name
+            obj.block.bookings.first().user.first_name,
+            obj.block.bookings.first().user.last_name
         )
     get_user.short_description = "User"
 
-    def get_blocktype(self, obj):
-        return obj.block.block_type
-    get_blocktype.short_description = "BlockType"
-
-    def block_start(self, obj):
-        return obj.block.start_date.strftime('%d %b %Y, %H:%M')
-    block_start.short_description = 'Start date'
-
-    def block_expiry(self, obj):
-        return obj.block.expiry_date.strftime('%d %b %Y, %H:%M')
-    block_expiry.short_description = 'Expiry date'
-
     def cost(self, obj):
-        return u"\u00A3{:.2f}".format(obj.block.block_type.cost)
+        return u"\u00A3{:.2f}".format(
+            obj.block.item_cost * obj.block.bookings.count()
+        )
 
 
 admin.site.register(PaypalBookingTransaction, PaypalBookingTransactionAdmin)

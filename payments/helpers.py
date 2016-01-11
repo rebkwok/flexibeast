@@ -24,11 +24,10 @@ def create_booking_paypal_transaction(user, booking):
     else:
         counter = '001'
 
-    try:
-        pbt = PaypalBookingTransaction.objects.create(
-            invoice_id=id_string+counter, booking=booking
-        )
-    except IntegrityError:
+    pbt = PaypalBookingTransaction.objects.filter(
+        invoice_id=id_string+counter
+    )
+    if pbt:
         # in case we end up creating a duplicate invoice id for a different
         # booking (the check for existing above checked for this exact
         # combination of invoice id and booking
@@ -36,6 +35,10 @@ def create_booking_paypal_transaction(user, booking):
         pbt = PaypalBookingTransaction.objects.create(
             invoice_id=id_string+str(random_prefix)+counter, booking=booking
         )
+    else:
+        pbt = PaypalBookingTransaction.objects.create(
+        invoice_id=id_string+counter, booking=booking
+    )
     return pbt
 
 
@@ -59,17 +62,19 @@ def create_block_paypal_transaction(user, block):
         counter = str(int(existing_counter) + 1).zfill(len(existing_counter))
     else:
         counter = '001'
-
-    try:
-        pbt = PaypalBlockTransaction.objects.create(
-            invoice_id=id_string+counter, block=block
-        )
-    except IntegrityError:
-        # in case we end up creating a duplicate invoice id for a different
-        # booking (the check for existing above checked for this exact
-        # combination of invoice id and booking
+    pbt = PaypalBlockTransaction.objects.filter(
+        invoice_id=id_string+counter
+    )
+    # in case we end up creating a duplicate invoice id for a different
+    # block (the check for existing above checked for this exact
+    # combination of invoice id and block
+    if pbt:
         random_prefix = random.randrange(100,999)
         pbt = PaypalBlockTransaction.objects.create(
             invoice_id=id_string+str(random_prefix)+counter, block=block
+        )
+    else:
+        pbt = PaypalBlockTransaction.objects.create(
+            invoice_id=id_string+counter, block=block
         )
     return pbt

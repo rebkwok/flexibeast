@@ -918,9 +918,9 @@ class PageFormTests(TestCase):
         }
         form = PageForm(data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors, "{'name': 'Page with this name already exists'}",
-            form.errors
+        self.assertIn(
+            "Page with this Name already exists",
+            form.errors['name'][0],
         )
 
 

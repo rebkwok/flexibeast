@@ -912,6 +912,3 @@ def cancellation_period_past(request, event_slug):
     context = {'event': event}
     return render(request, 'flex_bookings/cancellation_period_past.html', context)
 
-
-def permission_denied(request):
-    return render(request, 'flex_bookings/permission_denied.html')
