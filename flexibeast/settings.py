@@ -18,6 +18,7 @@ env = environ.Env(DEBUG=(bool, False),
                   USE_MAILCATCHER=(bool, False),
                   TRAVIS=(bool, False),
                   HEROKU=(bool, False),
+                  BOOKING_ON=(bool, False)
                   )
 
 environ.Env.read_env(root('flexibeast/.env'))  # reading .env file
@@ -106,6 +107,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "website.context_processors.more_menu_options",
     "website.context_processors.menu_options",
     "website.context_processors.reviews_pending",
+    "website.context_processors.booking_on",
 
 )
 
@@ -415,3 +417,6 @@ if env('TRAVIS') or env('HEROKU'):
 
 # for gallery app
 PERMISSION_DENIED_URL = 'flexbookings:permission_denied'
+
+BOOKING_ON = env('BOOKING_ON')
+

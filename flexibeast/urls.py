@@ -9,7 +9,6 @@ from accounts.views import CustomLoginView
 urlpatterns = patterns('',
     url(r'^studioadmin/',
         include('studioadmin.urls', namespace='studioadmin')),
-    url(r'^', include('flex_bookings.urls', namespace='flexbookings')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^gallery/', include('gallery.urls', namespace='gallery')),
     url(r'^testimonials/', include('reviews.urls', namespace='reviews')),
@@ -30,3 +29,9 @@ if settings.DEBUG:
     urlpatterns += patterns('',
         url(r'^__debug__/', include(debug_toolbar.urls)),
     )
+
+if settings.BOOKING_ON:
+    urlpatterns += patterns('',
+        url(r'^bookings', include('flex_bookings.urls', namespace='flexbookings')),
+    )
+

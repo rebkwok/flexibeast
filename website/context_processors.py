@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from website.models import Page
 
 from reviews.models import Review
@@ -38,3 +40,7 @@ def reviews_pending(request):
         return {'reviews_pending': reviews_pending}
     else:
         return {}
+
+
+def booking_on(request):
+    return {'booking_on': settings.BOOKING_ON}
