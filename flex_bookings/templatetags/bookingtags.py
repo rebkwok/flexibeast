@@ -101,3 +101,12 @@ def block_cost(block):
 @register.assignment_tag
 def check_debug():
     return settings.DEBUG
+
+
+@register.filter
+def viewable(page, user):
+    return not page.restricted or user.has_perm('website.can_view_restricted')
+
+@register.filter
+def can_view_restricted(user):
+    return user.has_perm('website.can_view_restricted')

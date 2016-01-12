@@ -68,7 +68,9 @@
 {#                       Main menu options are hidden at small screen sizes#}
                         {% for page in website_pages %}
                             {% if page.menu_name and page.menu_location == 'main' %}
-                            <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'website:page' page.name %}">{{ page.menu_name }}</a></li>
+                                {% if page|viewable:user %}
+                                    <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'website:page' page.name %}">{{ page.menu_name }}</a></li>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
                         <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
@@ -79,8 +81,10 @@
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">More<span class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                 {% for page in website_pages %}
-                                    {% if page.menu_name and page.menu_location == 'dropdown'%}
-                                        <li class="active-nav"><a href="{% url 'website:page' page.name %}">{{ page.menu_name }}</a></li>
+                                    {% if page.menu_name and page.menu_location == 'dropdown' %}
+                                        {% if page|viewable:user %}
+                                            <li class="active-nav"><a href="{% url 'website:page' page.name %}">{{ page.menu_name }}</a></li>
+                                        {% endif %}
                                     {% endif %}
                                 {% endfor %}
                               </ul>

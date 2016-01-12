@@ -26,6 +26,10 @@ TEMPLATES = {
 
 def page(request, page_name):
     page = get_object_or_404(Page, name=page_name)
+
+    if page.restricted and not request.user.has_perm('website.can_view_restricted'):
+        return HttpResponseRedirect(reverse(settings.PERMISSION_DENIED_URL))
+
     template = TEMPLATES['no-img']
     if page.pictures.count() > 0:
         template = TEMPLATES[page.layout]

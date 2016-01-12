@@ -1,6 +1,1 @@
-{% for subsection in page.subsections.all %}
-    {% if subsection.subheading %}
-        <h3>{{ subsection.subheading }}</h3>
-        {% endif %}
-    <p>{{ subsection.content|safe }}</p>
-{% endfor %}
+{{ page.content|safe }}

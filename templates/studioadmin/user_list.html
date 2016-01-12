@@ -18,6 +18,7 @@
                                 <th class="table-center">Username <span class="fa fa-sort"></span></th>
                                 <th class="table-center">First Name <span class="fa fa-sort"></span></th>
                                 <th class="table-center">Last Name <span class="fa fa-sort"></span></th>
+                                <th class="table-center">Can view restricted webpages?</th>
                                 <th class="table-center">Bookings</th>
                                 <th class="table-center">Email</th>
                             </tr>
@@ -28,6 +29,12 @@
                                 <td class="table-center studioadmin-tbl">{{ user.username }}</td>
                                 <td class="table-center studioadmin-tbl">{{ user.first_name }}</td>
                                 <td class="table-center studioadmin-tbl">{{ user.last_name }}</td>
+                                <td class="table-center studioadmin-tbl">
+                                    <form class="wl-table-form" method="get">
+                                                <button class="btn table-btn perm-btn {% if user|can_view_restricted %}btn-success{% else %}btn-default{% endif %}"
+                                                        type="submit" name="change_user" id="can_view_restricted_button" value="{{ user.id }}">{% if user|can_view_restricted %}Yes{% else %}No{% endif %}</button>
+                                    </form>
+                                </td>
                                 <td class="table-center studioadmin-tbl">
                                     <a href="{% url 'studioadmin:user_bookings_list' user.id 'future_open' %}"><span class="fa fa-external-link fa-lg"></span></a>
                                 </td>

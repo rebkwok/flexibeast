@@ -38,6 +38,72 @@ class UserListView(LoginRequiredMixin, StaffUserMixin, ListView):
     context_object_name = 'users'
     queryset = User.objects.all().order_by('first_name')
 
+    def get(self, request, *args, **kwargs):
+        if 'change_user' in self.request.GET:
+            change_user_id = self.request.GET.getlist('change_user')[0]
+            user_to_change = User.objects.get(id=change_user_id)
+            can_view_restricted = user_to_change.has_perm(
+                'website.can_view_restricted'
+            )
+            perm = Permission.objects.get(codename='can_view_restricted')
+            if can_view_restricted:
+                user_to_change.user_permissions.remove(perm)
+                if user_to_change.is_superuser:
+                    messages.error(
+                        request,
+                        "{} {} ({}) is a superuser; you cannot remove "
+                        "permissions".format(
+                            user_to_change.first_name,
+                            user_to_change.last_name,
+                            user_to_change.username
+                        )
+                    )
+                else:
+                    messages.success(
+                        request,
+                        "Permission to view restricted pages removed for "
+                        "{} {} ({}) ".format(
+                            user_to_change.first_name,
+                            user_to_change.last_name,
+                            user_to_change.username
+                        )
+                    )
+                    ActivityLog.objects.create(
+                        log="Permission to view restricted pages "
+                            "has been removed for {} {} ({}) by admin "
+                            "user {}".format(
+                            user_to_change.first_name,
+                            user_to_change.last_name,
+                            user_to_change.username,
+                            request.user.username
+                        )
+                    )
+
+            else:
+                user_to_change.user_permissions.add(perm)
+                messages.success(
+                    request,
+                    "Permission to view restricted pages has been added for "
+                    "{} {} ({})".format(
+                        user_to_change.first_name,
+                        user_to_change.last_name,
+                        user_to_change.username
+                    )
+                )
+                ActivityLog.objects.create(
+                    log="Permission to view restricted pages has been added "
+                        "for {} {} ({}) by admin user {}".format(
+                        user_to_change.first_name,
+                            user_to_change.last_name,
+                            user_to_change.username,
+                            request.user.username
+                        )
+                )
+            user_to_change.save()
+            return HttpResponseRedirect(reverse('studioadmin:users'))
+
+        return super(UserListView, self).get(request, *args, **kwargs)
+
     def get_context_data(self):
         context = super(UserListView, self).get_context_data()
         context['sidenav_selection'] = 'users'

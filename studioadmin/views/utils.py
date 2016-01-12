@@ -9,7 +9,7 @@ def staff_required(func):
         if request.user.is_staff:
             return func(request, *args, **kwargs)
         else:
-            return HttpResponseRedirect(reverse('flexbookings:permission_denied'))
+            return HttpResponseRedirect(reverse('permission_denied'))
     return wraps(func)(decorator)
 
 
@@ -17,5 +17,5 @@ class StaffUserMixin(object):
 
     def dispatch(self, request, *args, **kwargs):
         if not self.request.user.is_staff:
-            return HttpResponseRedirect(reverse('flexbookings:permission_denied'))
+            return HttpResponseRedirect(reverse('permission_denied'))
         return super(StaffUserMixin, self).dispatch(request, *args, **kwargs)

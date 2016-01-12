@@ -16,7 +16,7 @@ from ckeditor.widgets import CKEditorWidget
 from flex_bookings.models import Block, Booking, Event, EventType
 from timetable.models import Session
 from payments.models import PaypalBookingTransaction
-from website.models import Page, SubSection, Picture
+from website.models import Page, Picture
 
 from floppyforms import ClearableFileInput
 
@@ -1117,9 +1117,23 @@ PagesFormset = modelformset_factory(
 
 class PageForm(forms.ModelForm):
 
+    restricted = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={
+            'class': 'regular-checkbox studioadmin-list',
+            'id': 'id_restricted'
+        }),
+        label="Restricted",
+        required=False,
+        help_text='Make this page visible only if user is logged in and has '
+                  'been given permission'
+        )
+
     class Meta:
         model = Page
-        fields = ('name', 'menu_name', 'menu_location', 'layout', 'heading')
+        fields = (
+            'name', 'menu_name', 'menu_location', 'layout', 'heading',
+            'content', 'restricted'
+        )
         widgets = {
             'name': forms.TextInput(
                 attrs={
@@ -1145,64 +1159,12 @@ class PageForm(forms.ModelForm):
                 attrs={
                     'class': 'form-control'
                 }
-            )
-        }
-
-class SubsectionBaseFormset(BaseInlineFormSet):
-
-    def __init__(self, *args, **kwargs):
-        super(SubsectionBaseFormset, self).__init__(*args, **kwargs)
-        self.empty_permitted = True
-
-    def add_fields(self, form, index):
-        super(SubsectionBaseFormset, self).add_fields(form, index)
-
-        if form.instance.id:
-
-            form.fields['DELETE'] = forms.BooleanField(
-                widget=forms.CheckboxInput(attrs={
-                    'class': 'delete-checkbox studioadmin-list',
-                    'id': 'DELETE_{}'.format(index)
-                }),
-                help_text="Tick box and click Save to delete this subsection",
-                required=False
-            )
-            form.DELETE_id = 'DELETE_{}'.format(index)
-
-        form.fields['content'] = forms.CharField(
-            widget=CKEditorWidget(
+            ),
+            'content': CKEditorWidget(
                 attrs={'class': 'form-control'},
                 config_name='studioadmin',
             ),
-            required=True
-        )
-
-        form.fields['subheading'] = forms.CharField(
-            widget=forms.TextInput(
-                attrs={'class': 'form-control'}
-            ),
-            required=False
-        )
-
-        form.fields['index'] = forms.IntegerField(
-            widget=forms.TextInput(
-               attrs={'class': 'form-control'}
-            ),
-            help_text="Use this to change the order subsections "
-                      "are displayed on the page. Subsections with the same "
-                      "index are displayed in the order they were created.",
-            required=False
-        )
-
-
-SubsectionFormset = inlineformset_factory(
-    Page,
-    SubSection,
-    fields=('index', 'subheading', 'content'),
-    formset=SubsectionBaseFormset,
-    can_delete=True,
-    extra=1,
-)
+        }
 
 
 class PictureBaseFormset(BaseInlineFormSet):

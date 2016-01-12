@@ -1,11 +1,7 @@
 from django.contrib import admin
 
-from website.models import Page, SubSection, Picture
+from website.models import Page, Picture
 
-
-class SubsectionInline(admin.TabularInline):
-    model = SubSection
-    extra = 1
 
 class PictureInline(admin.TabularInline):
     model = Picture
@@ -13,6 +9,6 @@ class PictureInline(admin.TabularInline):
 
 class PageAdmin(admin.ModelAdmin):
     model = Page
-    inlines = (SubsectionInline, PictureInline)
+    inlines = (PictureInline,)
 
 admin.site.register(Page, PageAdmin)

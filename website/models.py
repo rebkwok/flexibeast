@@ -48,6 +48,17 @@ class Page(models.Model):
                   "without too much detail for column layout.  One-image "
                   "options will use the first uploaded image."
     )
+    content = models.TextField('Content')
+    restricted = models.BooleanField(
+        default=False,
+        help_text='Page only visible if user is logged in and has been given '
+                  'permission'
+    )
+
+    class Meta:
+        permissions = (
+            ("can_view_restricted", "Can view restricted pages"),
+        )
 
     def __str__(self):
         return "{} page content".format(self.name.title())
@@ -57,45 +68,6 @@ class Page(models.Model):
         if ' ' in self.name:
             self.name = self.name.replace(' ', '-')
         super(Page, self).save()
-
-
-class SubSection(models.Model):
-    subheading = models.CharField(
-        max_length=255, null=True, blank=True,
-        help_text="Leave blank if no subheading required for this section"
-    )
-    content = models.TextField(
-        'Content',
-        help_text='Leave a blank line between paragraphs.'
-    )
-    index = models.PositiveIntegerField(
-        help_text="This controls the order subsections are displayed on "
-                  "the page",
-        null=True,
-    )
-    page = models.ForeignKey(Page, related_name='subsections')
-
-    class Meta:
-        ordering = ['index', 'id']
-
-    def __str__(self):
-        return "{} page - subsection {} {}".format(
-            self.page.name.title(), self.index,
-            "- {}".format(self.subheading) if self.subheading else ''
-        )
-
-    def save(self):
-        # assign/edit indices
-        subsections = self.page.subsections.all()
-
-        # assign index if one has not been provided
-        if not self.index:
-            if self.id:
-                self.index = len(subsections)
-            else:
-                self.index = len(subsections) + 1
-
-        super(SubSection, self).save()
 
 
 class Picture(models.Model):

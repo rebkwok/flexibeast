@@ -40,47 +40,12 @@
                 <ul class="list-group">
                     <li class="list-group-item list-group-item-success">Page settings</li>
                     <li class="list-group-item">
-
-                            {% for field in form %}
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-2">{% if field.field.required %}*{% endif %}{{ field.label }}</label>
-                                        <div class="col-sm-9">{{ field }}<p class="studioadmin-help">{{ field.help_text }}</p></div>
-                                    </div>
-                            {% endfor %}
-                    </li>
-
-                    <li class="list-group-item list-group-item-success">Subsections</li>
-                    <li class="list-group-item">
-
-                        {{ subsection_formset.management_form }}
-
-                        {% for subsection in subsection_formset %}
+                        {% for field in form %}
                             <div class="form-group">
-                                <span class="hide">{{ subsection.id }}</span>
-                                {% if not subsection.instance.id %}
-                                    <span class="divider"></span>
-                                    <div class="new-inline-label">
-                                        <h4>Add new subsection:</h4>
-                                    </div>
-                                {% endif %}
-
-                                    {% for field in subsection %}
-                                        {% if field.name != 'DELETE' and field.name != 'id' and field.name != 'page' %}
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-2">{% if field.field.required %}*{% endif %}{{ field.label }}</label>
-                                                <div class="col-sm-9">{{ field }}<p class="studioadmin-help">{{ field.help_text }}</p></div>
-                                            </div>
-                                        {% endif %}
-                                    {% endfor %}
-
-                                    {% if subsection.instance.id %}
-                                        <div class="form-group">
-                                            <label class="control-label delete-label col-sm-2">{{ subsection.DELETE.label }}</label>
-                                            <div class="col-sm-9 delete-label">{{ subsection.DELETE }}<label class="delete-label" for={{ subsection.DELETE_id }}></label>
-                                            <span class="studioadmin-help delete-label">{{ subsection.DELETE.help_text }}</span>
-                                            </div>
-                                        </div>
-                                    {% endif %}
+                                <label class="control-label col-sm-2">{% if field.field.required %}*{% endif %}{{ field.label }}</label>
+                                <div class="col-sm-9">{{ field }}{% if field.name == "restricted" %}
+                                    <label class="aligned-label" for=id_restricted></label>{% endif %}
+                                    <p class="studioadmin-help">{{ field.help_text }}</p></div>
                             </div>
                         {% endfor %}
                     </li>
@@ -94,9 +59,9 @@
                             <div class="form-group">
                                 <span class="hide">{{ picture.id }}</span>
                                 {% if not picture.instance.id %}
-                                    <span class="divider"></span>
+                                    {% if page.pictures.exists %}<span class="divider"></span>{% endif %}
                                     <div class="new-inline-label">
-                                        <h4>Add new picture:</h4>
+                                        <h5>Add new picture:</h5>
                                     </div>
                                 {% endif %}
                                     <div class="form-group">

@@ -27,10 +27,10 @@ from django.core.mail import send_mail
 
 from braces.views import LoginRequiredMixin
 
-from studioadmin.forms import PageForm, PagesFormset, SubsectionFormset, PictureFormset
+from studioadmin.forms import PageForm, PagesFormset, PictureFormset
 from studioadmin.views.utils import StaffUserMixin
 
-from website.models import Page, SubSection, Picture
+from website.models import Page, Picture
 
 
 logger = logging.getLogger(__name__)
@@ -57,9 +57,8 @@ class PageListView(LoginRequiredMixin, StaffUserMixin, ListView):
                 if form.has_changed() and 'DELETE' in form.changed_data:
                     page = Page.objects.get(id=form.instance.id)
 
-                    # delete associated subsections and pictures
+                    # delete associated pictures
                     # loop to delete pics so we call delete() on each instance
-                    SubSection.objects.filter(page=page).delete()
                     [pic.delete() for pic in Picture.objects.filter(page=page)]
 
                     deleted_page_names.append(page.name)
@@ -99,9 +98,6 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
         context = super(PageUpdateView, self).get_context_data(**kwargs)
         context['sidenav_selection'] = 'page_list'
 
-        subsection_formset = SubsectionFormset(instance=self.get_object())
-        context['subsection_formset'] = subsection_formset
-
         picture_formset = PictureFormset(instance=self.get_object())
         context['picture_formset'] = picture_formset
         return context
@@ -110,14 +106,11 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
         name = self.kwargs['name']
         page = Page.objects.get(name=name)
         form = PageForm(request.POST, instance=page)
-        subsection_formset = SubsectionFormset(request.POST, instance=page)
         picture_formset = PictureFormset(request.POST, request.FILES, instance=page)
 
-        if form.is_valid() and subsection_formset.is_valid() and \
-                picture_formset.is_valid():
+        if form.is_valid() and picture_formset.is_valid():
 
-            if (form.has_changed() or subsection_formset.has_changed() or
-                    picture_formset.has_changed()):
+            if (form.has_changed() or picture_formset.has_changed()):
 
                 change_messages = []
 
@@ -128,27 +121,6 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
                     )
 
                 page = form.save()
-
-                for form in subsection_formset.forms:
-                    if form.is_valid():
-                        subsection = form.save(commit=False)
-                        if 'DELETE' in form.changed_data:
-                            subsection.delete()
-                            change_messages.append(
-                                'Subsection deleted from "{}" page'.format(
-                                    page.name.title()
-                                ))
-                        elif form.has_changed():
-                            subsection.save()
-                            change_messages.append(
-                                'Subsection successfully edited for "{}" '
-                                'page'.format(
-                                    page.name.title()
-                                )
-                            )
-                    else:
-                        for error in form.errors:
-                            messages.error(request, mark_safe(error))
 
                 for form in picture_formset.forms:
                     if form.is_valid():
@@ -188,13 +160,6 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
             else:
                 messages.info(request, "No changes made")
         else:
-            if not subsection_formset.is_valid():
-                for error in subsection_formset.errors:
-                    for k, v in error.items():
-                        messages.error(
-                            request, mark_safe("{}: {}".format(k.title(), v))
-                        )
-
             if not picture_formset.is_valid():
                 for error in picture_formset.errors:
                     for k, v in error.items():
@@ -203,7 +168,6 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
                         )
             context = {
                 'form': form,
-                'subsection_formset': subsection_formset,
                 'picture_formset': picture_formset,
                 'sidenav_selection': 'page_list'
             }
@@ -229,9 +193,6 @@ class PageCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
         context = super(PageCreateView, self).get_context_data(**kwargs)
         context['sidenav_selection'] = 'page_list'
 
-        subsection_formset = SubsectionFormset()
-        context['subsection_formset'] = subsection_formset
-
         picture_formset = PictureFormset()
         context['picture_formset'] = picture_formset
         return context
@@ -241,12 +202,10 @@ class PageCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
 
         if form.is_valid():
             page = form.save()
-            subsection_formset = SubsectionFormset(request.POST, instance=page)
             picture_formset = PictureFormset(request.POST, request.FILES, instance=page)
 
-            if form.is_valid() and subsection_formset.is_valid() and picture_formset.is_valid():
+            if form.is_valid() and picture_formset.is_valid():
                 form.save()
-                subsection_formset.save()
                 picture_formset.save()
 
                 messages.success(request, mark_safe(
@@ -254,13 +213,6 @@ class PageCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
                     )
                 )
             else:
-                if not subsection_formset.is_valid():
-                    for error in subsection_formset.errors:
-                        for k, v in error.items():
-                            messages.error(
-                                request, mark_safe("{}: {}".format(k.title(), v))
-                            )
-
                 if not picture_formset.is_valid():
                     for error in picture_formset.errors:
                         for k, v in error.items():
@@ -270,7 +222,6 @@ class PageCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
 
                 context = {
                     'form': form,
-                    'subsection_formset': subsection_formset,
                     'picture_formset': picture_formset,
                     'sidenav_selection': 'page_list'
                 }
