@@ -1170,8 +1170,9 @@ class SubsectionBaseFormset(BaseInlineFormSet):
             form.DELETE_id = 'DELETE_{}'.format(index)
 
         form.fields['content'] = forms.CharField(
-            widget=forms.Textarea(
-                attrs={'class': 'form-control'}
+            widget=CKEditorWidget(
+                attrs={'class': 'form-control'},
+                config_name='studioadmin',
             ),
             required=True
         )

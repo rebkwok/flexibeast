@@ -2,5 +2,5 @@
     {% if subsection.subheading %}
         <h3>{{ subsection.subheading }}</h3>
         {% endif %}
-    <p>{{ subsection.content|linebreaks }}</p>
+    <p>{{ subsection.content|safe }}</p>
 {% endfor %}

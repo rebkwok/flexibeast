@@ -8,6 +8,8 @@ Date.prototype.dateFormat = function (format) {
 jQuery(document).ready(function () {
     //http://xdsoft.net/jqplugins/datetimepicker/
 
+    jQuery('form').areYouSure();
+
     jQuery('#datetimepicker').datetimepicker({
         format: 'DD MMM YYYY HH:mm',
         formatTime: 'HH:mm',

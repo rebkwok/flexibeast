@@ -156,10 +156,10 @@
                             <li class="active-nav-login"><a href="{% url 'account_logout' %}">Sign Out</a></li>
                           </ul>
                         </li>
-                        {% elif booking_on %}
+                    {% else %}
                         <div class="welcome-menu">Not signed in</div>
                         <li class="active-nav-login"><a class="account-menu" href="{% url 'account_login' %}?next={{request.get_full_path}}">Sign In</a></li>
-                        {% endif %}
+                    {% endif %}
                     </ul>
                 </div><!--/.nav-collapse -->
             </div>
@@ -245,9 +245,8 @@
 <script src="{% static 'flex_bookings/js/jquery.datetimepicker.js' %}"></script>
 <script src="{% static 'flex_bookings/js/jquery.maskedinput.min.js' %}"></script>
 <script src="{% static 'flex_bookings/js/jquery.tablesorter.min.js' %}"></script>
+<script src="{% static 'flex_bookings/js/jquery.are-you-sure.js' %}"></script>
 <script src="{% static 'flex_bookings/js/custom.js' %}"></script>
-
-<!--<script src="{% static 'flex_bookings/js/bootstrap-switch.js' %}"></script>-->
 
 {% block extra_scripts %}{% endblock %}
 
