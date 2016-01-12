@@ -32,7 +32,7 @@ class PaypalBlockTransactionAdmin(admin.ModelAdmin):
     list_display = ('id', 'get_user', 'invoice_id',
                     'transaction_id')
     readonly_fields = ('block', 'id', 'get_user', 'invoice_id',
-                    'transaction_id', 'get_block_id', 'cost', 'block_expiry')
+                    'transaction_id', 'get_block_id', 'cost')
 
 
     def get_block_id(self, obj):
