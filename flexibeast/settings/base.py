@@ -11,12 +11,11 @@ import dj_database_url
 import environ
 import os
 
-root = environ.Path(__file__) - 2  # two folders back (/a/b/ - 3 = /)
+root = environ.Path(__file__) - 3  # two folders back (/a/b/ - 3 = /)
 
 env = environ.Env(DEBUG=(bool, False),
                   PAYPAL_TEST=(bool, False),
                   USE_MAILCATCHER=(bool, False),
-                  TRAVIS=(bool, False),
                   HEROKU=(bool, False),
                   BOOKING_ON=(bool, False)
                   )
@@ -200,7 +199,7 @@ DEFAULT_STUDIO_EMAIL = env('DEFAULT_STUDIO_EMAIL')
 SUPPORT_EMAIL = 'rebkwok@gmail.com'
 
 # #####LOGGING######
-if not env('HEROKU') and not env('TRAVIS'):
+if not env('HEROKU'):
     LOG_FOLDER = env('LOG_FOLDER')
 
     LOGGING = {
@@ -375,8 +374,8 @@ if env('USE_MAILCATCHER'):
 PAYPAL_RECEIVER_EMAIL = env('PAYPAL_RECEIVER_EMAIL')
 PAYPAL_TEST = env('PAYPAL_TEST')
 
-# TRAVIS and HEROKU logging
-if env('TRAVIS') or env('HEROKU'):
+# HEROKU logging
+if env('HEROKU'):
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,

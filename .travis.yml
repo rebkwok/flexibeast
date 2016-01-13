@@ -6,7 +6,7 @@ python:
 addons:
   postgresql: "9.3"
 
-env: SECRET_KEY='dummy_secret' EMAIL_HOST_PASSWORD='dummy_password' DATABASE_URL=postgres://postgres@localhost/travis_ci_test PAYPAL_RECEIVER_EMAIL=dummy-email@hotmail.com PAYPAL_TEST=True DEFAULT_STUDIO_EMAIL=flexibeasttest@gmail.com LOG_FOLDER=log_folder TRAVIS=True HEROKU=False BOOKING_ON=True
+env: SECRET_KEY='dummy_secret' EMAIL_HOST_PASSWORD='dummy_password' DATABASE_URL=postgres://postgres@localhost/travis_ci_test PAYPAL_RECEIVER_EMAIL=dummy-email@hotmail.com PAYPAL_TEST=True DEFAULT_STUDIO_EMAIL=flexibeasttest@gmail.com LOG_FOLDER=log_folder HEROKU=False
 
 install:
   - pip install -r requirements.txt
@@ -15,10 +15,10 @@ install:
 
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
-  - python manage.py migrate
+  - python manage.py migrate --settings=flexibeast.settings.travis
 
 script:
-  - coverage run --source=flexibeast,flex_bookings,timetable,payments,gallery,reviews,studioadmin,accounts --omit=../*migrations*,../*tests*,../*wsgi*,../*__init__* manage.py test
+  - coverage run --source=flexibeast,flex_bookings,timetable,payments,gallery,reviews,studioadmin,accounts --omit=../*migrations*,../*tests*,../*wsgi*,../*__init__* manage.py test --settings=flexibeast.settings.travis
 
 after_success:
   coveralls

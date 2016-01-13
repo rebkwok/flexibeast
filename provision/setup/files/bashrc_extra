@@ -9,5 +9,5 @@ alias venv=". /src/flexibeast/venv/bin/activate"
 alias runserver="cd /src/flexibeast
 venv
 echo 'Application is running at 127.0.0.1:7100'
-./manage.py runserver 0.0.0.0:16000"
+./manage.py runserver 0.0.0.0:16000 --settings=flexibeast.settings.base"
 

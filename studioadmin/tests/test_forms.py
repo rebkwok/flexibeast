@@ -18,14 +18,14 @@ from studioadmin.forms import (
     PictureFormset,
     TimetableSessionFormSet,
     SessionAdminForm,
-    SubsectionFormset,
     UploadTimetableForm,
     # UserFilterForm,
     UserBookingFormSet,
     UserBlockFormSet
 )
 from timetable.models import Session
-from website.models import Page, SubSection, Picture
+from website.models import Page, Picture
+
 
 class EventFormSetTests(TestCase):
 
@@ -896,7 +896,8 @@ class PageFormTests(TestCase):
             'heading': self.page.heading,
             'menu_name': self.page.menu_name,
             'menu_location': self.page.menu_location,
-            'layout': self.page.layout
+            'layout': self.page.layout,
+            'content': self.page.content,
             }
 
         for key, value in extra_data.items():
@@ -914,7 +915,8 @@ class PageFormTests(TestCase):
             'heading': 'Test Heading',
             'menu_name': 'test_name',
             'menu_location': 'main',
-            'layout': 'no-img'
+            'layout': 'no-img',
+            'content': self.page.content
         }
         form = PageForm(data)
         self.assertFalse(form.is_valid())
@@ -926,40 +928,6 @@ class PageFormTests(TestCase):
 
     def test_required_fields(self):
         pass
-
-class SubsectionFormsetTests(TestCase):
-
-    def setUp(self):
-        self.subsection = mommy.make(SubSection)
-
-    def formset_data(self, extra_data={}):
-        data = {
-            'subsections-TOTAL_FORMS': 1,
-            'subsections-INITIAL_FORMS': 1,
-            'subsections-0-id': self.subsection.id,
-            'subsections-0-content': self.subsection.content,
-            }
-
-        for key, value in extra_data.items():
-            data[key] = value
-
-        return data
-
-    def test_formset_valid(self):
-        formset = SubsectionFormset(data=self.formset_data())
-        self.assertTrue(formset.is_valid())
-
-    def test_content_field_required(self):
-        formset = SubsectionFormset(
-            data=self.formset_data({'subsections-0-content': ''})
-        )
-        self.assertFalse(formset.is_valid())
-
-        form = formset.forms[0]
-        self.assertIn(
-            'This field is required', str(form.errors['content']),
-            form.errors
-        )
 
 
 class PictureFormsetTests(TestCase):

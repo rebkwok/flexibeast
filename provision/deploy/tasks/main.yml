@@ -11,13 +11,12 @@
     - django-extensions
 
 - name: Django db
-  django_manage: command={{ item }} app_path={{ project_root_path }} virtualenv={{ virtualenv_path }}
+  django_manage: command={{ item }} app_path={{ project_root_path }} virtualenv={{ virtualenv_path }} settings={{ settings_path }}
   with_items:
-    - syncdb
     - migrate
 
 - name: Populate database
-  django_manage: command={{ item }} app_path={{ project_root_path }} virtualenv={{ virtualenv_path }}
+  django_manage: command={{ item }} app_path={{ project_root_path }} virtualenv={{ virtualenv_path }} settings={{ settings_path }}
   with_items:
     - setup_fb
 #    - load_users
