@@ -45,7 +45,16 @@
                                 <label class="control-label col-sm-2">{% if field.field.required %}*{% endif %}{{ field.label }}</label>
                                 <div class="col-sm-9">{{ field }}{% if field.name == "restricted" %}
                                     <label class="aligned-label" for=id_restricted></label>{% endif %}
-                                    <p class="studioadmin-help">{{ field.help_text }}</p></div>
+                                    <p class="studioadmin-help">{{ field.help_text }}</p>
+                                    {% if field.name == 'content' %}
+                                        <span class="studioadmin-help">
+                                            To add images, upload pictures using the "Add new picture" link below.  In the content editor, select the image icon
+                                            and add the url of your picture.<br/>
+                                            Images uploaded in this page will be available at {{ request.META.HTTP_HOST }}/media/website_pages/&lt;name of file including extension&gt;<br/>
+                                            Images uploaded in the gallery will be available at {{ request.META.HTTP_HOST }}/media/gallery/&lt;name of file including extension&gt;<br/>
+                                        </span>
+                                    {% endif %}
+                                </div>
                             </div>
                         {% endfor %}
                     </li>
