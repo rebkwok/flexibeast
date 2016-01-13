@@ -17,16 +17,15 @@ from django.core.mail import send_mail
 
 from braces.views import LoginRequiredMixin
 
+from activitylog.models import ActivityLog
 from flex_bookings.models import Event, Booking, Block, WaitingListUser, \
     BookingError
-
 from flex_bookings.email_helpers import send_support_email, \
     send_waiting_list_email
 from studioadmin.forms import BookingStatusFilter, UserBookingFormSet, \
     UserBlockFormSet
-
 from studioadmin.views.utils import StaffUserMixin, staff_required
-from activitylog.models import ActivityLog
+from website.models import RestrictedAccessTracker
 
 
 logger = logging.getLogger(__name__)
@@ -39,15 +38,44 @@ class UserListView(LoginRequiredMixin, StaffUserMixin, ListView):
     queryset = User.objects.all().order_by('first_name')
 
     def get(self, request, *args, **kwargs):
+        perm = Permission.objects.get(codename='can_view_restricted')
+
+        if 'remove_all' in self.request.GET:
+            users = [
+                user.id for user in User.objects.all() if
+                user.has_perm('website.can_view_restricted')
+                ]
+            RestrictedAccessTracker.objects.all().delete()
+            if users:
+                for user in users:
+                    user.user_permissions.remove(perm)
+                messages.success(
+                    request,
+                    "Restricted access permission has been removed for all "
+                    "users"
+                )
+                ActivityLog.objects.create(
+                    log='Restricted access permission has been removed for all '
+                        'users by admin user {}'.format(request.user.username)
+                )
+            else:
+                messages.error(
+                    request,
+                    "No users currently have restricted access permission"
+                )
+
+
         if 'change_user' in self.request.GET:
             change_user_id = self.request.GET.getlist('change_user')[0]
             user_to_change = User.objects.get(id=change_user_id)
             can_view_restricted = user_to_change.has_perm(
                 'website.can_view_restricted'
             )
-            perm = Permission.objects.get(codename='can_view_restricted')
             if can_view_restricted:
                 user_to_change.user_permissions.remove(perm)
+                RestrictedAccessTracker.objects.filter(
+                    user=user_to_change
+                ).delete()
                 if user_to_change.is_superuser:
                     messages.error(
                         request,
@@ -62,7 +90,7 @@ class UserListView(LoginRequiredMixin, StaffUserMixin, ListView):
                     messages.success(
                         request,
                         "Permission to view restricted pages removed for "
-                        "{} {} ({}) ".format(
+                        "{} {} ({}) and timer stopped".format(
                             user_to_change.first_name,
                             user_to_change.last_name,
                             user_to_change.username
@@ -81,10 +109,16 @@ class UserListView(LoginRequiredMixin, StaffUserMixin, ListView):
 
             else:
                 user_to_change.user_permissions.add(perm)
+                tracker, created = RestrictedAccessTracker.objects.get_or_create(
+                    user=user_to_change
+                )
+                if not created:
+                    tracker.start_date = timezone.now()
+                    tracker.save()
                 messages.success(
                     request,
                     "Permission to view restricted pages has been added for "
-                    "{} {} ({})".format(
+                    "{} {} ({}) and timer started".format(
                         user_to_change.first_name,
                         user_to_change.last_name,
                         user_to_change.username

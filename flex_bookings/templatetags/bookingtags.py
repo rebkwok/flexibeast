@@ -1,9 +1,13 @@
 import pytz
 
+from datetime import timedelta
+
 from django import template
 from django.conf import settings
+from django.utils import timezone
 
 from flex_bookings.models import Booking
+from website.models import RestrictedAccessTracker
 
 register = template.Library()
 
@@ -107,6 +111,20 @@ def check_debug():
 def viewable(page, user):
     return not page.restricted or user.has_perm('website.can_view_restricted')
 
+
 @register.filter
 def can_view_restricted(user):
     return user.has_perm('website.can_view_restricted')
+
+
+@register.filter
+def time_since_access(user):
+    try:
+        tracker = RestrictedAccessTracker.objects.get(user=user)
+        time_since = timezone.now() - tracker.start_date
+        return '{} days, {}h:{}m:{}s'.format(
+            time_since.days, time_since.seconds//3600,
+            (time_since.seconds//60) % 60, time_since.seconds % 60
+        )
+    except RestrictedAccessTracker.DoesNotExist:
+        return ''

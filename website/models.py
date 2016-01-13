@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -95,3 +96,8 @@ class Picture(models.Model):
         # delete the image from storage when deleting Picture object
         self.image.delete()
         super(Picture, self).delete(*args, **kwargs)
+
+
+class RestrictedAccessTracker(models.Model):
+    user = models.OneToOneField(User)
+    start_date = models.DateTimeField(default=timezone.now)

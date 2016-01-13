@@ -10,15 +10,19 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-success">
-
                     <div class="table-responsive">
+                    <form method="get">
+                        <button class="btn remove_all_button btn-success pull-right"
+                                type="submit" name="remove_all" id="remove_all_button">Remove restricted access from all</button>
+                    </form>
                         <table class="table tablesorter" id="sortTable">
                             <thead>
                             <tr class="success">
                                 <th class="table-center">Username <span class="fa fa-sort"></span></th>
                                 <th class="table-center">First Name <span class="fa fa-sort"></span></th>
                                 <th class="table-center">Last Name <span class="fa fa-sort"></span></th>
-                                <th class="table-center">Can view restricted webpages?</th>
+                                <th class="table-center">Can view restricted<br/>webpages?</th>
+                                <th class="table-center">Time since<br/>access granted</th>
                                 <th class="table-center">Bookings</th>
                                 <th class="table-center">Email</th>
                             </tr>
@@ -35,6 +39,7 @@
                                                         type="submit" name="change_user" id="can_view_restricted_button" value="{{ user.id }}">{% if user|can_view_restricted %}Yes{% else %}No{% endif %}</button>
                                     </form>
                                 </td>
+                                <td class="table-center studioadmin-tbl">{{ user|time_since_access }}</td>
                                 <td class="table-center studioadmin-tbl">
                                     <a href="{% url 'studioadmin:user_bookings_list' user.id 'future_open' %}"><span class="fa fa-external-link fa-lg"></span></a>
                                 </td>
