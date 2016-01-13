@@ -14,7 +14,6 @@ urlpatterns = patterns('',
     url(r'^testimonials/', include('reviews.urls', namespace='reviews')),
     url(r'^page-not-available/$', 'website.views.permission_denied',
         name='permission_denied'),
-    url(r'^', include('website.urls', namespace='website')),
     url(r'^accounts/profile/', include('accounts.urls', namespace='profile')),
     url(r'^accounts/login/$', CustomLoginView.as_view(), name='login'),
     (r'^accounts/', include('allauth.urls')),
@@ -40,3 +39,7 @@ if settings.BOOKING_ON:
 if settings.HEROKU:
     urlpatterns += static(settings.STATIC_URL,
                           document_root=settings.STATIC_ROOT)
+
+urlpatterns += patterns('',
+    url(r'^', include('website.urls', namespace='website'))
+)

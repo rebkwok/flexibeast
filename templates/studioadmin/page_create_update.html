@@ -49,9 +49,10 @@
                                     {% if field.name == 'content' %}
                                         <span class="studioadmin-help">
                                             To add images, upload pictures using the "Add new picture" link below.  In the content editor, select the image icon
-                                            and add the url of your picture.<br/>
-                                            Images uploaded in this page will be available at {{ request.META.HTTP_HOST }}/media/website_pages/&lt;name of file including extension&gt;<br/>
-                                            Images uploaded in the gallery will be available at {{ request.META.HTTP_HOST }}/media/gallery/&lt;name of file including extension&gt;<br/>
+                                            and add the url of your picture.  The url will be shown with the picture thumbnail below.  (You can also use the urls of picture uploaded
+                                            for other pages.)<br/>
+                                            Images uploaded in the gallery will be available at {{ request.META.HTTP_HOST }}/media/gallery/&lt;name of file including extension&gt;
+                                            (urls are also displayed with individual images when adding/editing <a href="{% url 'gallery:categories' %}">categories</a> in the gallery)<br/>
                                         </span>
                                     {% endif %}
                                 </div>
@@ -86,7 +87,7 @@
 
                                         {% if picture.instance.id %}
                                             <div class="form-group">
-                                                <div class="studioadmin-help col-sm-6">{{ picture.instance.image.name }}</div>
+                                                <div class="studioadmin-help col-sm-6">{{ request.META.HTTP_HOST }}{{ picture.instance.image.url }}</div>
                                                 <div class="col-xs-6 aligned-label-container"><label class="aligned-label">{{ picture.main.label }}</label>
                                                     {{ picture.main }}
                                                     <label class="aligned-label" for={{ picture.main_id }}></label>

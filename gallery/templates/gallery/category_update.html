@@ -51,6 +51,7 @@
                                 </div>
                                 {% if image.instance.id %}
                                     <div class="gallery-update-group">
+                                        <label>URL:</label> {{ request.META.HTTP_HOST }}{{ image.instance.photo.url }}</br>
                                         <label>{{ image.DELETE.label }}</label>
                                         <div class="delete-label">{{ image.DELETE }}<label class="delete-label" for={{ image.DELETE_id }}></label>
                                         <span class="gallery-help delete-label">{{ image.DELETE.help_text }}</span>
