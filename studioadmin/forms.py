@@ -1162,7 +1162,7 @@ class PageForm(forms.ModelForm):
             ),
             'content': CKEditorWidget(
                 attrs={'class': 'form-control'},
-                config_name='studioadmin',
+                config_name='studioadmin_extended',
             ),
         }
 

@@ -357,7 +357,27 @@ CKEDITOR_CONFIGS = {
         'height': 100,
         'width': '100%',
     },
+    'studioadmin_extended': {
+        'autoGrow_onStartup': True,
+        'autoGrow_minWidth': 1200,
+        'autoGrow_minHeight': 300,
+        'autoGrow_maxHeight': 500,
+        'extraPlugins': 'autogrow',
+        'title': '',
+        'width': '100%',
+        'extraAllowedContent': 'iframe[*]',
+        'toolbar': [
+            ['Source', '-', 'Bold', 'Italic', 'Underline',
+            'TextColor', 'BGColor', '-', 'Image', 'Iframe'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent',
+             'Indent', '-',
+            'JustifyLeft', 'JustifyCenter', 'JustifyRight', '-',
+            'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'Link'],
+            ['Format', 'Font', 'FontSize']
+        ]
+    },
 }
+
 CKEDITOR_JQUERY_URL = \
     '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
 
