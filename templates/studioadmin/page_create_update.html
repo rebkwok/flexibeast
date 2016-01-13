@@ -39,7 +39,7 @@
 
                 <ul class="list-group">
                     <li class="list-group-item list-group-item-success">Page settings</li>
-                    <li class="list-group-item">
+                    <div class="list-group-item">
                         {% for field in form %}
                             <div class="form-group">
                                 <label class="control-label col-sm-2">{% if field.field.required %}*{% endif %}{{ field.label }}</label>
@@ -47,13 +47,55 @@
                                     <label class="aligned-label" for=id_restricted></label>{% endif %}
                                     <p class="studioadmin-help">{{ field.help_text }}</p>
                                     {% if field.name == 'content' %}
-                                        <span class="studioadmin-help">
-                                            To add images, upload pictures using the "Add new picture" link below.  In the content editor, select the image icon
-                                            and add the url of your picture.  The url will be shown with the picture thumbnail below.  (You can also use the urls of picture uploaded
-                                            for other pages.)<br/>
-                                            Images uploaded in the gallery will be available at {{ request.META.HTTP_HOST }}/media/gallery/&lt;name of file including extension&gt;
-                                            (urls are also displayed with individual images when adding/editing <a href="{% url 'gallery:categories' %}">categories</a> in the gallery)<br/>
+
+                                        <div>
+                                            <a id="toggler" href="#" data-toggle="collapse" class="active" data-target="#help-images">
+                                                <span class="fa help-images fa-plus-square"></span>
+                                                Show help for image embedding
+                                            </a>
+                                        </div>
+                                        <span id="help-images" class="collapse">
+                                            <p><strong>Adding images within the page content</strong></p>
+                                                <ul>
+                                                    <li>Move cursor to the point in the text where you want to add an image</li>
+                                                    <li>Click on the image icon <span class="fa fa-picture-o"></span> in the editor toolbar and add the url of your picture in the window that opens</li>
+                                                    <li>Edit the height and width settings if you want (you can double click on the image later to adjust these)</li>
+                                                    <li>To find your image's url do one of the following:
+                                                        <ul>
+                                                            <li>Use the url of an external image (e.g. a link from facebook</li>
+                                                            <li>Upload a picture using the "Add new picture" link below.  The url is displayed next to the picture thumbnail.</li>
+                                                            <li>Select "No images" as the layout option for this page (unless you want pictures uploaded to the page to be automatically inserted in addition to any you include in the "content" field.</li>
+                                                            <li>Use the url of a picture you've uploaded to a different page using it's "Add new picture" link.</li>
+                                                            <li>Use the url of a picture uploaded to the gallery (urls are also with individual images when
+                                                                adding/editing <a href="{% url 'gallery:categories' %}">categories</a> in the gallery)</li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
                                         </span>
+                                            <div>
+                                            <a id="toggler" href="#" data-toggle="collapse" class="active" data-target="#help-video">
+                                                <span class="fa help-video fa-plus-square"></span>
+                                                Show help for video embedding
+                                            </a>
+                                        </div>
+                                        <span id="help-video" class="collapse">
+                                            <p><strong>Adding videos within the page content</strong></p>
+                                                <ul>
+                                                    <li>Upload video to YouTube, vimeo etc (or find video you want to embed)</li>
+                                                    <li>Under the video in YouTube, click Share and select the "Embed" tab.  It will give you some code to copy.</li>
+                                                    <li>To embed in the content, there are 2 options:</li>
+                                                    <ol>
+                                                        <li>Click "Source"  on the text editor, and paste the entire code snippet where you want it (the code will be
+                                                        in the tags &ltiframe&gt...&lt/iframe&gt).  Click "Source" again to return to normal view.
+                                                        <li>Find the embed url in the code snippet (will look something like https://www.youtube.com/embed/BJo3OjpqJK8).
+                                                        Click the iframe icon <span class="fa fa-globe"></span> in the editor toolbar and paste the url in the form that opens.</li>
+                                                    </ol>
+                                                    <li>Once your video is embedded (by either method), you can double click on it to change size etc.</li>
+                                                    <li>Note that you will probably see the video as a "iframe" placeholder in the text editor.  Go back to the main site and
+                                                    view the page to see what the embedded video will look like.</li>
+                                                </ul>
+                                        </span>
+
                                     {% endif %}
                                 </div>
                             </div>
