@@ -173,14 +173,14 @@ USE_L10N = True
 
 USE_TZ = True
 
-
+HEROKU = env('HEROKU')
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 STATICFILES_DIRS = (root('static'),)
 
 STATIC_URL = '/static/'
 STATIC_ROOT = root('collected-static')
-if env('HEROKU'):
+if HEROKU:
     STATIC_ROOT = 'staticfiles'
 
 MEDIA_URL = '/media/'
@@ -199,7 +199,7 @@ DEFAULT_STUDIO_EMAIL = env('DEFAULT_STUDIO_EMAIL')
 SUPPORT_EMAIL = 'rebkwok@gmail.com'
 
 # #####LOGGING######
-if not env('HEROKU'):
+if not HEROKU:
     LOG_FOLDER = env('LOG_FOLDER')
 
     LOGGING = {
@@ -375,7 +375,7 @@ PAYPAL_RECEIVER_EMAIL = env('PAYPAL_RECEIVER_EMAIL')
 PAYPAL_TEST = env('PAYPAL_TEST')
 
 # HEROKU logging
-if env('HEROKU'):
+if HEROKU:
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -418,4 +418,3 @@ if env('HEROKU'):
 PERMISSION_DENIED_URL = 'permission_denied'
 
 BOOKING_ON = env('BOOKING_ON')
-

@@ -37,3 +37,6 @@ if settings.BOOKING_ON:
         url(r'^bookings/', include('flex_bookings.urls', namespace='flexbookings')),
     )
 
+if settings.HEROKU:
+    urlpatterns += static(settings.STATIC_URL,
+                          document_root=settings.STATIC_ROOT)
