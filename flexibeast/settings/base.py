@@ -40,8 +40,6 @@ if str(DEBUG).lower() in ['true', 'on']:
 else:
     DEBUG = False
 
-TEMPLATE_DEBUG = DEBUG
-
 ALLOWED_HOSTS = []
 
 
@@ -93,23 +91,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
-    # Required by allauth template tags
-    "django.template.context_processors.request",
-    # allauth specific context processors
-    "allauth.account.context_processors.account",
-    "allauth.socialaccount.context_processors.socialaccount",
-    "django.contrib.messages.context_processors.messages",
-    "django.core.context_processors.media",
-    "website.context_processors.website_pages",
-    "website.context_processors.more_menu_options",
-    "website.context_processors.menu_options",
-    "website.context_processors.reviews_pending",
-    "website.context_processors.booking_on",
-
-)
-
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
     "django.contrib.auth.backends.ModelBackend",
@@ -137,8 +118,28 @@ ACCOUNT_SIGNUP_FORM_CLASS = 'accounts.forms.SignupForm'
 
 SOCIALACCOUNT_QUERY_EMAIL = True
 
-TEMPLATE_DIRS = (root('templates'),)
-APP_DIRS = True
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [root('templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': (
+                'django.contrib.auth.context_processors.auth',
+                # Required by allauth template tags
+                "django.template.context_processors.request",
+                "django.contrib.messages.context_processors.messages",
+                "django.core.context_processors.media",
+                "website.context_processors.website_pages",
+                "website.context_processors.more_menu_options",
+                "website.context_processors.menu_options",
+                "website.context_processors.reviews_pending",
+                "website.context_processors.booking_on",
+            ),
+            'debug': DEBUG,
+        },
+    },
+]
 
 ROOT_URLCONF = 'flexibeast.urls'
 

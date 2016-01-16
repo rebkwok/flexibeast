@@ -19,7 +19,6 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.core.mail import send_mail
 from django.template.loader import get_template
-from django.template import Context
 from braces.views import LoginRequiredMixin
 
 from flex_bookings.models import Block, Booking, BookingError, \
@@ -364,12 +363,11 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
 
             host = 'http://{}'.format(self.request.META.get('HTTP_HOST'))
             # send email to user
-            ctx = Context(
-                {
-                    'host': host, 'block_obj': block, 'block_name': block.name,
-                    'block_events': block.events.all(), 'user': self.request.user
+            ctx = {
+                'host': host, 'block_obj': block, 'block_name': block.name,
+                'block_events': block.events.all(), 'user': self.request.user
                 }
-            )
+
             try:
                 send_mail('{} Booking for {}'.format(
                     settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, block.name),
@@ -463,17 +461,17 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
 
             host = 'http://{}'.format(self.request.META.get('HTTP_HOST'))
             # send email to user
-            ctx = Context({
-                  'host': host,
-                  'booking': booking,
-                  'event': booking.event,
-                  'date': booking.event.date.strftime('%A %d %B'),
-                  'time': booking.event.date.strftime('%H:%M'),
-                  'prev_cancelled_and_direct_paid':
-                  previously_cancelled and booking.paid,
-                  'ev_type': 'workshop' if
-                  self.event.event_type.event_type == 'EV' else 'class'
-            })
+            ctx = {
+                'host': host,
+                'booking': booking,
+                'event': booking.event,
+                'date': booking.event.date.strftime('%A %d %B'),
+                'time': booking.event.date.strftime('%H:%M'),
+                'prev_cancelled_and_direct_paid':
+                 previously_cancelled and booking.paid,
+                'ev_type': 'workshop' if
+                 self.event.event_type.event_type == 'EV' else 'class'
+            }
             try:
                 send_mail('{} Booking for {}'.format(
                     settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, booking.event.name),
@@ -509,7 +507,7 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
                               get_template(
                                 'flex_bookings/email/to_studio_booking.txt'
                                 ).render(
-                                  Context({
+                                  {
                                       'host': host,
                                       'booking': booking,
                                       'event': booking.event,
@@ -519,7 +517,7 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
                                       previously_cancelled and booking.paid,
                                       # 'transaction_id': transaction_id,
                                       # 'invoice_id': invoice_id
-                                  })
+                                  }
                               ),
                               settings.DEFAULT_FROM_EMAIL,
                               [settings.DEFAULT_STUDIO_EMAIL],
@@ -587,11 +585,11 @@ def update_block(request, pk):
 
     # send email to studio
     host = 'http://{}'.format(request.META.get('HTTP_HOST'))
-    ctx = Context({
+    ctx = {
         'host': host,
         'user': request.user,
         'block_obj': block
-    })
+    }
     try:
         send_mail('{} Payment confirmed for {} by {} {}'.format(
             settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, block.name,
@@ -633,11 +631,11 @@ def update_booking(request, pk):
 
     # send email to studio
     host = 'http://{}'.format(request.META.get('HTTP_HOST'))
-    ctx = Context({
+    ctx = {
         'host': host,
         'user': request.user,
         'booking': booking
-    })
+    }
     try:
         send_mail('{} Payment confirmed for {} by {} {}'.format(
             settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, booking.event,
@@ -835,14 +833,14 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
         host = 'http://{}'.format(self.request.META.get('HTTP_HOST'))
         # send email to user
 
-        ctx = Context({
-                      'host': host,
-                      'bookings': bookings,
-                      'block_obj': block,
-                      'user': request.user,
-                      'contact_person': bookings[0].event.contact_person,
-                      'contact_email': bookings[0].event.contact_email,
-                      })
+        ctx = {
+            'host': host,
+            'bookings': bookings,
+            'block_obj': block,
+            'user': request.user,
+            'contact_person': bookings[0].event.contact_person,
+            'contact_email': bookings[0].event.contact_email,
+        }
         subject = "Block {} cancelled".format(block.name) \
             if cancel_type == 'block' \
             else "Booking for {} cancelled".format(bookings[0].event)

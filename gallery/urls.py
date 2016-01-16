@@ -1,16 +1,16 @@
-from django.conf.urls import include, patterns, url
-from gallery.views import CategoryListView, CategoryUpdateView
+from django.conf.urls import url
+from gallery.views import CategoryListView, CategoryUpdateView, view_gallery
 
-urlpatterns = patterns('',
-    url(r'^$', 'gallery.views.view_gallery', name='gallery'),
+urlpatterns = [
+    url(r'^$', view_gallery, name='gallery'),
     ##### VIEWS FOR STAFF USER ONLY #####
-    # images list, allow editing of image name and category, delete image, filter by category
-    # url(r'^images/', ImageListView.as_view(), name='images'),
-    # add single image
-    # url(r'^images/add$', ImageCreateView.as_view(), name='add_image'),
     # Category list view, show all categories in list, allow  for edit of
-    # name and delete of entire category, add new category, links to category detail views
+    # name and delete of entire category, add new category, links to category
+    # detail views
     url(r'^categories/$', CategoryListView.as_view(), name='categories'),
     # Category detail view, show all images for edit/delete/add
-    url(r'^categories/(?P<pk>\d+)$', CategoryUpdateView.as_view(), name='edit_category'),
-)
+    url(
+        r'^categories/(?P<pk>\d+)$', CategoryUpdateView.as_view(),
+        name='edit_category'
+    ),
+]

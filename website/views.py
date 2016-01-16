@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.core.mail.message import EmailMessage, EmailMultiAlternatives
 from django.template.loader import get_template, select_template
-from django.template import Context, RequestContext, TemplateDoesNotExist
+from django.template import TemplateDoesNotExist
 from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.core.mail import send_mail
@@ -63,15 +63,13 @@ def process_contact_form(request):
         cc = form.cleaned_data['cc']
         message = form.cleaned_data['message']
 
-        ctx = Context(
-            {
-                'host': 'http://{}'.format(request.META.get('HTTP_HOST')),
-                'first_name': first_name,
-                'last_name': last_name,
-                'email_address': email_address,
-                'message': message,
-            }
-        )
+        ctx = {
+            'host': 'http://{}'.format(request.META.get('HTTP_HOST')),
+            'first_name': first_name,
+            'last_name': last_name,
+            'email_address': email_address,
+            'message': message,
+        }
 
         try:
             msg = EmailMultiAlternatives(

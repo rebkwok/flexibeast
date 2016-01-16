@@ -7,10 +7,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         page, created = Page.objects.get_or_create(
-            name='about',
+            name='about'
         )
         if created:
             page.menu_location = 'main'
+            page.heading = ''
             page.layout = 'no-img'
             page.content = 'Coming Soon'
             page.save()

@@ -13,7 +13,6 @@ from django.utils import timezone
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import get_template
-from django.template import Context
 from django.core.management.base import BaseCommand
 from django.core import management
 
@@ -51,12 +50,12 @@ class Command(BaseCommand):
         for booking in bookings:
             event_was_full = booking.event.spaces_left() == 0
 
-            ctx = Context({
-                  'booking': booking,
-                  'event': booking.event,
-                  'date': booking.event.date.strftime('%A %d %B'),
-                  'time': booking.event.date.strftime('%I:%M %p'),
-            })
+            ctx = {
+                'booking': booking,
+                'event': booking.event,
+                'date': booking.event.date.strftime('%A %d %B'),
+                'time': booking.event.date.strftime('%I:%M %p'),
+            }
             # send mails to users
             try:
                 send_mail('{} Booking cancelled: {}'.format(

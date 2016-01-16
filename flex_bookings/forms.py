@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+
 
 from flex_bookings.models import Booking, Event
 

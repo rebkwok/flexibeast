@@ -3,7 +3,7 @@ cd /src/flexibeast
 . /src/flexibeast/venv/bin/activate
 
 echo "Application is running at 127.0.0.1:7100"
-
+export DJANGO_SETTINGS_MODULE=flexibeast.settings.base
 alias go="cd /src/flexibeast"
 alias venv=". /src/flexibeast/venv/bin/activate"
 alias runserver="cd /src/flexibeast

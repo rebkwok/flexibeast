@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from django.forms.models import modelformset_factory, BaseModelFormSet, \
     inlineformset_factory, formset_factory, BaseFormSet, BaseInlineFormSet
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 
 from ckeditor.widgets import CKEditorWidget
@@ -247,17 +246,17 @@ class EventAdminForm(forms.ModelForm):
             ),
             }
         help_texts = {
-            'payment_due_date': _('Only use this field if the cost is greater '
+            'payment_due_date': 'Only use this field if the cost is greater '
                                   'than 0.  If a payment due date is set, '
-                                  'advance payment will always be required'),
-            'email_studio_when_booked': _('Tick if you want the studio to '
+                                  'advance payment will always be required',
+            'email_studio_when_booked': 'Tick if you want the studio to '
                                           'receive email notifications when a '
-                                          'booking is made'),
-            'advance_payment_required': _('If this checkbox is not ticked, '
+                                          'booking is made',
+            'advance_payment_required': 'If this checkbox is not ticked, '
                                           'unpaid bookings will remain '
                                           'active after the cancellation period '
                                           'and will not be '
-                                          'automatically cancelled')
+                                          'automatically cancelled'
         }
 
 
@@ -718,11 +717,11 @@ class SessionAdminForm(forms.ModelForm):
             }
 
         help_texts = {
-            'advance_payment_required': _('If this checkbox is not ticked, '
+            'advance_payment_required': 'If this checkbox is not ticked, '
                                           'unpaid bookings will remain '
                                           'active after the cancellation period '
                                           'and will not be '
-                                          'automatically cancelled')
+                                          'automatically cancelled'
         }
 
 
@@ -1196,8 +1195,8 @@ class PictureBaseFormset(BaseInlineFormSet):
         form.main_id = 'main_{}'.format(index)
 
         form.fields['image'] = forms.ImageField(
-            label=_(''),
-            error_messages={'invalid':_("Image files only")},
+            label='',
+            error_messages={'invalid':"Image files only"},
             widget=ImageThumbnailFileInput,
             required=False
         )

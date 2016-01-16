@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template.loader import get_template
-from django.template import Context
 from django.shortcuts import HttpResponseRedirect, HttpResponse, redirect, \
     render, get_object_or_404
 from django.views.generic import \
@@ -44,11 +43,11 @@ def confirm_user_booking_payment(request, pk):
             )
         )
 
-        ctx = Context({
+        ctx = {
             'event': booking.event,
             'host': 'http://{}'.format(request.META.get('HTTP_HOST')),
             'user': booking.user
-        })
+        }
         try:
             send_mail(
                 '{} Payment status updated for {}'.format(
@@ -99,11 +98,11 @@ def confirm_user_block_payment(request, user_id, block_id):
                 block.name, user.first_name, user.last_name, user.username)
             )
 
-        ctx = Context({
+        ctx = {
             'block_obj': block,
             'host': 'http://{}'.format(request.META.get('HTTP_HOST')),
             'user': user
-        })
+        }
         try:
             send_mail(
                 '{} Payment status updated for {}'.format(
@@ -165,11 +164,11 @@ def confirm_user_block_payment(request, user_id, block_id):
     #             self.success_message.format(payment_status, booking.user.username)
     #         )
     #
-    #         ctx = Context({
+    #         ctx = {
     #             'event': booking.event,
     #             'host': 'http://{}'.format(self.request.META.get('HTTP_HOST')),
     #             'payment_status': payment_status
-    #         })
+    #         }
     #         try:
     #             send_mail(
     #                 '{} Payment status updated for {}'.format(
@@ -231,11 +230,10 @@ class ConfirmRefundView(LoginRequiredMixin, StaffUserMixin, UpdateView):
                                             booking.user.username)
             )
 
-            ctx = Context({
+            ctx = {
                 'event': booking.event,
                 'host': 'http://{}'.format(self.request.META.get('HTTP_HOST'))
-
-            })
+            }
 
             send_mail(
                 '{} Payment refund confirmed for {}'.format(

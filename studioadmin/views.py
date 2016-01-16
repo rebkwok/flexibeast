@@ -175,12 +175,12 @@ logger = logging.getLogger(__name__)
 #                         msg.attach_alternative(
 #                             get_template(
 #                                 'studioadmin/email/email_users.html').render(
-#                                   Context({
+#                                   {
 #                                       'subject': subject,
-#                                       'message': message})
-#                               ),
-#                             "text/html"
-#                         )
+#                                       'message': message
+#                                   },
+#                               "text/html"
+#                           )
 #                         msg.send(fail_silently=False)
 #                     except Exception as e:
 #                         # send mail to tech support with Exception

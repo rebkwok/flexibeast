@@ -1,10 +1,10 @@
-from django.conf.urls import include, patterns, url
+from django.conf.urls import url
 
 from reviews.views import ReviewListView, ReviewCreateView, \
     ReviewUpdateView, StaffReviewListView
 
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^$', ReviewListView.as_view(), name='reviews'),
     ##### VIEWS FOR LOGGED IN USER ONLY #####
     # add a review
@@ -16,4 +16,4 @@ urlpatterns = patterns('',
     ##### VIEWS FOR STAFF USER ONLY #####
     # listview for all reviews, button to publish/reject
     url(r'^staff-review$', StaffReviewListView.as_view(), name='staff_reviews')
-)
+]

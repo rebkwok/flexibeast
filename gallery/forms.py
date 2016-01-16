@@ -1,7 +1,6 @@
 from django import forms
 from django.forms.models import modelformset_factory, BaseModelFormSet, \
     inlineformset_factory, formset_factory, BaseFormSet, BaseInlineFormSet
-from django.utils.translation import ugettext_lazy as _
 
 from floppyforms import ClearableFileInput
 
@@ -71,8 +70,8 @@ class ImageBaseFormset(BaseInlineFormSet):
             form.DELETE_id = 'DELETE_{}'.format(index)
 
         form.fields['photo'] = forms.ImageField(
-            label=_(''),
-            error_messages={'invalid':_("Image files only")},
+            label='',
+            error_messages={'invalid':"Image files only"},
             widget=ImageThumbnailFileInput,
             required=False
         )

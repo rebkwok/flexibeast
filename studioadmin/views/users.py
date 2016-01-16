@@ -6,7 +6,6 @@ from django.contrib.auth.models import User, Permission
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.template.loader import get_template
-from django.template import Context
 from django.template.response import TemplateResponse
 from django.shortcuts import HttpResponseRedirect, HttpResponse, redirect, \
     render, get_object_or_404
@@ -289,12 +288,12 @@ def _process_confirmation_email(request, form, booking, action):
             # send confirmation email
             host = 'http://{}'.format(request.META.get('HTTP_HOST'))
             # send email to studio
-            ctx = Context({
+            ctx = {
                 'host': host,
                 'event': booking.event,
                 'user': booking.user,
                 'action': action,
-            })
+            }
             send_mail('{} Your booking for {} has been {}'.format(
                 settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, booking.event, action
                 ),
@@ -530,12 +529,12 @@ def _process_block_confirmation_email(request, user, form, block, action):
             # send confirmation email
             host = 'http://{}'.format(request.META.get('HTTP_HOST'))
             # send email to studio
-            ctx = Context({
+            ctx = {
                 'host': host,
                 'block': block,
                 'user': user,
                 'action': action,
-            })
+            }
             send_mail('{} block {} has been {}'.format(
                 settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, block.name, action
                 ),

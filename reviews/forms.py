@@ -1,6 +1,5 @@
 from django import forms
 from django.forms.models import modelformset_factory, BaseModelFormSet
-from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 
 
@@ -91,9 +90,9 @@ ReviewFormSet = modelformset_factory(
 
 
 REVIEW_CHOICES = (
-  ('approve', mark_safe(_('<span class="fa fa-thumbs-up fa-lg" alt="approve" title="approve">'))),
-  ('reject', mark_safe(_('<span class="fa fa-thumbs-down fa-lg" alt="approve" title="approve">'))),
-  ('undecided',mark_safe(_('<span class="fa fa-question-circle fa-lg" alt="approve" title="approve">'))),
+  ('approve', mark_safe('<span class="fa fa-thumbs-up fa-lg" alt="approve" title="approve">')),
+  ('reject', mark_safe('<span class="fa fa-thumbs-down fa-lg" alt="approve" title="approve">')),
+  ('undecided',mark_safe('<span class="fa fa-question-circle fa-lg" alt="approve" title="approve">')),
 )
 
 
