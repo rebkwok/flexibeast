@@ -61,7 +61,6 @@ INSTALLED_APPS = (
     'django_extensions',
     'crispy_forms',
     'floppyforms',
-    'debug_toolbar',
     'imagekit',
     'ckeditor',
     'accounts',
