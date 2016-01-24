@@ -40,8 +40,8 @@ if settings.BOOKING_ON:
     )
 
 if settings.HEROKU:
-    urlpatterns.append(
-        static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(
+        settings.STATIC_URL, document_root=settings.STATIC_ROOT
     )
 
 urlpatterns.append(url(r'^', include('website.urls', namespace='website')))
