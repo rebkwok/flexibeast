@@ -40,9 +40,9 @@
                     <span class="sidebar_active">Registered users</span>{% else %}Registered users{% endif %}</a></li>
     <li><a href="{% url 'studioadmin:block_bookings' %}">{% if sidenav_selection == 'block_bookings' %}
                     <span class="sidebar_active">Blocks</span>{% else %}Block bookings{% endif %}</a></li>
-{#    <li class="active-nav"><a href="{% url 'studioadmin:choose_email_users' %}">{% if sidenav_selection == 'email_users' %}#}
-{#                    <span class="sidebar_active">Bulk email to students</span>{% else %}Bulk email to students{% endif %}</a></li>#}
-{#    <li class="divider"></li>#}
+    <li class="active-nav"><a href="{% url 'studioadmin:choose_email_users' %}">{% if sidenav_selection == 'email_users' %}
+                    <span class="sidebar_active">Bulk email to students</span>{% else %}Bulk email to students{% endif %}</a></li>
+    <li class="divider"></li>
     <li class="active-nav"><a href="{% url 'studioadmin:activitylog' %}">{% if sidenav_selection == 'activitylog' %}
                     <span class="sidebar_active">Activity Log</span>{% else %}Activity Log{% endif %}</a></li>
       <li class="divider"></li>
@@ -177,8 +177,8 @@
                     <span class="sidebar_active">Registered users</span>{% else %}Registered users{% endif %}</a></li>
                     <li><a href="{% url 'studioadmin:block_bookings' %}">{% if sidenav_selection == 'block_bookings' %}
                     <span class="sidebar_active">Blocks</span>{% else %}Block bookings{% endif %}</a></li>
-{#                    <li><a href="{% url 'studioadmin:choose_email_users' %}">{% if sidenav_selection == 'email_users' %}#}
-{#                    <span class="sidebar_active">Bulk email to students</span>{% else %}Bulk email to students{% endif %}</a></li>#}
+                    <li><a href="{% url 'studioadmin:choose_email_users' %}">{% if sidenav_selection == 'email_users' %}
+                    <span class="sidebar_active">Bulk email to students</span>{% else %}Bulk email to students{% endif %}</a></li>
                 </span>
 
                 <li class="sidebar-title">

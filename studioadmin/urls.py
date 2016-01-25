@@ -6,6 +6,8 @@ from studioadmin.views.events import EventAdminCreateView, \
     EventAdminUpdateView, event_admin_list, registers_by_date
 from studioadmin.views.blocks import BlockAdminCreateView, \
     BlockAdminUpdateView, admin_block_list, single_block_bookings_view
+from studioadmin.views.email_users import choose_users_to_email, \
+    email_users_view
 from studioadmin.views.misc import confirm_user_booking_payment, \
     confirm_user_block_payment
 from studioadmin.views.timetable import TimetableSessionUpdateView, \
@@ -53,9 +55,9 @@ urlpatterns = [
     ),
     url(r'^timetable/upload/$', upload_timetable_view, name='upload_timetable'),
     url(r'^users/$', UserListView.as_view(), name="users"),
-    # url(r'^users/email/$', choose_users_to_email, name="choose_email_users"),
-    # url(r'^users/email/emailform/$', email_users_view,
-    #     name="email_users_view"),
+    url(r'^users/email/$', choose_users_to_email, name="choose_email_users"),
+    url(r'^users/email/emailform/$', email_users_view,
+        name="email_users_view"),
     url(
         r'^users/(?P<user_id>\d+)/bookings/(?P<booking_status>[\w-]+)$',
         user_bookings_view, name='user_bookings_list'

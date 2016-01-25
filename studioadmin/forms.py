@@ -902,52 +902,53 @@ UserBlockFormSet = formset_factory(
     can_delete=True,
 )
 
-# class ChooseUsersBaseFormSet(BaseModelFormSet):
-#
-#     def add_fields(self, form, index):
-#         super(ChooseUsersBaseFormSet, self).add_fields(form, index)
-#
-#         form.fields['email_user'] = forms.BooleanField(
-#             widget=forms.CheckboxInput(attrs={
-#                 'class': "regular-checkbox studioadmin-list select-checkbox",
-#                 'id': 'email_user_cbox_{}'.format(index)
-#             }),
-#             initial=True,
-#             required=False
-#         )
-#         form.email_user_cbox_id = 'email_user_cbox_{}'.format(index)
-#
-# ChooseUsersFormSet = modelformset_factory(
-#     User,
-#     fields=('id',),
-#     formset=ChooseUsersBaseFormSet,
-#     extra=0,
-#     can_delete=False)
-#
-#
-# class EmailUsersForm(forms.Form):
-#     subject = forms.CharField(max_length=255, required=True,
-#                               widget=forms.TextInput(
-#                                   attrs={'class': 'form-control'}))
-#     from_address = forms.EmailField(max_length=255,
-#                                     initial=settings.DEFAULT_STUDIO_EMAIL,
-#                                     required=True,
-#                                     widget=forms.TextInput(
-#                                         attrs={'class': 'form-control'}),
-#                                     help_text='This will be the reply-to address')
-#     cc = forms.BooleanField(
-#         widget=forms.CheckboxInput(attrs={
-#                 'class': "regular-checkbox studioadmin-list",
-#                 'id': 'cc_id'
-#             }),
-#         label="cc. from address",
-#         initial=True,
-#         required=False
-#     )
-#     message = forms.CharField(
-#         widget=forms.Textarea(attrs={'class': 'form-control email-message',
-#                                      'rows': 10}),
-#         required=True)
+
+class ChooseUsersBaseFormSet(BaseModelFormSet):
+
+    def add_fields(self, form, index):
+        super(ChooseUsersBaseFormSet, self).add_fields(form, index)
+
+        form.fields['email_user'] = forms.BooleanField(
+            widget=forms.CheckboxInput(attrs={
+                'class': "regular-checkbox studioadmin-list select-checkbox",
+                'id': 'email_user_cbox_{}'.format(index)
+            }),
+            initial=True,
+            required=False
+        )
+        form.email_user_cbox_id = 'email_user_cbox_{}'.format(index)
+
+ChooseUsersFormSet = modelformset_factory(
+    User,
+    fields=('id',),
+    formset=ChooseUsersBaseFormSet,
+    extra=0,
+    can_delete=False)
+
+
+class EmailUsersForm(forms.Form):
+    subject = forms.CharField(max_length=255, required=True,
+                              widget=forms.TextInput(
+                                  attrs={'class': 'form-control'}))
+    from_address = forms.EmailField(max_length=255,
+                                    initial=settings.DEFAULT_STUDIO_EMAIL,
+                                    required=True,
+                                    widget=forms.TextInput(
+                                        attrs={'class': 'form-control'}),
+                                    help_text='This will be the reply-to address')
+    cc = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={
+                'class': "regular-checkbox studioadmin-list",
+                'id': 'cc_id'
+            }),
+        label="cc. from address",
+        initial=True,
+        required=False
+    )
+    message = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control email-message',
+                                     'rows': 10}),
+        required=True)
 #
 #
 # def get_event_names(event_type):

@@ -15,17 +15,6 @@
            {% if users_to_email %}
                 <div class="panel-body">
                         <div>
-                            {% if events or lessons %}
-                                You are sending an email regarding:
-                                <ul>
-                                    {% for event in events %}
-                                    <li>{{ event.name }}</li>
-                                    {% endfor %}
-                                    {% for lesson in lessons %}
-                                    <li>{{ lesson.name }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
 
                             The following students will be emailed:
                             <ul>
