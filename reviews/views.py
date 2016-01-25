@@ -115,13 +115,19 @@ class StaffReviewListView(StaffUserMixin, ListView):
 
         review_formset = ReviewFormSet(request.POST)
 
+        view = request.GET.getlist('view', [''])[0]
+        # if we are viewing approved or rejected, we can ignore the decision
+        # unless it is the opposite
+        change = False
+
         if review_formset.has_changed():
             for form in review_formset:
                 if form.is_valid():
                     if form.has_changed() and 'decision' in form.changed_data:
                         review = form.save(commit=False)
                         decision = form.cleaned_data.get('decision')
-                        if decision == 'approve':
+
+                        if decision == 'approve' and view != 'approved':
                             review.approve()
                             messages.success(
                                 request, 'Review from user {} {} has been '
@@ -130,7 +136,8 @@ class StaffReviewListView(StaffUserMixin, ListView):
                                     review.user.last_name
                                 )
                             )
-                        elif decision == 'reject':
+                            change = True
+                        elif decision == 'reject' and view != 'rejected':
                             review.reject()
                             messages.success(
                                 request, 'Review from user {} {} has been '
@@ -139,8 +146,13 @@ class StaffReviewListView(StaffUserMixin, ListView):
                                     review.user.last_name
                                 )
                             )
+                            change = True
+
                         review.save()
             review_formset.save()
+
+        if not change:
+            messages.info(request, 'No changes made')
 
         return HttpResponseRedirect(self.get_success_url())
 

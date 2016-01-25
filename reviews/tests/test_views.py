@@ -287,9 +287,39 @@ class ReviewUpdateViewTests(ReviewTestMixin, TestCase):
 
 class StaffReviewListViewTests(ReviewTestMixin, TestCase):
 
-    def _get_response(self, user):
+    def setUp(self):
+        super(StaffReviewListViewTests, self).setUp()
+        # reviews:
+        # 1 pending first review
+        # 1 pending update review
+        # 1 reviewed and approved/published
+        # 1 reviewed and rejected
+        # 1 updated and reviewed and accepted/published
+        # 1 updated and reviewed and rejected
+
+        self.review_pending = mommy.make(Review)
+        self.review_published = mommy.make(Review)
+        self.review_published.approve()
+        self.review_rejected = mommy.make(Review)
+        self.review_rejected.reject()
+        self.review_update_pending = mommy.make(Review)
+        self.review_update_pending.approve()
+        self.review_update_pending.title = "updated title"
+        self.review_update_pending.save()
+        self.review_update_published = mommy.make(Review)
+        self.review_update_published.approve()
+        self.review_update_published.title = "updated title"
+        self.review_update_published.save()
+        self.review_update_published.approve()
+        self.review_update_rejected = mommy.make(Review)
+        self.review_update_rejected.approve()
+        self.review_update_rejected.title = "updated title"
+        self.review_update_rejected.save()
+        self.review_update_rejected.reject()
+
+    def _get_response(self, user, data={}):
         url = reverse('reviews:staff_reviews')
-        request = self.factory.get(url)
+        request = self.factory.get(url, data)
         request.user = user
         view = StaffReviewListView.as_view()
         return view(request)
@@ -313,28 +343,115 @@ class StaffReviewListViewTests(ReviewTestMixin, TestCase):
         resp = self._get_response(self.staff_user)
         self.assertEqual(resp.status_code, 200)
 
-    # def test_view_default_pending_list(self):
-        #"""
-        #Show reviews that are pending either initial review or
-        #edited review.  Review is pending if reviewed == False:
+    def test_view_default_pending_list(self):
+        """
+        Show reviews that are pending either initial review or
+        edited review.  Review is pending if reviewed == False
+        """
+        resp = self._get_response(self.staff_user)
+        self.assertEqual(Review.objects.count(), 6)
+        self.assertEqual(len(resp.context_data['reviews']), 2)
+        self.assertEqual(
+            sorted(review.id for review in resp.context_data['reviews']),
+            sorted([self.review_pending.id, self.review_update_pending.id])
+        )
 
-    # def test_view_approved_list(self):
-        #"""
-        #Review is approved if:
-        #it's been reviewed AND
-        #    is published AND hasn't been edited
-        #    OR
-        #    has been edited and update_published is true
-        #"""
+    def test_view_approved_list(self):
+        """
+        Review is approved if:
+        it's been reviewed AND
+           is published AND hasn't been edited
+           OR
+           has been edited and update_published is true
+        """
+        resp = self._get_response(self.staff_user, {'view': 'approved'})
+        self.assertEqual(Review.objects.count(), 6)
+        self.assertEqual(len(resp.context_data['reviews']), 2)
+        self.assertEqual(
+            sorted(review.id for review in resp.context_data['reviews']),
+            sorted([self.review_published.id, self.review_update_published.id])
+        )
 
-    # def test_view_rejected_list(self):
-        #"""
-        #Review is rejected if
-        # it's been reviewed AND
-        #   is not published
-        #   OR
-        #   has been edited and update_published is false
+    def test_view_rejected_list(self):
+        """
+        Review is rejected if
+        it's been reviewed AND
+          is not published
+          OR
+          has been edited and update_published is false
+         """
+        resp = self._get_response(self.staff_user, {'view': 'rejected'})
+        self.assertEqual(Review.objects.count(), 6)
+        self.assertEqual(len(resp.context_data['reviews']), 2)
+        self.assertEqual(
+            sorted(review.id for review in resp.context_data['reviews']),
+            sorted([self.review_rejected.id, self.review_update_rejected.id])
+        )
 
-    # def test_approve_review(self):
+    def test_approve_review_first_submission(self):
+        form_data = {
+            'form-TOTAL_FORMS': 2,
+            'form-INITIAL_FORMS': 2,
+            'form-0-id': str(self.review_pending.id),
+            'form-0-decision': 'approve',
+            'form-1-id': str(self.review_update_pending.id),
+        }
+        self._post_response(self.staff_user, form_data)
+        self.review_pending.refresh_from_db()
+        self.review_update_pending.refresh_from_db()
 
-    # def test_reject_review(self):
+        self.assertTrue(self.review_pending.reviewed)
+        self.assertTrue(self.review_pending.published)
+        self.assertFalse(self.review_update_pending.reviewed)
+        self.assertFalse(self.review_update_pending.update_published)
+
+    def test_approve_review_updated_submission(self):
+        form_data = {
+            'form-TOTAL_FORMS': 2,
+            'form-INITIAL_FORMS': 2,
+            'form-0-id': str(self.review_pending.id),
+            'form-1-id': str(self.review_update_pending.id),
+            'form-1-decision': 'approve',
+        }
+        self._post_response(self.staff_user, form_data)
+        self.review_pending.refresh_from_db()
+        self.review_update_pending.refresh_from_db()
+
+        self.assertFalse(self.review_pending.reviewed)
+        self.assertFalse(self.review_pending.published)
+        self.assertTrue(self.review_update_pending.reviewed)
+        self.assertTrue(self.review_update_pending.update_published)
+
+    def test_reject_review_first_submission(self):
+        form_data = {
+            'form-TOTAL_FORMS': 2,
+            'form-INITIAL_FORMS': 2,
+            'form-0-id': str(self.review_pending.id),
+            'form-0-decision': 'reject',
+            'form-1-id': str(self.review_update_pending.id),
+        }
+        self._post_response(self.staff_user, form_data)
+        self.review_pending.refresh_from_db()
+        self.review_update_pending.refresh_from_db()
+
+        self.assertTrue(self.review_pending.reviewed)
+        self.assertFalse(self.review_pending.published)
+        self.assertFalse(self.review_update_pending.reviewed)
+        self.assertFalse(self.review_update_pending.update_published)
+
+    def test_reject_review_updated_submission(self):
+        form_data = {
+            'form-TOTAL_FORMS': 2,
+            'form-INITIAL_FORMS': 2,
+            'form-0-id': str(self.review_pending.id),
+            'form-1-id': str(self.review_update_pending.id),
+            'form-1-decision': 'reject',
+        }
+        self._post_response(self.staff_user, form_data)
+        self.review_pending.refresh_from_db()
+        self.review_update_pending.refresh_from_db()
+
+        self.assertFalse(self.review_pending.reviewed)
+        self.assertFalse(self.review_pending.published)
+        self.assertTrue(self.review_update_pending.reviewed)
+        self.assertFalse(self.review_update_pending.update_published)

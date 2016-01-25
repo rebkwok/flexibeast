@@ -108,8 +108,8 @@ ReviewFormSet = modelformset_factory(
 
 REVIEW_CHOICES = (
   ('approve', mark_safe('<span class="fa fa-thumbs-up fa-lg" alt="approve" title="approve">')),
-  ('reject', mark_safe('<span class="fa fa-thumbs-down fa-lg" alt="approve" title="approve">')),
-  ('undecided',mark_safe('<span class="fa fa-question-circle fa-lg" alt="approve" title="approve">')),
+  ('reject', mark_safe('<span class="fa fa-thumbs-down fa-lg" alt="reject" title="reject">')),
+  ('undecided', mark_safe('<span class="fa fa-question-circle fa-lg" alt="undecided" title="undecided">')),
 )
 
 
