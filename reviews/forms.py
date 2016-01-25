@@ -3,7 +3,16 @@ from django.forms.models import modelformset_factory, BaseModelFormSet
 from django.utils.safestring import mark_safe
 
 
+from django.core.exceptions import ValidationError
+
 from reviews.models import Review
+
+
+def validate_rating(value):
+    if value < 1 or value > 5:
+        raise ValidationError(
+            'Rating must be between 1 and 5.'
+        )
 
 
 class ReviewForm(forms.ModelForm):
@@ -20,7 +29,8 @@ class ReviewForm(forms.ModelForm):
                 'name': 'rating'
             }
         ),
-        initial=5
+        initial=5,
+        validators=[validate_rating]
     )
 
     class Meta:
@@ -66,6 +76,13 @@ class BaseReviewFormSet(BaseModelFormSet):
     def add_fields(self, form, index):
         super(BaseReviewFormSet, self).add_fields(form, index)
 
+        if self.previous:
+            # don't show option to reset to undecided if already approved or
+            # rejected
+            review_choices = REVIEW_CHOICES[0:2]
+        else:
+            review_choices = REVIEW_CHOICES
+
         if self.previous == 'approved':
             initial = 'approve'
         elif self.previous == 'rejected':
@@ -75,7 +92,7 @@ class BaseReviewFormSet(BaseModelFormSet):
 
         form.fields['decision'] = forms.ChoiceField(
             widget=forms.RadioSelect(renderer=HorizontalRadioRenderer),
-            choices=REVIEW_CHOICES,
+            choices=review_choices,
             initial=initial,
             required=False
         )

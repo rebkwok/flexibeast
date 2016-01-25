@@ -14,6 +14,13 @@
                 Add new testimonial
             {% endif %}
         </h1>
+
+    {% if form.instance.edited and not form.instance.reviewed and not form.instance.update_published %}
+        <p>The form below shows a submitted update which is still pending review.</p>
+    {% elif form.instance.edited and form.instance.reviewed and not form.instance.update_published %}
+        <p>The form below shows a submitted update which has not been accepted. You
+            may edit and resubmit it for review if you wish.</p>
+    {% endif %}
         <form method="post" action="">
             {% csrf_token %}
             {% for field in form %}

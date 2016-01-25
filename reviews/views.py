@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.db.models import Q
@@ -57,6 +58,12 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
     model = Review
     form_class = ReviewForm
 
+    def dispatch(self, request, *args, **kwargs):
+        review = self.get_object()
+        if request.user.is_authenticated() and review.user != request.user:
+            return HttpResponseRedirect(settings.PERMISSION_DENIED_URL)
+        return super(ReviewUpdateView, self).dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         form.save()
         messages.success(self.request, 'Your testimonial has been updated and '
@@ -85,7 +92,7 @@ class StaffReviewListView(StaffUserMixin, ListView):
                 Q(update_published=True, edited=True)
             )
         elif self.previous == 'rejected':
-            # review is rejects if it's been reviewed AND is not published OR
+            # review is rejected if it's been reviewed AND is not published OR
             # has been edited and update_published is false
             queryset = Review.objects.filter(
                 Q(reviewed=True),

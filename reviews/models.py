@@ -14,7 +14,7 @@ class Review(models.Model):
         help_text='If not provided, your first name will be used'
     )
     submission_date = models.DateTimeField(default=timezone.now)
-    title = models.CharField(max_length=255, null=True, blank=True  )
+    title = models.CharField(max_length=255, null=True, blank=True)
     review = models.TextField(verbose_name='testimonial')
     rating = models.IntegerField(default=5)
     published = models.BooleanField(default=False)
@@ -37,17 +37,13 @@ class Review(models.Model):
     class Meta:
         ordering = ('-submission_date',)
 
-    def publish(self):
-        self.published = True
-        self.reviewed = True
-        self.save()
-
     def approve(self):
         if not self.published:
             self.published = True
         elif not self.update_published:
             self.update_published = True
         self.reviewed = True
+        self.save()
 
     def reject(self):
         self.reviewed = True
@@ -55,6 +51,7 @@ class Review(models.Model):
             self.published = False
         elif self.update_published:
             self.update_published = False
+        self.save()
 
     def save(self, *args, **kwargs):
         # if no user_display_name on save, make it the user's first name
@@ -66,7 +63,8 @@ class Review(models.Model):
             already_exists = True
             orig = Review.objects.get(pk=self.pk)
 
-        # on save, check if review, rating or title have changed; if so, we
+        # on save, check if user_display_name review, rating or title have
+        # changed; if so, we
         # set edited to True, and copy the current values to previous
         # In templates, show the previous values if published is True but
         # update_published is False (i.e. not approved by staff yet)
