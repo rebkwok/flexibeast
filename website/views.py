@@ -47,11 +47,6 @@ def page(request, page_name):
     )
 
 
-def contact(request):
-
-    return TemplateResponse(request, 'website/contact.html')
-
-
 def process_contact_form(request):
     form = ContactForm(request.POST)
 
@@ -145,6 +140,10 @@ def process_contact_form(request):
             mark_safe("There were errors in the following "
                       "fields: {}".format(form.errors)
                       )
+        )
+        return TemplateResponse(
+            request, 'website/contact.html',
+            {'section': 'contact', 'form': form}
         )
 
 
