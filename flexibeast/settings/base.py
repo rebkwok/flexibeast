@@ -339,6 +339,7 @@ CKEDITOR_CONFIGS = {
          ['Format', 'Font', 'FontSize']
         ],
         'width': '100%',
+        'AllowedContent': True,
     },
     'studioadmin': {
         'toolbar': [
@@ -350,6 +351,7 @@ CKEDITOR_CONFIGS = {
          ['Format', 'Font', 'FontSize', 'Link']
         ],
         'width': '100%',
+        'AllowedContent': True,
     },
     'studioadmin_min': {
         'toolbar': [
@@ -366,7 +368,8 @@ CKEDITOR_CONFIGS = {
         'extraPlugins': 'autogrow',
         'title': '',
         'width': '100%',
-        'extraAllowedContent': 'iframe[*]',
+        'AllowedContent': True,
+        'extraAllowedContent': ['iframe[*]', '*[id]', '*(*)'],
         'toolbar': [
             ['Source', '-', 'Bold', 'Italic', 'Underline',
             'TextColor', 'BGColor', '-', 'Image', 'Iframe'],
