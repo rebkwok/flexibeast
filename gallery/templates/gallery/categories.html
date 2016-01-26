@@ -34,8 +34,8 @@
                             {% for category in categories_formset %}
                                 <span class=hide>{{ category.id }}</span>
                                 <tr>
-                                    <td class="gallery-tbl">{% if not category.instance.id %}<strong>Add New Category:</strong>{% endif %}{{ category.name }}</td>
-                                    <td class="gallery-tbl">{{ category.description }}</td>
+                                    <td class="gallery-tbl">{% if not category.instance.id %}<strong>Add New Category:</strong>{% endif %}<span {% if category.name.errors %}class="form-error"{% endif %}>{{ category.name }} {{ category.name.errors }}</span></td>
+                                    <td class="gallery-tbl"><span {% if category.description.errors %}class="form-error"{% endif %}>{{ category.description }}{{ category.description.errors }}</span></td>
                                     <td class="gallery-tbl table-center">{% if category.instance.id %}{{ category.image_count }}{% endif %}</td>
                                     <td class="gallery-tbl table-center">{% if category.instance.id %}
                                         <a href="{% url 'gallery:edit_category' category.instance.id %}">

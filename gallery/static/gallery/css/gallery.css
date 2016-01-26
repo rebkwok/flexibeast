@@ -132,3 +132,12 @@ img.gallery-update-thumbnail {
 .bootstrap-filestyle.input-group {
     margin-left: 13px;
 }
+
+.form-error {
+    color: red;
+}
+
+.form > input, .form > .regular-checkbox + label {
+    border: 1px solid red;
+    background-color: rgba(255, 0, 0, 0.1);
+}

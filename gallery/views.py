@@ -46,82 +46,91 @@ class CategoryListView(StaffUserMixin, ListView):
     def post(self, request, *args, **kwargs):
         categories_formset = CategoriesFormset(request.POST)
 
-        if categories_formset.has_changed():
+        if categories_formset.is_valid():
+            if categories_formset.has_changed():
 
-            deleted_categories = []
-            updated_categories = {}
-            new_categories = []
-            update_desc_msg = ""
+                deleted_categories = []
+                updated_categories = {}
+                new_categories = []
+                update_desc_msg = ""
 
-            for form in categories_formset:
-                if form.has_changed():
-                    if 'DELETE' in form.changed_data:
-                        category = Category.objects.get(id=form.instance.id)
-                        deleted_categories.append(category.name)
-                        category.delete()
-                    else:
-                        new = False
-                        try:
-                            old_cat = Category.objects.get(id=form.instance.id)
-                            new_cat = form.save(commit=False)
-                        except Category.DoesNotExist:  # creating a new category
-                            new = True
-
-                        if 'name' in form.changed_data:
-                            if new:
-                                old_name = old_cat.name
-                                new_name = new_cat.name
-                                updated_categories['category.id'] = [old_name, new_name]
+                for form in categories_formset:
+                    if form.is_valid():
+                        if form.has_changed():
+                            if 'DELETE' in form.changed_data:
+                                category = Category.objects.get(id=form.instance.id)
+                                deleted_categories.append(category.name)
+                                category.delete()
                             else:
-                                new_categories.append(new_cat.name)
-                        elif 'description' in form.changed_data:
-                            if not new:
-                                update_desc_msg = "Category {}'s description " \
-                                                  "has been updated".format(
-                                    new_cat.name
-                                )
-                        form.save()
+                                new = False
+                                try:
+                                    new_cat = form.save(commit=False)
+                                    old_cat = Category.objects.get(id=new_cat.id)
+                                except Category.DoesNotExist:  # creating a new category
+                                    new = True
 
-            del_msg = ""
-            upd_msg = ""
-            new_msg = ""
+                                if 'name' in form.changed_data:
+                                    if not new:
+                                        old_name = old_cat.name
+                                        new_name = new_cat.name
+                                        updated_categories['category.id'] = [old_name, new_name]
+                                    else:
+                                        new_categories.append(new_cat.name)
+                                elif 'description' in form.changed_data:
+                                    if not new:
+                                        update_desc_msg = "Category {}'s description " \
+                                                          "has been updated".format(
+                                            new_cat.name
+                                        )
+                                form.save()
 
-            if len(deleted_categories) == 1:
-                del_msg = "Category '{}' and all associated images have been " \
-                      "deleted".format(deleted_categories[0])
-            elif len(deleted_categories) > 1:
-                del_msg = "Categories {} and all associated images have been " \
-                      "deleted".format(
-                    ', '.join(["'{}'".format(name) for name in deleted_categories])
-                )
-            if updated_categories:
-                upd_msg = "Category names changed: {}".format(
-                    ', '.join(
-                        ["'{}' changed to '{}'".format(val[0], val[1])
-                         for key, val in updated_categories.items()]
+                del_msg = ""
+                upd_msg = ""
+                new_msg = ""
+
+                if len(deleted_categories) == 1:
+                    del_msg = "Category '{}' and all associated images have been " \
+                          "deleted".format(deleted_categories[0])
+                elif len(deleted_categories) > 1:
+                    del_msg = "Categories {} and all associated images have been " \
+                          "deleted".format(
+                        ', '.join(["'{}'".format(name) for name in deleted_categories])
+                    )
+                if updated_categories:
+                    upd_msg = "Category names changed: {}".format(
+                        ', '.join(
+                            ["'{}' changed to '{}'".format(val[0], val[1])
+                             for key, val in updated_categories.items()]
+                        )
+                    )
+                if len(new_categories) == 1:
+                    new_msg = "Category '{}' has been created".format(new_categories[0])
+                elif len(new_categories) > 1:
+                    del_msg = "Categories {} have been created".format(
+                        ', '.join(["'{}'".format(name) for name in new_categories])
+                    )
+
+                messages.success(
+                    request,
+                    mark_safe(
+                        "{}{}{}".format(
+                            "{}</br>".format(del_msg) if del_msg else "",
+                            "{}</br>".format(upd_msg) if del_msg else "",
+                            "{}</br>".format(update_desc_msg) if update_desc_msg else "",
+                            "{}".format(new_msg)
+                        )
                     )
                 )
-            if len(new_categories) == 1:
-                new_msg = "Category '{}' has been created".format(new_categories[0])
-            elif len(new_categories) > 1:
-                del_msg = "Categories {} have been created".format(
-                    ', '.join(["'{}'".format(name) for name in new_categories])
-                )
 
-            messages.success(
-                request,
-                mark_safe(
-                    "{}{}{}".format(
-                        "{}</br>".format(del_msg) if del_msg else "",
-                        "{}</br>".format(upd_msg) if del_msg else "",
-                        "{}</br>".format(update_desc_msg) if update_desc_msg else "",
-                        "{}".format(new_msg)
-                    )
-                )
-            )
+            else:
+                messages.info(request, "No changes made")
 
         else:
-            messages.info(request, "No changes made")
+            messages.error(request, "Please correct the errors below")
+            return TemplateResponse(
+                request, self.template_name,
+                {'categories_formset': categories_formset}
+            )
 
         return HttpResponseRedirect(self.get_success_url())
 
