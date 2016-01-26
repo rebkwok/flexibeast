@@ -137,7 +137,7 @@ img.gallery-update-thumbnail {
     color: red;
 }
 
-.form > input, .form > .regular-checkbox + label {
+.form-error > input, .form-error > textarea, .form-error > .regular-checkbox + label {
     border: 1px solid red;
     background-color: rgba(255, 0, 0, 0.1);
 }

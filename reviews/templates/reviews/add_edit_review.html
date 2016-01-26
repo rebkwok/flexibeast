@@ -24,8 +24,9 @@
         <form method="post" action="">
             {% csrf_token %}
             {% for field in form %}
-            <label>{{ field.label }}{% if field.field.required %}*{% endif %}</label>{{ field }}<br>
-                {% if field.errors %}{% for err in field.errors %}{{ err }}{% endfor %}{% endif %}
+            <label>{{ field.label }}{% if field.field.required %}*{% endif %}</label>
+                <div {% if field.errors %}class='form-error'{% endif %}>{{ field }}</div>
+                {% if field.errors %}{% for err in field.errors %}<span class="form-error">{{ err }}</span>{% endfor %}{% endif %}<br>
                 <div class="review-help">{{ field.help_text }}</div><br>
             {% endfor %}
 

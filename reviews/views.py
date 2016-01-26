@@ -50,6 +50,10 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
                               'displayed on the site shortly')
         return HttpResponseRedirect(reverse('reviews:reviews'))
 
+    def form_invalid(self, form):
+        messages.error(self.request, "Please correct the errors below")
+        return super(ReviewCreateView, self).form_invalid(form)
+
 
 class ReviewUpdateView(LoginRequiredMixin, UpdateView):
 
@@ -70,6 +74,10 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
                                         'will be displayed on the site shortly')
 
         return HttpResponseRedirect(reverse('reviews:reviews'))
+    
+    def form_invalid(self, form):
+        messages.error(self.request, "Please correct the errors below")
+        return super(ReviewUpdateView, self).form_invalid(form)
 
 
 class StaffReviewListView(StaffUserMixin, ListView):
