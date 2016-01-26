@@ -1134,10 +1134,12 @@ class PageForm(forms.ModelForm):
         validators=[
             RegexValidator(
                 regex=r'^([a-zA-Z0-9\/-])+\s*$',
-                message="must contain only letters, numbers, / or -",
+                message="This field must contain only letters, numbers, / or -",
                 code='invalid_name'
             )
-        ]
+        ],
+        help_text="A unique identifier for this page. Use lowercase, no "
+                  "spaces.  Forward slash (/) and hyphens (-) are allowed."
     )
 
     class Meta:

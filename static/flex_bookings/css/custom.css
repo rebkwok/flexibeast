@@ -1023,3 +1023,20 @@ li.notification-menu-item > a:hover,
 	box-shadow:none;
 	background-clip: padding-box;
 }
+
+.form-error {
+    color: red;
+}
+
+.form-error > input, .form-error > textarea,
+.form-error > .regular-checkbox + label,
+.form-error > .django-ckeditor-widget {
+    border: 1px solid red;
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+.form-error > ul {
+    list-style: none;
+    font-size: small;
+    font-style: italic;
+}

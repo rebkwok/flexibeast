@@ -160,6 +160,7 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
             else:
                 messages.info(request, "No changes made")
         else:
+            messages.error(request, "Please correct the errors below")
             if not picture_formset.is_valid():
                 for error in picture_formset.errors:
                     for k, v in error.items():
@@ -230,6 +231,7 @@ class PageCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
 
                 return TemplateResponse(request, self.template_name, context)
         else:
+            messages.error(request, "Please correct the errors below")
             picture_formset = PictureFormset(request.POST, request.FILES)
             return TemplateResponse(
                     request, self.template_name,

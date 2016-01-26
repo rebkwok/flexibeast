@@ -23,17 +23,20 @@
     </ul>
     <ul class="dropdown-menu">
          <li class="dropdown">
-          <a href="#" class="dropdown-toggle active-nav visible-xs" data-toggle="dropdown" role="button" aria-expanded="false"><strong>Users </strong><span class="fa fa-caret-down"></span></a>
+          <a href="#" class="dropdown-toggle active-nav visible-xs" data-toggle="dropdown" role="button" aria-expanded="false"><strong>Students </strong><span class="fa fa-caret-down"></span></a>
           <ul class="dropdown-menu" role="menu">
                 <li class="active-nav"><a href="{% url 'studioadmin:users' %}">{% if sidenav_selection == 'users' %}
                     <span class="sidebar_active">Registered users</span>{% else %}Registered users{% endif %}</a></li>
+          {% if booking_on %}
                 <li><a href="{% url 'studioadmin:block_bookings' %}">{% if sidenav_selection == 'block_bookings' %}
                     <span class="sidebar_active">Blocks</span>{% else %}Block bookings{% endif %}</a></li>
+          {% endif %}
                 <li class="active-nav"><a href="{% url 'studioadmin:choose_email_users' %}">{% if sidenav_selection == 'email_users' %}
                     <span class="sidebar_active">Bulk email to students</span>{% else %}Bulk email to students{% endif %}</a></li>
           </ul>
       </li>
     </ul>
+{% if booking_on %}
     <ul class="dropdown-menu">
         <li class="dropdown">
               <a href="#" class="dropdown-toggle active-nav visible-xs" data-toggle="dropdown" role="button" aria-expanded="false"><strong>Classes and Workshops </strong><span class="fa fa-caret-down"></span></a>
@@ -75,7 +78,7 @@
               </ul>
           </li>
     </ul>
-
+{% endif %}
     <ul class="dropdown-menu">
          <li class="dropdown">
               <a href="#" class="dropdown-toggle active-nav visible-xs" data-toggle="dropdown" role="button" aria-expanded="false"><strong>Activity Log </strong><span class="fa fa-caret-down"></span></a>
@@ -102,6 +105,7 @@
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">Studio Admin</li>
 
+            {% if booking_on %}
                 <li class="sidebar-title">
                     <a id="toggler" href="#" data-toggle="collapse" class="active" data-target="#classes">
                         <span class="fa classes
@@ -197,6 +201,7 @@
                     <li class="active-nav"><a href="{% url 'studioadmin:registers_by_date' %}">{% if sidenav_selection == 'registers_by_date' %}
                         <span class="sidebar_active">Registers by date</span>{% else %}Registers by date{% endif %}</a></li>
                 </span>
+            {% endif %}
 
                 <li class="sidebar-title">
                     <a id="toggler" href="#" data-toggle="collapse" class="active" data-target="#students">
@@ -213,8 +218,10 @@
                 <span id="students" class="collapse {% if sidenav_selection == 'users' or sidenav_selection == 'block_bookings' %} in{% endif %}">
                     <li><a href="{% url 'studioadmin:users' %}">{% if sidenav_selection == 'users' %}
                     <span class="sidebar_active">Registered users</span>{% else %}Registered users{% endif %}</a></li>
-                    <li><a href="{% url 'studioadmin:block_bookings' %}">{% if sidenav_selection == 'block_bookings' %}
-                    <span class="sidebar_active">Blocks</span>{% else %}Block bookings{% endif %}</a></li>
+                    {% if booking_on %}
+                        <li><a href="{% url 'studioadmin:block_bookings' %}">{% if sidenav_selection == 'block_bookings' %}
+                        <span class="sidebar_active">Blocks</span>{% else %}Block bookings{% endif %}</a></li>
+                    {% endif %}
                     <li><a href="{% url 'studioadmin:choose_email_users' %}">{% if sidenav_selection == 'email_users' %}
                     <span class="sidebar_active">Bulk email to students</span>{% else %}Bulk email to students{% endif %}</a></li>
                 </span>

@@ -38,24 +38,24 @@ class UserListView(LoginRequiredMixin, StaffUserMixin, ListView):
 
     def get(self, request, *args, **kwargs):
         perm = Permission.objects.get(codename='can_view_restricted')
-
         if 'remove_all' in self.request.GET:
             users = [
-                user.id for user in User.objects.all() if
+                user for user in User.objects.all() if
                 user.has_perm('website.can_view_restricted')
                 ]
             RestrictedAccessTracker.objects.all().delete()
             if users:
                 for user in users:
-                    user.user_permissions.remove(perm)
+                    if not user.is_staff:
+                        user.user_permissions.remove(perm)
                 messages.success(
                     request,
                     "Restricted access permission has been removed for all "
-                    "users"
+                    "users (except staff and superusers)"
                 )
                 ActivityLog.objects.create(
                     log='Restricted access permission has been removed for all '
-                        'users by admin user {}'.format(request.user.username)
+                        'users (except staff and superusers) by admin user {}'.format(request.user.username)
                 )
             else:
                 messages.error(

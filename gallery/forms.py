@@ -41,7 +41,7 @@ class CategoriesBaseFormSet(BaseModelFormSet):
 
         form.fields['description'] = forms.CharField(
             widget=forms.Textarea(
-                attrs={'class': 'form-control', 'rows': 2}
+                attrs={'class': 'form-control', 'rows': 1}
             )
         )
 

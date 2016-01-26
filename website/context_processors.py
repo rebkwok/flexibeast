@@ -17,11 +17,23 @@ def more_menu_options(request):
     dropdown menu
     """
     pages = Page.objects.all()
-    more_menu_options = [
+    more_menu_options_unrestricted = [
         True for page in pages if page.menu_name and
-        page.menu_location == 'dropdown'
+        page.menu_location == 'dropdown' and not page.restricted
         ]
-    return {'more_menu_options': True if more_menu_options else False}
+    more_menu_options_restricted = [
+        True for page in pages if page.menu_name and
+        page.menu_location == 'dropdown' and page.restricted
+        ]
+
+    if more_menu_options_unrestricted:
+        return {'more_menu_options': True}
+    elif more_menu_options_restricted:
+        if request.user.has_perm('website.can_view_restricted'):
+            return {'more_menu_options': True}
+        return {'more_menu_options': False}
+    else:
+        return {'more_menu_options': False}
 
 
 def menu_options(request):

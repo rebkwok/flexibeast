@@ -136,10 +136,7 @@ def process_contact_form(request):
 
     else:
         messages.error(
-            request,
-            mark_safe("There were errors in the following "
-                      "fields: {}".format(form.errors)
-                      )
+            request, "Please correct the errors below"
         )
         return TemplateResponse(
             request, 'website/contact.html',
