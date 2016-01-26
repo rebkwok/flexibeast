@@ -1,5 +1,6 @@
 {% extends 'email_base.html' %}
 
+{%  block donotreply %}{%  endblock donotreply %}
 {% block messagecontent %}
 
     <p>Message received from {{ first_name }} {{ last_name }} ({{ email_address }}) via web contact form:</p>
