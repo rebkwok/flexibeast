@@ -202,7 +202,9 @@ class PageCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
 
         if form.is_valid():
             page = form.save()
-            picture_formset = PictureFormset(request.POST, request.FILES, instance=page)
+            picture_formset = PictureFormset(
+                request.POST, request.FILES, instance=page
+            )
 
             if form.is_valid() and picture_formset.is_valid():
                 form.save()
@@ -227,6 +229,15 @@ class PageCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
                 }
 
                 return TemplateResponse(request, self.template_name, context)
+        else:
+            picture_formset = PictureFormset(request.POST, request.FILES)
+            return TemplateResponse(
+                    request, self.template_name,
+                    {'form': form, 'picture_formset': picture_formset,
+                     'sidenav_selection': 'add_page'}
+                    )
+
+            return TemplateResponse(request, self.template_name, context)
 
         return HttpResponseRedirect(self.get_success_url())
 

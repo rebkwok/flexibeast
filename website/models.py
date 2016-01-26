@@ -24,7 +24,8 @@ class Page(models.Model):
 
     name = models.CharField(
         max_length=255, unique=True,
-        help_text="A unique identifier for this page. Use lowercase, no spaces."
+        help_text="A unique identifier for this page. Use lowercase, no "
+                  "spaces.  Forward slash (/) and hyphens (-) are allowed."
     )
     menu_name = models.CharField(
         max_length=255,

@@ -82,11 +82,11 @@ urlpatterns = [
         PageListView.as_view(), name='website_pages_list'
     ),
     url(
-        r'^website-pages/(?P<name>[\w-]+)$',
-        PageUpdateView.as_view(), name='edit_page'
+        r'^website-pages/new/$', PageCreateView.as_view(), name='add_page'
     ),
     url(
-        r'^website-pages/new/$', PageCreateView.as_view(), name='add_page'
+        r'^website-pages/(?P<name>[\w\d//-]+)$',
+        PageUpdateView.as_view(), name='edit_page'
     ),
     url(
         r'^$',

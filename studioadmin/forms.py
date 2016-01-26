@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, date
 import time
 
 from django import forms
+from django.core.validators import RegexValidator
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.forms.models import modelformset_factory, BaseModelFormSet, \
@@ -1128,6 +1129,17 @@ class PageForm(forms.ModelForm):
                   'been given permission'
         )
 
+    name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        validators=[
+            RegexValidator(
+                regex=r'^([a-zA-Z0-9\/-])+\s*$',
+                message="must contain only letters, numbers, / or -",
+                code='invalid_name'
+            )
+        ]
+    )
+
     class Meta:
         model = Page
         fields = (
@@ -1135,11 +1147,6 @@ class PageForm(forms.ModelForm):
             'content', 'restricted'
         )
         widgets = {
-            'name': forms.TextInput(
-                attrs={
-                    'class': 'form-control'
-                }
-            ),
             'heading': forms.TextInput(
                 attrs={
                     'class': 'form-control'
