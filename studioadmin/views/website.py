@@ -27,6 +27,8 @@ from django.core.mail import send_mail
 
 from braces.views import LoginRequiredMixin
 
+from activitylog.models import ActivityLog
+
 from studioadmin.forms import PageForm, PagesFormset, PictureFormset
 from studioadmin.views.utils import StaffUserMixin
 
@@ -53,6 +55,7 @@ class PageListView(LoginRequiredMixin, StaffUserMixin, ListView):
 
         if pages_forms.has_changed():
             deleted_page_names = []
+            deleted_page_ids = []
             for form in pages_forms:
                 if form.has_changed() and 'DELETE' in form.changed_data:
                     page = Page.objects.get(id=form.instance.id)
@@ -62,14 +65,34 @@ class PageListView(LoginRequiredMixin, StaffUserMixin, ListView):
                     [pic.delete() for pic in Picture.objects.filter(page=page)]
 
                     deleted_page_names.append(page.name)
+                    deleted_page_ids.append(page.id)
                     # delete page
                     page.delete()
 
             if len(deleted_page_names) == 1:
                 msg = "Page '{}' has been deleted".format(deleted_page_names[0])
+                ActivityLog.objects.create(
+                    log="Page {} (id {}) has been deleted by admin "
+                        "user {}".format(
+                        deleted_page_names[0], deleted_page_ids[0],
+                        request.user.username
+                    )
+                )
             elif len(deleted_page_names) > 1:
                 msg = "Pages {} have been deleted".format(
-                    ', '.join(["'{}'".format(name) for name in deleted_page_names])
+                    ', '.join(["'{}'".format(name) for name in deleted_page_names]),
+                )
+                ActivityLog.objects.create(
+                    log= "Pages {} (ids {}) have been deleted by admin "
+                         "user {}".format(
+                        ', '.join(
+                            ["{}".format(name) for name in deleted_page_names]
+                        ),
+                        ', '.join(
+                            ['{}'.format(pageid for pageid in deleted_page_ids)]
+                        ),
+                        request.user.username
+                    )
                 )
             else:
                 msg = "No changes made"
@@ -131,7 +154,7 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
                             change_messages.append(
                                 'Picture {} deleted from "{}" page'.format(
                                     name.split('/')[-1],
-                                    page.name.title()
+                                    page.name
                                 )
                             )
                         elif form.has_changed():
@@ -154,6 +177,13 @@ class PageUpdateView(LoginRequiredMixin, StaffUserMixin, UpdateView):
                              ''.join(['<li>{}</li>'.format(msg)
                               for msg in change_messages])
                          )
+                    )
+                )
+                ActivityLog.objects.create(
+                    log="Page {} (id {}) has been updated by admin user "
+                        "{}: {}".format(
+                        page.name, page.id, request.user.username,
+                        ', '.join(change_messages)
                     )
                 )
 
@@ -212,9 +242,15 @@ class PageCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
                 picture_formset.save()
 
                 messages.success(request, mark_safe(
-                    "Page {} has been created".format(page.name.title())
+                    "Page {} has been created".format(page.name)
                     )
                 )
+                ActivityLog.objects.create(
+                    log="Page {} (id {}) has been created by admin "
+                        "user {}".format(
+                        page.name, page.id, request.user.username
+                    )
+                    )
             else:
                 if not picture_formset.is_valid():
                     for error in picture_formset.errors:
