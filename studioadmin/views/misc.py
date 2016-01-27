@@ -24,8 +24,8 @@ from activitylog.models import ActivityLog
 logger = logging.getLogger(__name__)
 
 
-@staff_required
 @login_required
+@staff_required
 def confirm_user_booking_payment(request, pk):
 
     template = 'studioadmin/confirm_payment.html'
@@ -78,8 +78,8 @@ def confirm_user_booking_payment(request, pk):
     return TemplateResponse(request, template, {'booking': booking})
 
 
-@staff_required
 @login_required
+@staff_required
 def confirm_user_block_payment(request, user_id, block_id):
 
     template = 'studioadmin/confirm_block_payment.html'
@@ -132,77 +132,6 @@ def confirm_user_block_payment(request, user_id, block_id):
     return TemplateResponse(
         request, template, {'user': user, 'block_obj': block}
     )
-
-
-    #
-    # def form_valid(self, form):
-    #     if form.has_changed():
-    #         booking = form.save(commit=False)
-    #
-    #         if booking.payment_confirmed and 'payment_confirmed' \
-    #                 in form.changed_data:
-    #             # if user leaves paid unchecked but checks payment confirmed
-    #             # as true, booking should be marked as paid
-    #             booking.paid = True
-    #             booking.date_payment_confirmed = timezone.now()
-    #
-    #         if not booking.paid and 'paid' in form.changed_data:
-    #             # if booking is changed to unpaid, reset payment_confirmed to
-    #             # False too
-    #             booking.payment_confirmed = False
-    #         booking.save()
-    #
-    #         if booking.paid and booking.payment_confirmed:
-    #             payment_status = 'paid and confirmed'
-    #         elif booking.paid:
-    #             payment_status = "paid - payment not confirmed yet"
-    #         else:
-    #             payment_status = 'not paid'
-    #
-    #         messages.success(
-    #             self.request,
-    #             self.success_message.format(payment_status, booking.user.username)
-    #         )
-    #
-    #         ctx = {
-    #             'event': booking.event,
-    #             'host': 'http://{}'.format(self.request.META.get('HTTP_HOST')),
-    #             'payment_status': payment_status
-    #         }
-    #         try:
-    #             send_mail(
-    #                 '{} Payment status updated for {}'.format(
-    #                     settings.ACCOUNT_EMAIL_SUBJECT_PREFIX, booking.event),
-    #                 get_template(
-    #                     'studioadmin/email/confirm_payment.html').render(ctx),
-    #                 settings.DEFAULT_FROM_EMAIL,
-    #                 [booking.user.email],
-    #                 html_message=get_template(
-    #                     'studioadmin/email/confirm_payment.html').render(ctx),
-    #                 fail_silently=False)
-    #         except Exception as e:
-    #             logger.error(
-    #                     'EXCEPTION "{}"" while sending email for booking '
-    #                     'id {}'.format(e, booking.id)
-    #                     )
-    #
-    #         ActivityLog(log='Payment status for booking id {} for event {}, '
-    #             'user {} has been updated by admin user {}'.format(
-    #             booking.id, booking.event, booking.user.username,
-    #             self.request.user.username
-    #             )
-    #         )
-    #     else:
-    #         messages.info(
-    #             self.request, "No changes made to the payment "
-    #                           "status for {}'s booking for {}.".format(
-    #                 self.object.user.username, self.object.event)
-    #         )
-    #
-    #     return HttpResponseRedirect(self.get_success_url())
-    #
-    # def get_success_url(self):
-    #     return reverse('studioadmin:users')
 
 
 class ConfirmRefundView(LoginRequiredMixin, StaffUserMixin, UpdateView):

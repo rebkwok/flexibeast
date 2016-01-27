@@ -16,10 +16,16 @@ from activitylog.models import ActivityLog
 from flex_bookings.models import Event, Booking, Block
 from flex_bookings.tests.helpers import set_up_fb, _create_session, setup_view
 # from studioadmin.forms import SimpleBookingRegisterFormSet
+
+from studioadmin.views.activitylog import ActivityLogListView
+from studioadmin.views.email_users import choose_users_to_email, \
+    email_users_view
+from studioadmin.views.users import UserListView
+from studioadmin.views.misc import confirm_user_block_payment, \
+    confirm_user_booking_payment, ConfirmRefundView
+
 # from studioadmin.views import (
     # ActivityLogListView,
-    # ConfirmPaymentView,
-    # ConfirmRefundView,
     # event_admin_list,
     # EventAdminCreateView,
     # EventAdminUpdateView,
@@ -30,10 +36,7 @@ from flex_bookings.tests.helpers import set_up_fb, _create_session, setup_view
     # TimetableSessionUpdateView,
     # TimetableSessionCreateView,
     # upload_timetable_view,
-    # UserListView,
     # BlockListView,
-    # # choose_users_to_email,
-    # # email_users_view,
     # user_blocks_view,
     # user_bookings_view,
     # url_with_querystring
@@ -54,260 +57,189 @@ class TestPermissionMixin(object):
         self.staff_user.save()
 
 
-# class ConfirmPaymentViewTests(TestPermissionMixin, TestCase):
-#
-#     def setUp(self):
-#         super(ConfirmPaymentViewTests, self).setUp()
-#         self.booking = mommy.make_recipe(
-#             'flex_bookings.booking', user=self.user,
-#             paid=False,
-#             payment_confirmed=False)
-#
-#     def _get_response(self, user, booking):
-#         url = reverse('studioadmin:confirm-payment', args=[booking.id])
-#         session = _create_session()
-#         request = self.factory.get(url)
-#         request.session = session
-#         request.user = user
-#         messages = FallbackStorage(request)
-#         request._messages = messages
-#
-#         view = ConfirmPaymentView.as_view()
-#         return view(request, pk=booking.id)
-#
-#     def _post_response(self, user, booking, form_data):
-#         url = reverse('studioadmin:confirm-payment', args=[booking.id])
-#         session = _create_session()
-#         request = self.factory.post(url, form_data)
-#         request.session = session
-#         request.user = user
-#         messages = FallbackStorage(request)
-#         request._messages = messages
-#
-#         view = ConfirmPaymentView.as_view()
-#         return view(request, pk=booking.id)
-#
-#     def test_cannot_access_if_not_logged_in(self):
-#         """
-#         test that the page redirects if user is not logged in
-#         """
-#         url = reverse('studioadmin:confirm-payment', args=[self.booking.id])
-#         resp = self.client.get(url)
-#         redirected_url = reverse('account_login') + "?next={}".format(url)
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertIn(redirected_url, resp.url)
-#
-#     def test_cannot_access_if_not_staff(self):
-#         """
-#         test that the page redirects if user is not a staff user
-#         """
-#         resp = self._get_response(self.user, self.booking)
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertEquals(resp.url, reverse('booking:permission_denied'))
-#
-#     def test_can_access_as_staff_user(self):
-#         """
-#         test that the page can be accessed by a staff user
-#         """
-#         resp = self._get_response(self.staff_user, self.booking)
-#         self.assertEquals(resp.status_code, 200)
-#
-#     def test_with_unpaid_booking(self):
-#         """
-#         Change an unpaid booking to paid and confirmed
-#         """
-#         self.assertFalse(self.booking.paid)
-#         self.assertFalse(self.booking.payment_confirmed)
-#
-#         form_data = {
-#             'paid': 'true',
-#             'payment_confirmed': 'true'
-#         }
-#         resp = self._post_response(self.staff_user, self.booking, form_data)
-#         booking = Booking.objects.get(id=self.booking.id)
-#         self.assertTrue(booking.paid)
-#         self.assertTrue(booking.payment_confirmed)
-#
-#         self.assertEquals(len(mail.outbox), 1)
-#         email = mail.outbox[0]
-#         self.assertIn("paid and confirmed", email.body)
-#
-#     def test_confirm_payment(self):
-#         """
-#         Changing payment_confirmed to True also sets booking to paid
-#         """
-#         self.assertFalse(self.booking.paid)
-#         self.assertFalse(self.booking.payment_confirmed)
-#
-#         form_data = {
-#             'payment_confirmed': 'true'
-#         }
-#         resp = self._post_response(self.staff_user, self.booking, form_data)
-#         booking = Booking.objects.get(id=self.booking.id)
-#         self.assertTrue(booking.paid)
-#         self.assertTrue(booking.payment_confirmed)
-#
-#         self.assertEquals(len(mail.outbox), 1)
-#         email = mail.outbox[0]
-#         self.assertIn("paid and confirmed", email.body)
-#
-#     def test_changing_paid_to_unpaid(self):
-#         """
-#         Changing a previously paid booking to unpaid also sets
-#         payment_confirmed to False
-#         """
-#         self.booking.paid = True
-#         self.booking.payment_confirmed = True
-#         self.booking.save()
-#         self.assertTrue(self.booking.paid)
-#         self.assertTrue(self.booking.payment_confirmed)
-#
-#         form_data = {
-#             'paid': 'false',
-#             'payment_confirmed': 'true'
-#         }
-#         resp = self._post_response(self.staff_user, self.booking, form_data)
-#         booking = Booking.objects.get(id=self.booking.id)
-#         self.assertFalse(booking.paid)
-#         self.assertFalse(booking.payment_confirmed)
-#
-#         self.assertEquals(len(mail.outbox), 1)
-#         email = mail.outbox[0]
-#         self.assertIn("not paid", email.body)
-#
-#     def test_changing_payment_confirmed_only(self):
-#         """
-#         Changing a previously unpaid booking to confirmed also sets
-#         paid to True
-#         """
-#         self.booking.save()
-#         self.assertFalse(self.booking.paid)
-#         self.assertFalse(self.booking.payment_confirmed)
-#
-#         form_data = {
-#             'paid': 'false',
-#             'payment_confirmed': 'true'
-#         }
-#         resp = self._post_response(self.staff_user, self.booking, form_data)
-#         booking = Booking.objects.get(id=self.booking.id)
-#         self.assertTrue(booking.paid)
-#         self.assertTrue(booking.payment_confirmed)
-#
-#     def test_payment_not_confirmed(self):
-#         form_data = {
-#             'paid': 'true',
-#             'payment_confirmed': 'false'
-#         }
-#         resp = self._post_response(self.staff_user, self.booking, form_data)
-#         booking = Booking.objects.get(id=self.booking.id)
-#         self.assertTrue(booking.paid)
-#         self.assertFalse(booking.payment_confirmed)
-#
-#         self.assertEquals(len(mail.outbox), 1)
-#         email = mail.outbox[0]
-#         self.assertIn("paid - payment not confirmed yet", email.body)
-#
-#     def test_no_changes(self):
-#         form_data = {
-#             'paid': 'false',
-#             'payment_confirmed': 'false'
-#         }
-#         resp = self._post_response(self.staff_user, self.booking, form_data)
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertEquals(resp.url, reverse('studioadmin:users'))
-#
-#
-# class ConfirmRefundViewTests(TestPermissionMixin, TestCase):
-#
-#     def setUp(self):
-#         super(ConfirmRefundViewTests, self).setUp()
-#         self.booking = mommy.make_recipe(
-#             'flex_bookings.booking', user=self.user,
-#             paid=True,
-#             payment_confirmed=True)
-#
-#     def _get_response(self, user, booking):
-#         url = reverse('studioadmin:confirm-refund', args=[booking.id])
-#         session = _create_session()
-#         request = self.factory.get(url)
-#         request.session = session
-#         request.user = user
-#         messages = FallbackStorage(request)
-#         request._messages = messages
-#
-#         view = ConfirmRefundView.as_view()
-#         return view(request, pk=booking.id)
-#
-#     def _post_response(self, user, booking, form_data):
-#         url = reverse('studioadmin:confirm-refund', args=[booking.id])
-#         session = _create_session()
-#         request = self.factory.post(url, form_data)
-#         request.session = session
-#         request.user = user
-#         messages = FallbackStorage(request)
-#         request._messages = messages
-#
-#         view = ConfirmRefundView.as_view()
-#         return view(request, pk=booking.id)
-#
-#     def test_cannot_access_if_not_logged_in(self):
-#         """
-#         test that the page redirects if user is not logged in
-#         """
-#         url = reverse('studioadmin:confirm-refund', args=[self.booking.id])
-#         resp = self.client.get(url)
-#         redirected_url = reverse('account_login') + "?next={}".format(url)
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertIn(redirected_url, resp.url)
-#
-#     def test_cannot_access_if_not_staff(self):
-#         """
-#         test that the page redirects if user is not a staff user
-#         """
-#         resp = self._get_response(self.user, self.booking)
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertEquals(resp.url, reverse('booking:permission_denied'))
-#
-#     def test_can_access_as_staff_user(self):
-#         """
-#         test that the page can be accessed by a staff user
-#         """
-#         resp = self._get_response(self.staff_user, self.booking)
-#         self.assertEquals(resp.status_code, 200)
-#
-#     def test_confirm_refund_for_paid_booking(self):
-#         """
-#         test that the page can be accessed by a staff user
-#         """
-#         self.assertTrue(self.booking.paid)
-#         self.assertTrue(self.booking.payment_confirmed)
-#         resp = self._post_response(
-#             self.staff_user, self.booking, form_data={'confirmed': ['Confirm']}
-#             )
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertEquals(resp.url, reverse('studioadmin:users'))
-#         booking = Booking.objects.get(id=self.booking.id)
-#         self.assertFalse(booking.paid)
-#         self.assertFalse(booking.payment_confirmed)
-#         self.assertEqual(len(mail.outbox), 1)
-#
-#     def test_cancel_confirm_form(self):
-#         """
-#         test that page redirects without changes if cancel button used
-#         """
-#         self.assertTrue(self.booking.paid)
-#         self.assertTrue(self.booking.payment_confirmed)
-#         resp = self._post_response(
-#             self.staff_user, self.booking, form_data={'cancelled': ['Cancel']}
-#             )
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertEquals(resp.url, reverse('studioadmin:users'))
-#         booking = Booking.objects.get(id=self.booking.id)
-#         self.assertTrue(booking.paid)
-#         self.assertTrue(booking.payment_confirmed)
-#         self.assertEqual(len(mail.outbox), 0)
-#
-#
+class ConfirmUserBookingPaymentViewTests(TestPermissionMixin, TestCase):
+
+    def setUp(self):
+        super(ConfirmUserBookingPaymentViewTests, self).setUp()
+        self.booking = mommy.make_recipe(
+            'flex_bookings.booking', user=self.user,
+            paid=False,
+            payment_confirmed=False)
+
+    def _get_response(self, user, booking):
+        url = reverse('studioadmin:confirm-payment', args=[booking.id])
+        session = _create_session()
+        request = self.factory.get(url)
+        request.session = session
+        request.user = user
+        messages = FallbackStorage(request)
+        request._messages = messages
+
+        return confirm_user_booking_payment(request, pk=booking.id)
+
+    def _post_response(self, user, booking, form_data):
+        url = reverse('studioadmin:confirm-payment', args=[booking.id])
+        session = _create_session()
+        request = self.factory.post(url, form_data)
+        request.session = session
+        request.user = user
+        messages = FallbackStorage(request)
+        request._messages = messages
+
+        return confirm_user_booking_payment(request, pk=booking.id)
+
+    def test_cannot_access_if_not_logged_in(self):
+        """
+        test that the page redirects if user is not logged in
+        """
+        url = reverse('studioadmin:confirm-payment', args=[self.booking.id])
+        resp = self.client.get(url)
+        redirected_url = reverse('account_login') + "?next={}".format(url)
+        self.assertEquals(resp.status_code, 302)
+        self.assertIn(redirected_url, resp.url)
+
+    def test_cannot_access_if_not_staff(self):
+        """
+        test that the page redirects if user is not a staff user
+        """
+        resp = self._get_response(self.user, self.booking)
+        self.assertEquals(resp.status_code, 302)
+        self.assertEquals(resp.url, reverse('permission_denied'))
+
+    def test_can_access_as_staff_user(self):
+        """
+        test that the page can be accessed by a staff user
+        """
+        resp = self._get_response(self.staff_user, self.booking)
+        self.assertEquals(resp.status_code, 200)
+
+    def test_with_unpaid_booking(self):
+        """
+        Change an unpaid booking to paid and confirmed
+        """
+        self.assertFalse(self.booking.paid)
+        self.assertFalse(self.booking.payment_confirmed)
+
+        form_data = {'confirm': 'true',}
+        self._post_response(self.staff_user, self.booking, form_data)
+        booking = Booking.objects.get(id=self.booking.id)
+        self.assertTrue(booking.paid)
+        self.assertTrue(booking.payment_confirmed)
+
+        self.assertEquals(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("paid and confirmed", email.body)
+
+    def test_confirm_payment(self):
+        """
+        Changing payment_confirmed to True also sets booking to paid
+        """
+        self.assertFalse(self.booking.paid)
+        self.assertFalse(self.booking.payment_confirmed)
+
+        form_data = {'confirm': 'true',}
+
+        self._post_response(self.staff_user, self.booking, form_data)
+        booking = Booking.objects.get(id=self.booking.id)
+        self.assertTrue(booking.paid)
+        self.assertTrue(booking.payment_confirmed)
+
+        self.assertEquals(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("paid and confirmed", email.body)
+
+
+class ConfirmRefundViewTests(TestPermissionMixin, TestCase):
+
+    def setUp(self):
+        super(ConfirmRefundViewTests, self).setUp()
+        self.booking = mommy.make_recipe(
+            'flex_bookings.booking', user=self.user,
+            paid=True,
+            payment_confirmed=True)
+
+    def _get_response(self, user, booking):
+        url = reverse('studioadmin:confirm-refund', args=[booking.id])
+        session = _create_session()
+        request = self.factory.get(url)
+        request.session = session
+        request.user = user
+        messages = FallbackStorage(request)
+        request._messages = messages
+
+        view = ConfirmRefundView.as_view()
+        return view(request, pk=booking.id)
+
+    def _post_response(self, user, booking, form_data):
+        url = reverse('studioadmin:confirm-refund', args=[booking.id])
+        session = _create_session()
+        request = self.factory.post(url, form_data)
+        request.session = session
+        request.user = user
+        messages = FallbackStorage(request)
+        request._messages = messages
+
+        view = ConfirmRefundView.as_view()
+        return view(request, pk=booking.id)
+
+    def test_cannot_access_if_not_logged_in(self):
+        """
+        test that the page redirects if user is not logged in
+        """
+        url = reverse('studioadmin:confirm-refund', args=[self.booking.id])
+        resp = self.client.get(url)
+        redirected_url = reverse('account_login') + "?next={}".format(url)
+        self.assertEquals(resp.status_code, 302)
+        self.assertIn(redirected_url, resp.url)
+
+    def test_cannot_access_if_not_staff(self):
+        """
+        test that the page redirects if user is not a staff user
+        """
+        resp = self._get_response(self.user, self.booking)
+        self.assertEquals(resp.status_code, 302)
+        self.assertEquals(resp.url, reverse('permission_denied'))
+
+    def test_can_access_as_staff_user(self):
+        """
+        test that the page can be accessed by a staff user
+        """
+        resp = self._get_response(self.staff_user, self.booking)
+        self.assertEquals(resp.status_code, 200)
+
+    def test_confirm_refund_for_paid_booking(self):
+        """
+        test that the page can be accessed by a staff user
+        """
+        self.assertTrue(self.booking.paid)
+        self.assertTrue(self.booking.payment_confirmed)
+        resp = self._post_response(
+            self.staff_user, self.booking, form_data={'confirmed': ['Confirm']}
+            )
+        self.assertEquals(resp.status_code, 302)
+        self.assertEquals(resp.url, reverse('studioadmin:users'))
+        booking = Booking.objects.get(id=self.booking.id)
+        self.assertFalse(booking.paid)
+        self.assertFalse(booking.payment_confirmed)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_cancel_confirm_form(self):
+        """
+        test that page redirects without changes if cancel button used
+        """
+        self.assertTrue(self.booking.paid)
+        self.assertTrue(self.booking.payment_confirmed)
+        resp = self._post_response(
+            self.staff_user, self.booking, form_data={'cancelled': ['Cancel']}
+            )
+        self.assertEquals(resp.status_code, 302)
+        self.assertEquals(resp.url, reverse('studioadmin:users'))
+        booking = Booking.objects.get(id=self.booking.id)
+        self.assertTrue(booking.paid)
+        self.assertTrue(booking.payment_confirmed)
+        self.assertEqual(len(mail.outbox), 0)
+
+
 # class EventRegisterListViewTests(TestPermissionMixin, TestCase):
 #
 #     def _get_response(self, user, ev_type, url=None):
@@ -1563,93 +1495,103 @@ class TestPermissionMixin(object):
 #         self.assertEqual(Event.objects.count(), 7)
 #
 #
-# class UserListViewTests(TestPermissionMixin, TestCase):
-#
-#     def _get_response(self, user, form_data={}):
-#         url = reverse('studioadmin:users')
-#         session = _create_session()
-#         request = self.factory.get(url, form_data)
-#         request.session = session
-#         request.user = user
-#         messages = FallbackStorage(request)
-#         request._messages = messages
-#         view = UserListView.as_view()
-#         return view(request)
-#
-#     def test_cannot_access_if_not_logged_in(self):
-#         """
-#         test that the page redirects if user is not logged in
-#         """
-#         url = reverse('studioadmin:users')
-#         resp = self.client.get(url)
-#         redirected_url = reverse('account_login') + "?next={}".format(url)
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertIn(redirected_url, resp.url)
-#
-#     def test_cannot_access_if_not_staff(self):
-#         """
-#         test that the page redirects if user is not a staff user
-#         """
-#         resp = self._get_response(self.user)
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertEquals(resp.url, reverse('booking:permission_denied'))
-#
-#     def test_can_access_as_staff_user(self):
-#         """
-#         test that the page can be accessed by a staff user
-#         """
-#         resp = self._get_response(self.staff_user)
-#         self.assertEquals(resp.status_code, 200)
-#
-#     def test_all_users_are_displayed(self):
-#         mommy.make_recipe('flex_bookings.user', _quantity=6)
-#         # 8 users total, incl self.user and self.staff_user
-#         self.assertEqual(User.objects.count(), 8)
-#         resp = self._get_response(self.staff_user)
-#         self.assertEqual(
-#             list(resp.context_data['users']), list(User.objects.all())
-#         )
-#
-#     def test_display_regular_students(self):
-#         not_reg_student = mommy.make_recipe('flex_bookings.user')
-#         reg_student = mommy.make_recipe('flex_bookings.user')
-#         perm = Permission.objects.get(codename='is_regular_student')
-#         reg_student.user_permissions.add(perm)
-#         reg_student.save()
-#
-#         resp = self._get_response(self.staff_user)
-#         resp.render()
-#         self.assertIn(
-#             'id="regular_student_button" value="{}">Yes'.format(reg_student.id),
-#             str(resp.content)
-#         )
-#         self.assertIn(
-#             'id="regular_student_button" value="{}">No'.format(not_reg_student.id),
-#             str(resp.content)
-#         )
-#
-#     def test_change_regular_student(self):
-#         not_reg_student = mommy.make_recipe('flex_bookings.user')
-#         reg_student = mommy.make_recipe('flex_bookings.user')
-#         perm = Permission.objects.get(codename='is_regular_student')
-#         reg_student.user_permissions.add(perm)
-#         reg_student.save()
-#
-#         self.assertTrue(reg_student.has_perm('flex_bookings.is_regular_student'))
-#         self._get_response(
-#             self.staff_user, {'change_user': [reg_student.id]}
-#         )
-#         changed_student = User.objects.get(id=reg_student.id)
-#         self.assertFalse(changed_student.has_perm('flex_bookings.is_regular_student'))
-#
-#         self.assertFalse(not_reg_student.has_perm('flex_bookings.is_regular_student'))
-#         self._get_response(
-#             self.staff_user, {'change_user': [not_reg_student.id]}
-#         )
-#         changed_student = User.objects.get(id=not_reg_student.id)
-#         self.assertTrue(changed_student.has_perm('flex_bookings.is_regular_student'))
-#
-#
+class UserListViewTests(TestPermissionMixin, TestCase):
+
+    def _get_response(self, user, form_data={}):
+        url = reverse('studioadmin:users')
+        session = _create_session()
+        request = self.factory.get(url, form_data)
+        request.session = session
+        request.user = user
+        messages = FallbackStorage(request)
+        request._messages = messages
+        view = UserListView.as_view()
+        return view(request)
+
+    def test_cannot_access_if_not_logged_in(self):
+        """
+        test that the page redirects if user is not logged in
+        """
+        url = reverse('studioadmin:users')
+        resp = self.client.get(url)
+        redirected_url = reverse('account_login') + "?next={}".format(url)
+        self.assertEquals(resp.status_code, 302)
+        self.assertIn(redirected_url, resp.url)
+
+    def test_cannot_access_if_not_staff(self):
+        """
+        test that the page redirects if user is not a staff user
+        """
+        resp = self._get_response(self.user)
+        self.assertEquals(resp.status_code, 302)
+        self.assertEquals(resp.url, reverse('permission_denied'))
+
+    def test_can_access_as_staff_user(self):
+        """
+        test that the page can be accessed by a staff user
+        """
+        resp = self._get_response(self.staff_user)
+        self.assertEquals(resp.status_code, 200)
+
+    def test_all_users_are_displayed(self):
+        mommy.make_recipe('flex_bookings.user', _quantity=6)
+        # 8 users total, incl self.user and self.staff_user
+        self.assertEqual(User.objects.count(), 8)
+        resp = self._get_response(self.staff_user)
+        self.assertEqual(
+            list(resp.context_data['users']), list(User.objects.all())
+        )
+
+    def test_display_restricted_users(self):
+        not_restr_student = mommy.make_recipe('flex_bookings.user')
+        restr_student = mommy.make_recipe('flex_bookings.user')
+        perm = Permission.objects.get(codename='can_view_restricted')
+        restr_student.user_permissions.add(perm)
+        restr_student.save()
+
+        resp = self._get_response(self.staff_user)
+        resp.render()
+        self.assertIn(
+            'id="can_view_restricted_button" value="{}">Yes'.format(restr_student.id),
+            str(resp.content)
+        )
+        self.assertIn(
+            'id="can_view_restricted_button" value="{}">No'.format(
+                not_restr_student.id
+            ),
+            str(resp.content)
+        )
+
+    def test_change_restricted_user(self):
+        not_restr_student = mommy.make_recipe('flex_bookings.user')
+        restr_student = mommy.make_recipe('flex_bookings.user')
+        perm = Permission.objects.get(codename='can_view_restricted')
+        restr_student.user_permissions.add(perm)
+        restr_student.save()
+
+        self.assertTrue(
+            restr_student.has_perm('website.can_view_restricted')
+        )
+        self._get_response(
+            self.staff_user, {'change_user': [restr_student.id]}
+        )
+        changed_student = User.objects.get(id=restr_student.id)
+        self.assertFalse(
+            changed_student.has_perm('website.can_view_restricted')
+        )
+
+        self.assertFalse(
+            not_restr_student.has_perm('website.can_view_restricted')
+        )
+        self._get_response(
+            self.staff_user, {'change_user': [not_restr_student.id]}
+        )
+        changed_student = User.objects.get(id=not_restr_student.id)
+        self.assertTrue(
+            changed_student.has_perm('website.can_view_restricted')
+        )
+
+
 # class BlockListViewTests(TestPermissionMixin, TestCase):
 #
 #     def _get_response(self, user, form_data={}):
@@ -1783,308 +1725,154 @@ class TestPermissionMixin(object):
 #             list(Block.objects.filter(id__in=[block.id for block in expired]))
 #         )
 #
-# class ChooseUsersToEmailTests(TestPermissionMixin, TestCase):
-#
-#     def _get_response(self, user):
-#         url = reverse('studioadmin:choose_email_users')
-#         session = _create_session()
-#         request = self.factory.get(url)
-#         request.session = session
-#         request.user = user
-#         messages = FallbackStorage(request)
-#         request._messages = messages
-#         return choose_users_to_email(request)
-#
-#     def _post_response(self, user, form_data):
-#         url = reverse('studioadmin:choose_email_users')
-#         session = _create_session()
-#         request = self.factory.post(url, form_data)
-#         request.session = session
-#         request.user = user
-#         messages = FallbackStorage(request)
-#         request._messages = messages
-#         return choose_users_to_email(request)
-#
-#     def formset_data(self, extra_data={}):
-#
-#         data = {
-#             'form-TOTAL_FORMS': 1,
-#             'form-INITIAL_FORMS': 1,
-#             'form-0-id': str(self.user.id),
-#             }
-#
-#         for key, value in extra_data.items():
-#             data[key] = value
-#
-#         return data
-#
-#     def test_cannot_access_if_not_logged_in(self):
-#         """
-#         test that the page redirects if user is not logged in
-#         """
-#         url = reverse('studioadmin:choose_email_users')
-#         resp = self.client.get(url)
-#         redirected_url = reverse('account_login') + "?next={}".format(url)
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertIn(redirected_url, resp.url)
-#
-#     def test_cannot_access_if_not_staff(self):
-#         """
-#         test that the page redirects if user is not a staff user
-#         """
-#         resp = self._get_response(self.user)
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertEquals(resp.url, reverse('booking:permission_denied'))
-#
-#     def test_can_access_as_staff_user(self):
-#         """
-#         test that the page can be accessed by a staff user
-#         """
-#         resp = self._get_response(self.staff_user)
-#         self.assertEquals(resp.status_code, 200)
-#
-#     def test_filter_users_by_event_booked(self):
-#         mommy.make_recipe('flex_bookings.user', _quantity=2)
-#         event = mommy.make_recipe('flex_bookings.future_EV')
-#         mommy.make_recipe('flex_bookings.booking', user=self.user, event=event)
-#         form_data = self.formset_data(
-#             {'filter': 'Show Students', 'filter-events': [event.id]}
-#         )
-#         resp = self._post_response(self.staff_user, form_data)
-#
-#         self.assertEqual(User.objects.count(), 4)
-#
-#         usersformset = resp.context_data['usersformset']
-#         self.assertEqual(len(usersformset.forms), 1)
-#
-#         user = usersformset.forms[0]
-#         self.assertEqual(user.instance, self.user)
-#
-#     def test_filter_users_by_class_booked(self):
-#         mommy.make_recipe('flex_bookings.user', _quantity=2)
-#         pole_class = mommy.make_recipe('flex_bookings.future_PC')
-#         mommy.make_recipe('flex_bookings.booking', user=self.user, event=pole_class)
-#         form_data = self.formset_data(
-#             {'filter': 'Show Students', 'filter-lessons': [pole_class.id]}
-#         )
-#         resp = self._post_response(self.staff_user, form_data)
-#
-#         self.assertEqual(User.objects.count(), 4)
-#
-#         usersformset = resp.context_data['usersformset']
-#         self.assertEqual(len(usersformset.forms), 1)
-#
-#         user = usersformset.forms[0]
-#         self.assertEqual(user.instance, self.user)
-#
-#     def test_filter_with_no_events_selected(self):
-#         mommy.make_recipe('flex_bookings.user', _quantity=2)
-#         pole_class = mommy.make_recipe('flex_bookings.future_PC')
-#         mommy.make_recipe('flex_bookings.booking', user=self.user, event=pole_class)
-#         form_data = self.formset_data(
-#             {
-#                 'filter': 'Show Students',
-#                 'filter-lessons': [''],
-#                 'filter-events': ['']}
-#         )
-#         resp = self._post_response(self.staff_user, form_data)
-#
-#         self.assertEqual(User.objects.count(), 4)
-#
-#         usersformset = resp.context_data['usersformset']
-#         self.assertEqual(len(usersformset.forms), 4)
-#
-#         users = [form.instance for form in usersformset.forms]
-#         self.assertEqual(set(users), set(User.objects.all()))
-#
-#     def test_filter_users_by_multiple_events_and_classes(self):
-#         new_user1 = mommy.make_recipe('flex_bookings.user')
-#         new_user2 = mommy.make_recipe('flex_bookings.user')
-#         event = mommy.make_recipe('flex_bookings.future_EV')
-#         pole_class = mommy.make_recipe('flex_bookings.future_PC')
-#         mommy.make_recipe('flex_bookings.booking', user=self.user, event=pole_class)
-#         mommy.make_recipe('flex_bookings.booking', user=new_user1, event=event)
-#         form_data = self.formset_data(
-#             {
-#                 'filter': 'Show Students',
-#                 'filter-lessons': [pole_class.id],
-#                 'filter-events': [event.id]}
-#         )
-#         resp = self._post_response(self.staff_user, form_data)
-#
-#         self.assertEqual(User.objects.count(), 4)
-#
-#         usersformset = resp.context_data['usersformset']
-#         self.assertEqual(len(usersformset.forms), 2)
-#
-#         users = [form.instance for form in usersformset.forms]
-#         self.assertEqual(set(users), set([self.user, new_user1]))
-#
-#     def test_users_for_cancelled_bookings_not_shown(self):
-#         new_user = mommy.make_recipe('flex_bookings.user')
-#         event = mommy.make_recipe('flex_bookings.future_EV')
-#         mommy.make_recipe(
-#             'flex_bookings.booking', user=self.user, event=event, status='CANCELLED'
-#         )
-#         mommy.make_recipe('flex_bookings.booking', user=new_user, event=event)
-#         form_data = self.formset_data(
-#             {
-#                 'filter': 'Show Students',
-#                 'filter-events': [event.id]}
-#         )
-#         resp = self._post_response(self.staff_user, form_data)
-#
-#         usersformset = resp.context_data['usersformset']
-#         self.assertEqual(len(usersformset.forms), 1)
-#
-#         user = usersformset.forms[0].instance
-#         self.assertEqual(user, new_user)
-#
-#     def test_filter_users_with_multiple_bookings(self):
-#         new_user = mommy.make_recipe('flex_bookings.user')
-#         events = mommy.make_recipe('flex_bookings.future_EV', _quantity=3)
-#         for event in events:
-#             mommy.make_recipe('flex_bookings.booking', user=new_user, event=event)
-#         form_data = self.formset_data(
-#             {
-#                 'filter': 'Show Students',
-#                 'filter-events': [event.id for event in events]}
-#         )
-#         resp = self._post_response(self.staff_user, form_data)
-#
-#         self.assertEqual(User.objects.count(), 3)
-#         self.assertEqual(Booking.objects.filter(user=new_user).count(), 3)
-#         usersformset = resp.context_data['usersformset']
-#         # user has 3 bookings, for each of the selected events, but is only
-#         # displayed once
-#         self.assertEqual(len(usersformset.forms), 1)
-#
-#         user = usersformset.forms[0].instance
-#         self.assertEqual(user, new_user)
-#
-#
-# class EmailUsersTests(TestPermissionMixin, TestCase):
-#
-#     def _get_response(
-#         self, user, users_to_email, event_ids=[], lesson_ids=[]
-#     ):
-#         url = url_with_querystring(
-#             reverse('studioadmin:email_users_view'),
-#             events=event_ids, lessons=lesson_ids
-#         )
-#         session = _create_session()
-#         request = self.factory.get(url)
-#         request.session = session
-#         request.session['users_to_email'] = users_to_email
-#         request.session['events'] = event_ids
-#         request.session['lessons'] = lesson_ids
-#         request.user = user
-#         messages = FallbackStorage(request)
-#         request._messages = messages
-#         return email_users_view(request)
-#
-#     def _post_response(
-#         self, user, users_to_email, form_data, event_ids=[], lesson_ids=[]
-#     ):
-#         url = url_with_querystring(
-#             reverse('studioadmin:email_users_view'),
-#             events=event_ids, lessons=lesson_ids
-#         )
-#         session = _create_session()
-#         request = self.factory.post(url, form_data)
-#         request.session = session
-#         request.session['users_to_email'] = users_to_email
-#         request.session['events'] = event_ids
-#         request.session['lessons'] = lesson_ids
-#         request.user = user
-#         messages = FallbackStorage(request)
-#         request._messages = messages
-#         return email_users_view(request)
-#
-#     def test_cannot_access_if_not_logged_in(self):
-#         """
-#         test that the page redirects if user is not logged in
-#         """
-#         url = reverse('studioadmin:email_users_view')
-#         resp = self.client.get(url)
-#         redirected_url = reverse('account_login') + "?next={}".format(url)
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertIn(redirected_url, resp.url)
-#
-#     def test_cannot_access_if_not_staff(self):
-#         """
-#         test that the page redirects if user is not a staff user
-#         """
-#         resp = self._get_response(self.user, [self.user.id])
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertEquals(resp.url, reverse('booking:permission_denied'))
-#
-#     def test_can_access_as_staff_user(self):
-#         """
-#         test that the page can be accessed by a staff user
-#         """
-#         resp = self._get_response(self.staff_user, [self.user.id])
-#         self.assertEquals(resp.status_code, 200)
-#
-#     def test_users_and_events_in_context(self):
-#         event = mommy.make_recipe('flex_bookings.future_EV', name='Test Event')
-#         lesson = mommy.make_recipe('flex_bookings.future_PC', name='Test Class')
-#         resp = self._get_response(
-#             self.staff_user, [self.user.id],
-#             event_ids=[event.id], lesson_ids=[lesson.id]
-#         )
-#         self.assertEqual([ev for ev in resp.context_data['events']], [event])
-#         self.assertEqual(
-#             [lsn for lsn in resp.context_data['lessons']], [lesson]
-#         )
-#         self.assertEqual(
-#             [user for user in resp.context_data['users_to_email']], [self.user]
-#         )
-#
-#     def test_subject_is_autopoulated(self):
-#         event = mommy.make_recipe('flex_bookings.future_EV')
-#         lesson = mommy.make_recipe('flex_bookings.future_PC')
-#         resp = self._get_response(
-#             self.staff_user, [self.user.id],
-#             event_ids=[event.id], lesson_ids=[lesson.id]
-#         )
-#         form = resp.context_data['form']
-#         self.assertEqual(
-#             form.initial['subject'], "; ".join([str(event), str(lesson)])
-#         )
-#
-#     def test_emails_sent(self):
-#         event = mommy.make_recipe('flex_bookings.future_EV')
-#         resp = self._post_response(
-#             self.staff_user, [self.user.id],
-#             event_ids=[event.id], lesson_ids=[],
-#             form_data={
-#                 'subject': 'Test email',
-#                 'message': 'Test message',
-#                 'from_address': 'test@test.com'}
-#         )
-#         self.assertEqual(len(mail.outbox), 1)
-#         email = mail.outbox[0]
-#         self.assertEqual(email.body, 'Test message')
-#         self.assertEqual(email.subject, '[watermelon studio bookings] Test email')
-#
-#     def test_cc_email_sent(self):
-#         resp = self._post_response(
-#             self.staff_user, [self.user.id],
-#             event_ids=[], lesson_ids=[],
-#             form_data={
-#                 'subject': 'Test email',
-#                 'message': 'Test message',
-#                 'from_address': 'test@test.com',
-#                 'cc': True}
-#         )
-#         self.assertEqual(len(mail.outbox), 2)
-#         email_to = [mail.to[0] for mail in mail.outbox]
-#         self.assertEqual(
-#             sorted(email_to), ['test@test.com', self.user.email]
-#         )
-#
-#
+class ChooseUsersToEmailTests(TestPermissionMixin, TestCase):
+
+    def _get_response(self, user):
+        url = reverse('studioadmin:choose_email_users')
+        session = _create_session()
+        request = self.factory.get(url)
+        request.session = session
+        request.user = user
+        messages = FallbackStorage(request)
+        request._messages = messages
+        return choose_users_to_email(request)
+
+    def _post_response(self, user, form_data):
+        url = reverse('studioadmin:choose_email_users')
+        session = _create_session()
+        request = self.factory.post(url, form_data)
+        request.session = session
+        request.user = user
+        messages = FallbackStorage(request)
+        request._messages = messages
+        return choose_users_to_email(request)
+
+    def formset_data(self, extra_data={}):
+
+        data = {
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 1,
+            'form-0-id': str(self.user.id),
+            }
+
+        for key, value in extra_data.items():
+            data[key] = value
+
+        return data
+
+    def test_cannot_access_if_not_logged_in(self):
+        """
+        test that the page redirects if user is not logged in
+        """
+        url = reverse('studioadmin:choose_email_users')
+        resp = self.client.get(url)
+        redirected_url = reverse('account_login') + "?next={}".format(url)
+        self.assertEquals(resp.status_code, 302)
+        self.assertIn(redirected_url, resp.url)
+
+    def test_cannot_access_if_not_staff(self):
+        """
+        test that the page redirects if user is not a staff user
+        """
+        resp = self._get_response(self.user)
+        self.assertEquals(resp.status_code, 302)
+        self.assertEquals(resp.url, reverse('permission_denied'))
+
+    def test_can_access_as_staff_user(self):
+        """
+        test that the page can be accessed by a staff user
+        """
+        resp = self._get_response(self.staff_user)
+        self.assertEquals(resp.status_code, 200)
+
+
+class EmailUsersTests(TestPermissionMixin, TestCase):
+
+    def _get_response(self, user, users_to_email):
+        url = reverse('studioadmin:email_users_view')
+        session = _create_session()
+        request = self.factory.get(url)
+        request.session = session
+        request.session['users_to_email'] = users_to_email
+        request.user = user
+        messages = FallbackStorage(request)
+        request._messages = messages
+        return email_users_view(request)
+
+    def _post_response(self, user, users_to_email, form_data):
+        url = reverse('studioadmin:email_users_view')
+        session = _create_session()
+        request = self.factory.post(url, form_data)
+        request.session = session
+        request.session['users_to_email'] = users_to_email
+        request.user = user
+        messages = FallbackStorage(request)
+        request._messages = messages
+        return email_users_view(request)
+
+    def test_cannot_access_if_not_logged_in(self):
+        """
+        test that the page redirects if user is not logged in
+        """
+        url = reverse('studioadmin:email_users_view')
+        resp = self.client.get(url)
+        redirected_url = reverse('account_login') + "?next={}".format(url)
+        self.assertEquals(resp.status_code, 302)
+        self.assertIn(redirected_url, resp.url)
+
+    def test_cannot_access_if_not_staff(self):
+        """
+        test that the page redirects if user is not a staff user
+        """
+        resp = self._get_response(self.user, [self.user.id])
+        self.assertEquals(resp.status_code, 302)
+        self.assertEquals(resp.url, reverse('permission_denied'))
+
+    def test_can_access_as_staff_user(self):
+        """
+        test that the page can be accessed by a staff user
+        """
+        resp = self._get_response(self.staff_user, [self.user.id])
+        self.assertEquals(resp.status_code, 200)
+
+    def test_users_in_context(self):
+        resp = self._get_response(self.staff_user, [self.user.id])
+        self.assertEqual(
+            [user for user in resp.context_data['users_to_email']], [self.user]
+        )
+
+    def test_emails_sent(self):
+        self._post_response(
+            self.staff_user, [self.user.id],
+            form_data={
+                'subject': 'Test email',
+                'message': 'Test message',
+                'from_address': 'test@test.com'}
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.body, 'Test message')
+        self.assertEqual(email.subject, '[flexibeast] Test email')
+        self.assertEqual(email.to, [self.user.email])
+        self.assertEqual(email.cc, [])
+        self.assertEqual(email.reply_to, ['test@test.com'])
+
+    def test_cc_email_sent(self):
+        self._post_response(
+            self.staff_user, [self.user.id],
+            form_data={
+                'subject': 'Test email',
+                'message': 'Test message',
+                'from_address': 'test@test.com',
+                'cc': True}
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.to, [self.user.email])
+        self.assertEqual(email.cc, ['test@test.com'])
+        self.assertEqual(email.reply_to, ['test@test.com'])
+
+
 # class UserBookingsViewTests(TestPermissionMixin, TestCase):
 #
 #     def setUp(self):
@@ -2720,147 +2508,158 @@ class TestPermissionMixin(object):
 #         )
 #
 #
-# class ActivityLogListViewTests(TestPermissionMixin, TestCase):
-#
-#     def setUp(self):
-#         super(ActivityLogListViewTests, self).setUp()
-#         # 9 logs
-#         # 2 logs when self.user and self.staff_user are created in setUp
-#         # 2 for empty cron jobs
-#         # 3 with log messages to test search text
-#         # 2 with fixed dates to test search date
-#         mommy.make(
-#             ActivityLog,
-#             log='email_warnings job run; no unpaid booking warnings to send'
-#         )
-#         mommy.make(
-#             ActivityLog,
-#             log='cancel_unpaid_bookings job run; no bookings to cancel'
-#         )
-#         mommy.make(ActivityLog, log='Test log message')
-#         mommy.make(ActivityLog, log='Test log message1')
-#         mommy.make(ActivityLog, log='Test log message2')
-#         mommy.make(
-#             ActivityLog,
-#             timestamp=datetime(2015, 1, 1, 16, 0, tzinfo=timezone.utc),
-#             log='Log with test date'
-#         )
-#         mommy.make(
-#             ActivityLog,
-#             timestamp=datetime(2015, 1, 1, 4, 0, tzinfo=timezone.utc),
-#             log='Log with test date for search'
-#         )
-#
-#     def _get_response(self, user, form_data={}):
-#         url = reverse('studioadmin:activitylog')
-#         session = _create_session()
-#         request = self.factory.get(url, form_data)
-#         request.session = session
-#         request.user = user
-#         messages = FallbackStorage(request)
-#         request._messages = messages
-#         view = ActivityLogListView.as_view()
-#         return view(request)
-#
-#     def test_cannot_access_if_not_logged_in(self):
-#         """
-#         test that the page redirects if user is not logged in
-#         """
-#         url = reverse('studioadmin:activitylog')
-#         resp = self.client.get(url)
-#         redirected_url = reverse('account_login') + "?next={}".format(url)
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertIn(redirected_url, resp.url)
-#
-#     def test_cannot_access_if_not_staff(self):
-#         """
-#         test that the page redirects if user is not a staff user
-#         """
-#         resp = self._get_response(self.user)
-#         self.assertEquals(resp.status_code, 302)
-#         self.assertEquals(resp.url, reverse('booking:permission_denied'))
-#
-#     def test_can_access_as_staff_user(self):
-#         """
-#         test that the page can be accessed by a staff user
-#         """
-#         resp = self._get_response(self.staff_user)
-#         self.assertEquals(resp.status_code, 200)
-#
-#     def test_empty_cron_job_logs_filtered_by_default(self):
-#         resp = self._get_response(self.staff_user)
-#         self.assertEqual(len(resp.context_data['logs']), 7)
-#
-#     def test_filter_out_empty_cron_job_logs(self):
-#         resp = self._get_response(
-#             self.staff_user, {'hide_empty_cronjobs': True}
-#         )
-#         self.assertEqual(len(resp.context_data['logs']), 7)
-#
-#     def test_search_text(self):
-#         resp = self._get_response(self.staff_user, {
-#             'search_submitted': 'Search',
-#             'search': 'message1'})
-#         self.assertEqual(len(resp.context_data['logs']), 1)
-#
-#         resp = self._get_response(self.staff_user, {
-#             'search_submitted': 'Search',
-#             'search': 'message'})
-#         self.assertEqual(len(resp.context_data['logs']), 3)
-#
-#     def test_search_date(self):
-#         resp = self._get_response(
-#             self.staff_user, {
-#                 'search_submitted': 'Search',
-#                 'search_date': '01-Jan-2015'
-#             }
-#         )
-#         self.assertEqual(len(resp.context_data['logs']), 2)
-#
-#     def test_invalid_search_date_format(self):
-#         """
-#         invalid search date returns all results and a message
-#         """
-#         resp = self._get_response(
-#             self.staff_user, {
-#                 'search_submitted': 'Search',
-#                 'search_date': '01-34-2015'}
-#         )
-#         self.assertEqual(len(resp.context_data['logs']), 9)
-#
-#     def test_search_date_and_text(self):
-#         resp = self._get_response(
-#             self.staff_user, {
-#                 'search_submitted': 'Search',
-#                 'search_date': '01-Jan-2015',
-#                 'search': 'test date for search'}
-#         )
-#         self.assertEqual(len(resp.context_data['logs']), 1)
-#
-#     def test_reset(self):
-#         """
-#         Test that reset button resets the search text and date and excludes
-#         empty cron job messages
-#         """
-#         resp = self._get_response(
-#             self.staff_user, {
-#                 'search_submitted': 'Search',
-#                 'search_date': '01-Jan-2015',
-#                 'search': 'test date for search'
-#             }
-#         )
-#         self.assertEqual(len(resp.context_data['logs']), 1)
-#
-#         resp = self._get_response(
-#             self.staff_user, {
-#                 'search_date': '01-Jan-2015',
-#                 'search': 'test date for search',
-#                 'reset': 'Reset'
-#             }
-#         )
-#         self.assertEqual(len(resp.context_data['logs']), 7)
-#
-#
+class ActivityLogListViewTests(TestPermissionMixin, TestCase):
+
+    def setUp(self):
+        super(ActivityLogListViewTests, self).setUp()
+        # 9 logs
+        # 2 logs when self.user and self.staff_user are created in setUp
+        # 2 for empty cron jobs
+        # 3 with log messages to test search text
+        # 2 with fixed dates to test search date
+        mommy.make(
+            ActivityLog,
+            log='email_warnings job run; no unpaid booking warnings to send'
+        )
+        mommy.make(
+            ActivityLog,
+            log='cancel_unpaid_bookings job run; no bookings to cancel'
+        )
+        mommy.make(ActivityLog, log='Test log message')
+        mommy.make(ActivityLog, log='Test log message1')
+        mommy.make(ActivityLog, log='Test log message2')
+        mommy.make(
+            ActivityLog,
+            timestamp=datetime(2015, 1, 1, 16, 0, tzinfo=timezone.utc),
+            log='Log with test date'
+        )
+        mommy.make(
+            ActivityLog,
+            timestamp=datetime(2015, 1, 1, 4, 0, tzinfo=timezone.utc),
+            log='Log with test date for search'
+        )
+
+    def _get_response(self, user, form_data={}):
+        url = reverse('studioadmin:activitylog')
+        session = _create_session()
+        request = self.factory.get(url, form_data)
+        request.session = session
+        request.user = user
+        messages = FallbackStorage(request)
+        request._messages = messages
+        view = ActivityLogListView.as_view()
+        return view(request)
+
+    def test_cannot_access_if_not_logged_in(self):
+        """
+        test that the page redirects if user is not logged in
+        """
+        url = reverse('studioadmin:activitylog')
+        resp = self.client.get(url)
+        redirected_url = reverse('account_login') + "?next={}".format(url)
+        self.assertEquals(resp.status_code, 302)
+        self.assertIn(redirected_url, resp.url)
+
+    def test_cannot_access_if_not_staff(self):
+        """
+        test that the page redirects if user is not a staff user
+        """
+        resp = self._get_response(self.user)
+        self.assertEquals(resp.status_code, 302)
+        self.assertEquals(resp.url, reverse('permission_denied'))
+
+    def test_can_access_as_staff_user(self):
+        """
+        test that the page can be accessed by a staff user
+        """
+        resp = self._get_response(self.staff_user)
+        self.assertEquals(resp.status_code, 200)
+
+    def test_empty_cron_job_logs_filtered_by_default(self):
+        resp = self._get_response(self.staff_user)
+        self.assertEqual(len(resp.context_data['logs']), 7)
+
+    def test_filter_out_empty_cron_job_logs(self):
+        resp = self._get_response(
+            self.staff_user, {'hide_empty_cronjobs': True}
+        )
+        self.assertEqual(len(resp.context_data['logs']), 7)
+
+    def test_search_text(self):
+        resp = self._get_response(self.staff_user, {
+            'search_submitted': 'Search',
+            'search': 'message1'})
+        self.assertEqual(len(resp.context_data['logs']), 1)
+
+        resp = self._get_response(self.staff_user, {
+            'search_submitted': 'Search',
+            'search': 'message'})
+        self.assertEqual(len(resp.context_data['logs']), 3)
+
+    def test_search_text_is_case_insensitive(self):
+        resp = self._get_response(self.staff_user, {
+            'search_submitted': 'search',
+            'search': 'meSSAge1'})
+        self.assertEqual(len(resp.context_data['logs']), 1)
+
+        resp = self._get_response(self.staff_user, {
+            'search_submitted': 'Search',
+            'search': 'meSSage'})
+        self.assertEqual(len(resp.context_data['logs']), 3)
+
+    def test_search_date(self):
+        resp = self._get_response(
+            self.staff_user, {
+                'search_submitted': 'Search',
+                'search_date': '01-Jan-2015'
+            }
+        )
+        self.assertEqual(len(resp.context_data['logs']), 2)
+
+    def test_invalid_search_date_format(self):
+        """
+        invalid search date returns all results and a message
+        """
+        resp = self._get_response(
+            self.staff_user, {
+                'search_submitted': 'Search',
+                'search_date': '01-34-2015'}
+        )
+        self.assertEqual(len(resp.context_data['logs']), 9)
+
+    def test_search_date_and_text(self):
+        resp = self._get_response(
+            self.staff_user, {
+                'search_submitted': 'Search',
+                'search_date': '01-Jan-2015',
+                'search': 'test date for search'}
+        )
+        self.assertEqual(len(resp.context_data['logs']), 1)
+
+    def test_reset(self):
+        """
+        Test that reset button resets the search text and date and excludes
+        empty cron job messages
+        """
+        resp = self._get_response(
+            self.staff_user, {
+                'search_submitted': 'Search',
+                'search_date': '01-Jan-2015',
+                'search': 'test date for search'
+            }
+        )
+        self.assertEqual(len(resp.context_data['logs']), 1)
+
+        resp = self._get_response(
+            self.staff_user, {
+                'search_date': '01-Jan-2015',
+                'search': 'test date for search',
+                'reset': 'Reset'
+            }
+        )
+        self.assertEqual(len(resp.context_data['logs']), 7)
+
+
 # class WaitingListViewStudioAdminTests(TestPermissionMixin, TestCase):
 #
 #     def _get_response(self, user, event):

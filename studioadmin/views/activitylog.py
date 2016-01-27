@@ -33,7 +33,8 @@ class ActivityLogListView(LoginRequiredMixin, StaffUserMixin, ListView):
         search_date = self.request.GET.get('search_date')
         hide_empty_cronjobs = self.request.GET.get('hide_empty_cronjobs')
 
-        if reset or (not (search_text or search_date) and hide_empty_cronjobs) or (not reset and not search_submitted):
+        if reset or (not (search_text or search_date) and hide_empty_cronjobs) \
+                or (not reset and not search_submitted):
             return queryset
 
         if not hide_empty_cronjobs:
@@ -55,8 +56,11 @@ class ActivityLogListView(LoginRequiredMixin, StaffUserMixin, ListView):
                 return queryset
 
         if search_text:
-            queryset = queryset.filter(
-                log__contains=search_text).order_by('-timestamp')
+            search_text = search_text.lower()
+            queryset = [
+                alog for alog in queryset if search_text in alog.log.lower()
+                or search_text == alog.log.lower()
+            ]
 
         return queryset
 

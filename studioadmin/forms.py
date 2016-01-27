@@ -543,18 +543,6 @@ class RegisterDayForm(forms.Form):
         return cleaned_data
 
 
-
-#
-# class StatusFilter(forms.Form):
-#
-#     status_choice = forms.ChoiceField(
-#         widget=forms.Select,
-#         choices=(('OPEN', 'Open bookings only'),
-#                  ('CANCELLED', 'Cancelled Bookings only'),
-#                  ('ALL', 'All'),),
-#     )
-#
-
 class BookingStatusFilter(forms.Form):
 
     booking_status = forms.ChoiceField(
@@ -950,37 +938,7 @@ class EmailUsersForm(forms.Form):
         widget=forms.Textarea(attrs={'class': 'form-control email-message',
                                      'rows': 10}),
         required=True)
-#
-#
-# def get_event_names(event_type):
-#
-#     def callable():
-#         EVENT_CHOICES = [(event.id, str(event)) for event in Event.objects.filter(
-#             event_type__event_type=event_type, date__gte=timezone.now()
-#         ).order_by('date')]
-#         EVENT_CHOICES.insert(0, ('', '--None selected--'))
-#         return tuple(EVENT_CHOICES)
-#
-#     return callable
-#
-#
-# class UserFilterForm(forms.Form):
-#
-#     events = forms.MultipleChoiceField(
-#         choices=get_event_names('EV'),
-#         widget=forms.SelectMultiple(
-#             attrs={'class': 'form-control'}
-#         ),
-#     )
-#
-#     lessons = forms.MultipleChoiceField(
-#         choices=get_event_names('CL'),
-#         widget=forms.SelectMultiple(
-#             attrs={'class': 'form-control'}
-#         ),
-#     )
-#
-#
+
 
 class UserBookingInlineFormSet(BaseInlineFormSet):
 

@@ -1,16 +1,19 @@
+import os
+
 from datetime import datetime, timedelta
 from mock import patch
 from model_mommy import mommy
+from tempfile import NamedTemporaryFile
 
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from flex_bookings.models import Event, EventType, Block
 from studioadmin.forms import (
-    # ChooseUsersFormSet,
+    ChooseUsersFormSet,
     DAY_CHOICES,
-    # EmailUsersForm,
+    EmailUsersForm,
     EventFormSet,
     EventAdminForm,
     PageForm,
@@ -19,7 +22,6 @@ from studioadmin.forms import (
     TimetableSessionFormSet,
     SessionAdminForm,
     UploadTimetableForm,
-    # UserFilterForm,
     UserBookingFormSet,
     UserBlockFormSet
 )
@@ -457,117 +459,71 @@ class UploadTimetableFormTests(TestCase):
         )
 
 
-# class ChooseUsersFormSetTests(TestCase):
-#
-#     def setUp(self):
-#         self.user = mommy.make_recipe('flex_bookings.user')
-#
-#     def formset_data(self, extra_data={}):
-#
-#         data = {
-#             'form-TOTAL_FORMS': 1,
-#             'form-INITIAL_FORMS': 1,
-#             'form-0-id': str(self.user.id),
-#             }
-#
-#         for key, value in extra_data.items():
-#             data[key] = value
-#
-#         return data
-#
-#     def test_choose_users_formset_valid(self):
-#         formset = ChooseUsersFormSet(data=self.formset_data())
-#         self.assertTrue(formset.is_valid())
-#
-#
-# class EmailUsersFormTests(TestCase):
-#
-#     def setUp(self):
-#         pass
-#
-#     def form_data(self, extra_data={}):
-#         data = {
-#             'subject': 'Test subject',
-#             'from_address': settings.DEFAULT_FROM_EMAIL,
-#             'message': 'Test message'
-#         }
-#
-#         for key, value in extra_data.items():
-#             data[key] = value
-#
-#         return data
-#
-#     def test_form_valid(self):
-#         form = EmailUsersForm(data=self.form_data())
-#         self.assertTrue(form.is_valid())
-#
-#     def test_missing_from_address(self):
-#         form = EmailUsersForm(
-#             data=self.form_data({'from_address': ''})
-#         )
-#         self.assertFalse(form.is_valid())
-#         self.assertEquals(
-#             form.errors['from_address'],
-#             ['This field is required.']
-#         )
-#
-#     def test_missing_message(self):
-#         form = EmailUsersForm(
-#             data=self.form_data({'message': ''})
-#         )
-#         self.assertFalse(form.is_valid())
-#         self.assertEquals(
-#             form.errors['message'],
-#             ['This field is required.']
-#         )
-#
-#
-# class UserFilterFormTests(TestCase):
-#
-#     def setUp(self):
-#         events = mommy.make_recipe(
-#             'flex_bookings.future_EV',
-#             _quantity=3
-#             )
-#         classes = mommy.make_recipe(
-#             'flex_bookings.future_PC',
-#             _quantity=4)
-#
-#     def test_events_dropdown(self):
-#         form = UserFilterForm()
-#         event_field = form.fields['events']
-#         event_choices = [
-#             choice for choice in event_field.widget.choices
-#             ]
-#         # number of choices is one more than number of events, to account
-#         # for the placeholder for None Selected
-#         self.assertEquals(len(event_choices), 4)
-#         # first id will be ('', '---None selected---')
-#         event_ids = [id for (id, name) in event_choices][1:]
-#         event_type = set([
-#             event.event_type.event_type
-#             for event in Event.objects.filter(id__in=event_ids)
-#             ])
-#         self.assertEquals(event_type, set(['EV']))
-#
-#     def test_lessons_dropdown(self):
-#         form = UserFilterForm()
-#         lesson_field = form.fields['lessons']
-#         lesson_choices = [
-#             choice for choice in lesson_field.widget.choices
-#             ]
-#         # number of choices is one more than number of events, to account
-#         # for the placeholder for None Selected
-#         self.assertEquals(len(lesson_choices), 5)
-#         # first id will be ('', '---None selected---')
-#         lesson_ids = [id for (id, name) in lesson_choices][1:]
-#         event_type = set([
-#             event.event_type.event_type
-#             for event in Event.objects.filter(id__in=lesson_ids)
-#             ])
-#         self.assertEquals(event_type, set(['CL']))
-#
-#
+class ChooseUsersFormSetTests(TestCase):
+
+    def setUp(self):
+        self.user = mommy.make_recipe('flex_bookings.user')
+
+    def formset_data(self, extra_data={}):
+
+        data = {
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 1,
+            'form-0-id': str(self.user.id),
+            }
+
+        for key, value in extra_data.items():
+            data[key] = value
+
+        return data
+
+    def test_choose_users_formset_valid(self):
+        formset = ChooseUsersFormSet(data=self.formset_data())
+        self.assertTrue(formset.is_valid())
+
+
+class EmailUsersFormTests(TestCase):
+
+    def setUp(self):
+        pass
+
+    def form_data(self, extra_data={}):
+        data = {
+            'subject': 'Test subject',
+            'from_address': settings.DEFAULT_FROM_EMAIL,
+            'message': 'Test message'
+        }
+
+        for key, value in extra_data.items():
+            data[key] = value
+
+        return data
+
+    def test_form_valid(self):
+        form = EmailUsersForm(data=self.form_data())
+        self.assertTrue(form.is_valid())
+
+    def test_missing_from_address(self):
+        form = EmailUsersForm(
+            data=self.form_data({'from_address': ''})
+        )
+        self.assertFalse(form.is_valid())
+        self.assertEquals(
+            form.errors['from_address'],
+            ['This field is required.']
+        )
+
+    def test_missing_message(self):
+        form = EmailUsersForm(
+            data=self.form_data({'message': ''})
+        )
+        self.assertFalse(form.is_valid())
+        self.assertEquals(
+            form.errors['message'],
+            ['This field is required.']
+        )
+
+
 class UserBookingFormSetTests(TestCase):
 
     def setUp(self):
@@ -926,10 +882,63 @@ class PageFormTests(TestCase):
         )
 
 
-    def test_required_fields(self):
-        pass
+    def test_form_invalid_name(self):
+        data = {
+            'name': 'name&',
+            'heading': 'Test Heading',
+            'menu_name': 'test_name',
+            'menu_location': 'main',
+            'layout': 'no-img',
+            'content': self.page.content
+        }
+        form = PageForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertIn(
+            "This field must contain only letters, numbers, / or -",
+            form.errors['name'][0],
+        )
 
 
+@override_settings(MEDIA_ROOT='/tmp/')
 class PictureFormsetTests(TestCase):
 
-    pass
+    def test_form_valid(self):
+        page = mommy.make(Page)
+        pic_file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
+
+        form_data = {
+            'pictures-TOTAL_FORMS': 1,
+            'pictures-INITIAL_FORMS': 0,
+            'pictures-0-image': pic_file.name,
+            }
+
+        form = PictureFormset(data=form_data, instance=page)
+        self.assertTrue(form.is_valid())
+        os.unlink(pic_file.name)
+
+    def test_main_ticked_for_more_than_one_picture(self):
+        page = mommy.make(Page)
+        pic_file = NamedTemporaryFile(suffix='.txt', dir='/tmp')
+        pic_file1 = NamedTemporaryFile(suffix='.txt', dir='/tmp')
+
+        form_data = {
+            'pictures-TOTAL_FORMS': 2,
+            'pictures-INITIAL_FORMS': 0,
+            'pictures-0-image': pic_file.name,
+            'pictures-0-main': True,
+            'pictures-1-image': pic_file1.name,
+            'pictures-1-main': True
+            }
+
+        form = PictureFormset(data=form_data, instance=page)
+        self.assertFalse(form.is_valid())
+        self.assertIn(
+            {
+                'main image': 'More than one image is selected as the "main" '
+                              'image to be displayed in single image layouts.  '
+                              'Please select one only.'
+            },
+            form.errors
+        )
+        os.unlink(pic_file.name)
+        os.unlink(pic_file1.name)

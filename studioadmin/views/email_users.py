@@ -49,9 +49,7 @@ def choose_users_to_email(request,
 
             request.session['users_to_email'] = users_to_email
 
-            return HttpResponseRedirect(url_with_querystring(
-                reverse('studioadmin:email_users_view'))
-            )
+            return HttpResponseRedirect(reverse('studioadmin:email_users_view'))
 
         else:
             messages.error(
@@ -76,10 +74,6 @@ def choose_users_to_email(request,
             'sidenav_selection': 'email_users',
             }
     )
-
-
-def url_with_querystring(path, **kwargs):
-    return path + '?' + urllib.parse.urlencode(kwargs)
 
 
 @login_required
