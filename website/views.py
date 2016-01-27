@@ -27,7 +27,8 @@ TEMPLATES = {
 def page(request, page_name):
     page = get_object_or_404(Page, name=page_name)
 
-    if page.restricted and not request.user.has_perm('website.can_view_restricted'):
+    if page.restricted and not request.user.is_staff and not \
+            request.user.has_perm('website.can_view_restricted'):
         return HttpResponseRedirect(reverse(settings.PERMISSION_DENIED_URL))
 
     template = TEMPLATES['no-img']
@@ -173,7 +174,7 @@ def contact(request, template_name='website/contact.html'):
 
     form = get_initial_contact_form(request)
 
-    return render(
+    return TemplateResponse(
         request, template_name, {'section': 'contact', 'form': form}
     )
 
