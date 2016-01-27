@@ -20,6 +20,7 @@ MENU_CHOICES = (
     ('dropdown', 'Displayed under "More" dropdown menu')
 )
 
+
 class Page(models.Model):
 
     name = models.CharField(

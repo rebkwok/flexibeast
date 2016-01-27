@@ -1,5 +1,7 @@
 import os
 
+from tempfile import NamedTemporaryFile
+
 from django.conf import settings
 from django.test import RequestFactory, TestCase, override_settings
 from django.contrib.auth.models import User
@@ -20,9 +22,8 @@ def create_image(photo, category):
         category=category, photo=photo, caption='This is an image'
     )
 
-TEST_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-@override_settings(MEDIA_ROOT=os.path.join(TEST_ROOT, 'gallery/testdata/'))
+@override_settings(MEDIA_ROOT='/tmp/')
 class GalleryModelTests(TestCase):
 
     def setUp(self):
@@ -32,12 +33,17 @@ class GalleryModelTests(TestCase):
         '''
         test that image is created with correct str output
         '''
-        testimg = create_image('hoop.jpg', 'category1')
+        file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
+        testimg = create_image(file.name, 'category1')
         self.assertEqual(str(testimg), 'Photo id: {}'.format(testimg.id))
+        os.unlink(file.name)
 
     def test_deleting_category_deletes_images(self):
-        img = create_image('hoop.jpg', 'categorytest')
-        img1 = create_image('pole.jpg', 'categorytest')
+        file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
+        file1 = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
+
+        img = create_image(file.name, 'categorytest')
+        img1 = create_image(file1.name, 'categorytest')
 
         cat = Category.objects.get(name='categorytest')
         self.assertEqual(
@@ -48,8 +54,38 @@ class GalleryModelTests(TestCase):
         cat.delete()
         self.assertEqual(Image.objects.count(), 0)
 
+        with self.assertRaises(FileNotFoundError):
+            os.unlink(file.name)
 
-@override_settings(MEDIA_ROOT=os.path.join(TEST_ROOT, 'gallery/testdata/'))
+        with self.assertRaises(FileNotFoundError):
+            os.unlink(file1.name)
+
+    def test_deleting_image_from_category_deletes_file(self):
+        file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
+        file1 = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
+
+        create_image(file.name, 'categorytest')
+        create_image(file1.name, 'categorytest')
+        self.assertEqual(Image.objects.count(), 2)
+
+        self.assertTrue(os.path.exists(file.name))
+        self.assertTrue(os.path.exists(file1.name))
+
+        cat = Category.objects.get(name='categorytest')
+        self.assertEqual(cat.images.first().photo, file.name)
+        cat.images.first().delete()
+        self.assertEqual(Image.objects.count(), 1)
+
+        self.assertFalse(os.path.exists(file.name))
+        self.assertTrue(os.path.exists(file1.name))
+
+        os.unlink(file1.name)
+        # check and clean up deleted temp file if it wasn't properly deleted
+        with self.assertRaises(FileNotFoundError):
+            os.unlink(file.name)
+
+
+@override_settings(MEDIA_ROOT='/tmp/')
 class GalleryViewTests(TestCase):
 
     def setUp(self):
@@ -79,11 +115,14 @@ class GalleryViewTests(TestCase):
         '''
         test that context is being generated correctly
         '''
-        create_image('hoop.jpg', 'category1')
+        file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
+        create_image(file.name, 'category1')
         response = self.client.get(reverse('gallery:gallery'))
         self.assertEqual(response.status_code, 200)
         self.assertTrue('images' in response.context)
         self.assertTrue('categories' in response.context)
+
+        os.unlink(file.name)
 
     def test_gallery_view_with_no_images(self):
         """
@@ -98,13 +137,16 @@ class GalleryViewTests(TestCase):
         """
         If image exists, it should be displayed.
         """
-        testimg = create_image('hoop.jpg', 'category1')
+        file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
+        testimg = create_image(file.name, 'category1')
         response = self.client.get(reverse('gallery:gallery'))
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(
             response.context['images'],
             ['<Image: Photo id: {}>'.format(testimg.id)]
         )
+
+        os.unlink(file.name)
 
     def test_gallery_view_with_logged_in_user(self):
         """
@@ -122,7 +164,6 @@ class GalleryViewTests(TestCase):
         self.assertIn('View and edit Gallery', str(response.content))
 
 
-@override_settings(MEDIA_ROOT=os.path.join(TEST_ROOT, 'gallery/testdata/'))
 class CategoryListViewTests(TestCase):
 
     def setUp(self):
