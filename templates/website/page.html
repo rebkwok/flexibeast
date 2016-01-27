@@ -2,6 +2,8 @@
 
 {% load static %}
 
+{% block bg_class %}{% if page.name == 'about' %}about_bg{% else %}plain_bg{% endif %}{%  endblock %}
+
 {% block content %}
 
 

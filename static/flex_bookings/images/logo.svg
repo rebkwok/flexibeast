@@ -27,7 +27,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.2763587"
      inkscape:cx="190.22857"
-     inkscape:cy="-0.19998723"
+     inkscape:cy="-62.878292"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -36,7 +36,7 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      inkscape:window-width="1280"
-     inkscape:window-height="692"
+     inkscape:window-height="687"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1" />
@@ -48,7 +48,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -68,6 +68,10 @@
          id="tspan3338"
          x="120"
          y="375.21936"
-         style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Hiragino Mincho ProN';-inkscape-font-specification:'Hiragino Mincho ProN, Semi-Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#00a900;fill-opacity:1">FLEXIBEAST</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Hiragino Mincho ProN';-inkscape-font-specification:'Hiragino Mincho ProN, Semi-Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#00a900;fill-opacity:1">F<tspan
+   style="font-size:30px"
+   id="tspan3335">LEXI</tspan>B<tspan
+   style="font-size:30px"
+   id="tspan3337">EAST</tspan></tspan></text>
   </g>
 </svg>
