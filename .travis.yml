@@ -18,7 +18,7 @@ before_script:
   - python manage.py migrate --settings=flexibeast.settings.travis
 
 script:
-  - coverage run --source=flexibeast,flex_bookings,timetable,payments,gallery,reviews,studioadmin,accounts --omit=../*migrations*,../*tests*,../*wsgi*,../*__init__* manage.py test --settings=flexibeast.settings.travis
+  - coverage run --source=flexibeast,flex_bookings,timetable,payments,gallery,reviews,studioadmin,accounts,website --omit=../*migrations*,../*tests*,../*wsgi*,../*__init__* manage.py test --settings=flexibeast.settings.travis
 
 after_success:
   coveralls
