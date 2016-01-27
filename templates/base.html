@@ -68,15 +68,15 @@
                         {% for page in website_pages %}
                             {% if page.menu_name and page.menu_location == 'main' %}
                                 {% if page|viewable:user %}
-                                    <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'website:page' page.name %}">{{ page.menu_name }}</a></li>
+                                    <li class="active-nav hidden-sm"><a href="{% url 'website:page' page.name %}">{{ page.menu_name }}</a></li>
                                 {% endif %}
                             {% endif %}
                         {% endfor %}
-                        <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
-                        <li class="active-nav hidden-sm hidden-xs"><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
+                        <li class="active-nav hidden-sm"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
+                        <li class="active-nav hidden-sm"><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
 {#                       More dropdown shows only those pages selected to in the More dropdown at larger screen sizes #}
                         {% if more_menu_options %}
-                            <li class="dropdown hidden-sm hidden-xs">
+                            <li class="dropdown hidden-sm">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">More<span class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                 {% for page in website_pages %}
@@ -108,11 +108,11 @@
 
 {#                       More dropdown shows all options other than Timetable and booking if small screen size #}
 {#                        {% if menu_options %}#}
-                            <li class="dropdown visible-sm visible-xs">
+                            <li class="dropdown visible-sm">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">More<span class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                 {% for page in website_pages %}
-                                    {% if page.menu_name %}
+                                    {% if page.menu_name and page|viewable:user %}
                                         <li class="active-nav"><a href="{% url 'website:page' page.name %}">{{ page.menu_name }}</a></li>
                                     {% endif %}
                                 {% endfor %}
