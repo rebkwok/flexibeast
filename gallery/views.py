@@ -6,9 +6,12 @@ from django.contrib import messages
 from django.template.response import TemplateResponse
 from django.utils.safestring import mark_safe
 
+from activitylog.models import ActivityLog
+
 from gallery.forms import CategoryForm, CategoriesFormset, ImageFormset
 from gallery.models import Category, Image
 from gallery.utils import StaffUserMixin, staff_required
+
 
 def view_gallery(request):
     categories = Category.objects.all().order_by('name')
@@ -73,7 +76,7 @@ class CategoryListView(StaffUserMixin, ListView):
                                     if not new:
                                         old_name = old_cat.name
                                         new_name = new_cat.name
-                                        updated_categories['category.id'] = [old_name, new_name]
+                                        updated_categories[new_cat.id] = [old_name, new_name]
                                     else:
                                         new_categories.append(new_cat.name)
                                 elif 'description' in form.changed_data:
@@ -115,12 +118,25 @@ class CategoryListView(StaffUserMixin, ListView):
                     mark_safe(
                         "{}{}{}".format(
                             "{}</br>".format(del_msg) if del_msg else "",
-                            "{}</br>".format(upd_msg) if del_msg else "",
+                            "{}</br>".format(upd_msg) if upd_msg else "",
                             "{}</br>".format(update_desc_msg) if update_desc_msg else "",
                             "{}".format(new_msg)
                         )
                     )
                 )
+
+                if del_msg:
+                    ActivityLog.objects.create(
+                        log=del_msg + 'by admin user {}'.format(request.user)
+                    )
+                if upd_msg:
+                    ActivityLog.objects.create(
+                        log=upd_msg + 'by admin user {}'.format(request.user)
+                    )
+                if new_msg:
+                    ActivityLog.objects.create(
+                        log=new_msg + 'by admin user {}'.format(request.user)
+                    )
 
             else:
                 messages.info(request, "No changes made")
@@ -166,11 +182,15 @@ class CategoryUpdateView(StaffUserMixin, UpdateView):
         if form.is_valid() and image_formset.is_valid():
 
             change_messages = []
+            deleted_pics = []
+            new_pics = []
+            edited_pics = []
 
             if image_formset.has_changed():
                 for form in image_formset.forms:
                     if form.is_valid():
                         image = form.save(commit=False)
+
                         if 'DELETE' in form.changed_data:
                             name = image.photo.name
                             image.delete()
@@ -180,6 +200,7 @@ class CategoryUpdateView(StaffUserMixin, UpdateView):
                                     category.name.title()
                                 )
                             )
+                            deleted_pics.append(name.split('/')[-1])
                         elif form.has_changed():
                             action = 'edited' if image.id else 'added'
                             image.save()
@@ -189,6 +210,12 @@ class CategoryUpdateView(StaffUserMixin, UpdateView):
                                     action
                                 )
                             )
+                            if action == 'edited':
+                                edited_pics.append(
+                                    image.photo.name.split('/')[-1]
+                                )
+                            else:
+                                new_pics.append(image.photo.name.split('/')[-1])
                     else:
                         for error in form.errors:
                             messages.error(request, mark_safe(error))
@@ -202,6 +229,28 @@ class CategoryUpdateView(StaffUserMixin, UpdateView):
                          )
                     )
                 )
+
+                if new_pics:
+                    ActivityLog.objects.create(
+                        log='Pictures added to Gallery category {} by admin '
+                            'user {}: {}'.format(
+                            category.name, request.user, ', '.join(new_pics)
+                        )
+                    )
+                if edited_pics:
+                    ActivityLog.objects.create(
+                        log='Pictures in Gallery category {} edited by admin '
+                            'user {}: {}'.format(
+                            category.name, request.user, ', '.join(edited_pics)
+                        )
+                    )
+                if deleted_pics:
+                    ActivityLog.objects.create(
+                        log='Pictures deleted from Gallery category {} by admin '
+                            'user {}: {}'.format(
+                            category.name, request.user, ', '.join(deleted_pics)
+                        )
+                    )
 
             else:
                 messages.info(request, "No changes made")
