@@ -31,7 +31,7 @@
     </div>
     {% if reviews %}
         {% for review in reviews %}
-            <div class="col-sm-10 col-sm-offset-2"><h4>
+            <div class="col-sm-12"><h4>
                 {% if not review.edited or review.update_published %}
                         {{ review.title }}
                 {% else %}

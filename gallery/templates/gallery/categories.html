@@ -41,7 +41,7 @@
                                 <tr>
                                     <td class="gallery-tbl"><span {% if category.name.errors %}class="form-error"{% endif %}>{{ category.name }} {{ category.name.errors }}</span></td>
                                     <td class="gallery-tbl"><span {% if category.description.errors %}class="form-error"{% endif %}>{{ category.description }}{{ category.description.errors }}</span></td>
-                                    <td class="gallery-tbl table-center">{% if category.instance.id %}{{ category.image_count }}{% endif %}</td>
+                                    <td class="gallery-tbl table-center" {% if category.instance.id %}id="cat_{{ category.instance.id }}_imagecount"{% endif %}>{% if category.instance.id %}{{ category.image_count }}{% endif %}</td>
                                     <td class="gallery-tbl table-center">{% if category.instance.id %}
                                         <a href="{% url 'gallery:edit_category' category.instance.id %}">
                                             <span class="fa fa-pencil-square-o fa-lg"></span>

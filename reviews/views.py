@@ -7,6 +7,8 @@ from django.db.models import Q
 
 from braces.views import LoginRequiredMixin
 
+from activitylog.models import ActivityLog
+
 from reviews.forms import ReviewForm, ReviewFormSet, ReviewSortForm
 from reviews.models import Review
 from reviews.utils import StaffUserMixin, staff_required
@@ -46,6 +48,11 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
         review = form.save(commit=False)
         review.user = self.request.user
         review.save()
+        ActivityLog.objects.create(
+            log="Testimonial (id {}) submitted by {}".format(
+                review.id, review.user.username
+            )
+        )
         messages.success(self.request, 'Your testimonial has been submitted and will be '
                               'displayed on the site shortly')
         return HttpResponseRedirect(reverse('reviews:reviews'))
@@ -70,6 +77,11 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         form.save()
+        ActivityLog.objects.create(
+            log="Testimonial (id {}) updated by {}".format(
+                form.instance.id, form.instance.user.username
+            )
+        )
         messages.success(self.request, 'Your testimonial has been updated and '
                                         'will be displayed on the site shortly')
 
@@ -145,6 +157,12 @@ class StaffReviewListView(StaffUserMixin, ListView):
                                 )
                             )
                             change = True
+                            ActivityLog.objects.create(
+                                log="Testimonial{} (id {}) approved by {}".format(
+                                    " update" if review.edited else "",
+                                    review.id, review.user.username
+                                )
+                            )
                         elif decision == 'reject' and view != 'rejected':
                             review.reject()
                             messages.success(
@@ -155,6 +173,13 @@ class StaffReviewListView(StaffUserMixin, ListView):
                                 )
                             )
                             change = True
+                            ActivityLog.objects.create(
+                                log="Testimonial{} (id {}) rejected "
+                                    "by {}".format(
+                                    " update" if review.edited else "",
+                                    review.id, review.user.username
+                                )
+                            )
 
                         review.save()
             review_formset.save()

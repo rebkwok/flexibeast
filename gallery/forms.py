@@ -42,7 +42,8 @@ class CategoriesBaseFormSet(BaseModelFormSet):
         form.fields['description'] = forms.CharField(
             widget=forms.Textarea(
                 attrs={'class': 'form-control', 'rows': 1}
-            )
+            ),
+            required=False
         )
 
 CategoriesFormset = modelformset_factory(
@@ -71,7 +72,7 @@ class ImageBaseFormset(BaseInlineFormSet):
 
         form.fields['photo'] = forms.ImageField(
             label='',
-            error_messages={'invalid':"Image files only"},
+            error_messages={'invalid': "Image files only"},
             widget=ImageThumbnailFileInput,
             required=False
         )
@@ -97,3 +98,4 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ('name', 'description')
+

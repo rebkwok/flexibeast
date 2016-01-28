@@ -30,7 +30,8 @@ class ReviewForm(forms.ModelForm):
             }
         ),
         initial=5,
-        validators=[validate_rating]
+        validators=[validate_rating],
+        help_text="Click on a star to select rating"
     )
 
     class Meta:
