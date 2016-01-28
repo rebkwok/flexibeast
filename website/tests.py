@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail
+from django.core import management
 from django.core.urlresolvers import reverse
 from django.test import Client, RequestFactory, TestCase, override_settings
 
@@ -370,3 +371,27 @@ class ContactViewsTests(TestMixin, TestCase):
             "Thank you for your enquiry! Your email has been sent and we'll "
             "get back to you as soon as possible."
         )
+
+
+class WebsiteManagementTests(TestCase):
+
+    def test_create_about_page(self):
+        self.assertFalse(Page.objects.exists())
+        management.call_command('create_about_page')
+        self.assertEqual(Page.objects.count(), 1)
+        self.assertEqual(Page.objects.first().name, 'about')
+
+    def test_about_page_not_overwritten_if_already_exists(self):
+        management.call_command('create_about_page')
+        self.assertEqual(Page.objects.count(), 1)
+        self.assertEqual(Page.objects.first().name, 'about')
+        self.assertEqual(Page.objects.first().content, 'Coming Soon')
+
+        page = Page.objects.first()
+        page.content = 'new content'
+        page.save()
+
+        management.call_command('create_about_page')
+        self.assertEqual(Page.objects.count(), 1)
+        self.assertEqual(Page.objects.first().name, 'about')
+        self.assertEqual(Page.objects.first().content, 'new content')
