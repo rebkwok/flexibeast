@@ -157,7 +157,9 @@ class PageViewsTests(TestMixin, TestCase):
             reverse('website:page', kwargs={'page_name': page.name})
         )
         self.assertEqual(resp.status_code, 302)
-        self.assertIn(resp.url, reverse('permission_denied'))
+        self.assertIn(
+            resp.url, reverse('website:restricted_page_not_logged_in')
+        )
 
     def test_cannot_get_restricted_page_without_permission(self):
         page = mommy.make(Page, name="testname", restricted=True)
