@@ -354,6 +354,9 @@ CKEDITOR_CONFIGS = {
         ],
         'width': '100%',
         'AllowedContent': True,
+        'font_names': 'Arial;Book Antiqua;Comic Sans MS;Courier New;Georgia;'
+                      'Lucida Sans Unicode;Tahoma,Times New Roman;'
+                      'Trebuchet MS;Verdana',
     },
     'studioadmin_min': {
         'toolbar': [
@@ -371,6 +374,9 @@ CKEDITOR_CONFIGS = {
         'title': '',
         'width': '100%',
         'AllowedContent': True,
+        'font_names': 'Arial;Book Antiqua;Comic Sans MS;Courier New;Georgia;'
+                      'Lucida Sans Unicode;Tahoma,Times New Roman;'
+                      'Trebuchet MS;Verdana',
         'extraAllowedContent': ['iframe[*]', '*[id]', '*(*)'],
         'toolbar': [
             ['Source', '-', 'Bold', 'Italic', 'Underline',
