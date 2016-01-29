@@ -42,6 +42,7 @@ else:
 
 ALLOWED_HOSTS = []
 
+SESSION_COOKIE_DOMAIN = ".flexibeast.com"
 
 # Application definition
 
