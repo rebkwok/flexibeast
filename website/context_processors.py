@@ -6,7 +6,7 @@ from reviews.models import Review
 
 
 def website_pages(request):
-    pages = Page.objects.all()
+    pages = Page.objects.all().exclude(active=False)
     return {'website_pages': pages}
 
 
@@ -16,7 +16,7 @@ def more_menu_options(request):
     :return: True if there are website pages to be shown in the "More"
     dropdown menu
     """
-    pages = Page.objects.all()
+    pages = Page.objects.all().exclude(active=False)
     more_menu_options_unrestricted = [
         True for page in pages if page.menu_name and
         page.menu_location == 'dropdown' and not page.restricted
@@ -41,7 +41,7 @@ def menu_options(request):
     :param request:
     :return: True if there are any website pages to be shown in the menu bar
     """
-    pages = Page.objects.all()
+    pages = Page.objects.all().exclude(active=False)
     menu_options = [True for page in pages if page.menu_name]
     return {'menu_options': True if menu_options else False}
 

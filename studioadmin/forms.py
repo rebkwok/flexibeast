@@ -1087,6 +1087,19 @@ class PageForm(forms.ModelForm):
                   'been given permission'
         )
 
+    active = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={
+            'class': 'regular-checkbox studioadmin-list',
+            'id': 'id_active'
+        }),
+        label="Active",
+        required=False,
+        initial=False,
+        help_text="Tick this box if you want this page to be visible "
+                  "on the site.  If unchecked, it will only be displayed for"
+                  "staff users"
+        )
+
     name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control'}),
         validators=[
@@ -1104,7 +1117,7 @@ class PageForm(forms.ModelForm):
         model = Page
         fields = (
             'name', 'menu_name', 'menu_location', 'layout', 'heading',
-            'content', 'restricted'
+            'content', 'restricted', 'active'
         )
         widgets = {
             'heading': forms.TextInput(

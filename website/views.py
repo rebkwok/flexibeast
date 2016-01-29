@@ -27,6 +27,9 @@ TEMPLATES = {
 def page(request, page_name):
     page = get_object_or_404(Page, name=page_name)
 
+    if not page.active and not request.user.is_staff:
+        return HttpResponseRedirect(reverse(settings.PERMISSION_DENIED_URL))
+
     if page.restricted:
         if request.user.is_anonymous():
             return HttpResponseRedirect(

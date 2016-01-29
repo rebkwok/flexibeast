@@ -36,6 +36,8 @@
                                 <div class="col-sm-9 ">{% if field.errors %}<span class="form-error">{{ field }}</span>{% else %}{{ field }}{% endif %}
                                     {% if field.name == "restricted" %}
                                         <label class="aligned-label" for=id_restricted></label>
+                                    {% elif field.name == "active" %}
+                                        <label class="aligned-label" for=id_active></label>
                                     {% endif %}
                                     {% if field.errors %}<div class="form-error">{{ field.errors }}</div>{% endif %}
                                     <p class="studioadmin-help">{{ field.help_text }}</p>

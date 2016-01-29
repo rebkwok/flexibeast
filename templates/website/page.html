@@ -8,6 +8,18 @@
 
 
 <div class="container-fluid">
+{% if user.is_staff %}
+    {% if not page.active or page.restricted %}
+        <div class="divider"></div>
+            <h4>NOTES FOR STAFF USERS (these messages are not displayed to non-staff users):</h4>
+            <ul>
+            {% if not page.active %}<li>THIS PAGE IS NOT LIVE AND IS NOT VISIBLE TO NON-STAFF USERS.  IF APPLICABLE, MENU LINKS WILL NOT APPEAR UNTIL PAGE IS ACTIVATED.</li>{% endif %}
+            {% if page.restricted %}<li>THIS IS A RESTRICTED PAGE.  PAGE IS ONLY VISIBLE TO USERS WITH PERMISSION.</li>{% endif %}
+            </ul>
+        <div class="divider"></div>
+    {% endif %}
+{% endif %}
+
 
         <div class="container-fluid extra-top-margin">
         {% if include_html %}{% include include_html %}{% endif %}

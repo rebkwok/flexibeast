@@ -79,11 +79,11 @@ class WebsiteFormsTests(TestCase):
 class WebsiteModelsTests(TestCase):
 
     def test_page_str(self):
-        page = mommy.make(Page, name='new-page')
+        page = mommy.make(Page, active=True, name='new-page')
         self.assertEqual(str(page), 'New-Page page content')
 
     def test_spaces_in_name_replaced_with_dash(self):
-        page = mommy.make(Page, name='new page')
+        page = mommy.make(Page, active=True, name='new page')
         self.assertEqual(page.name, 'new-page')
 
     def test_creating_picture_instance(self):
@@ -136,7 +136,7 @@ class PageViewsTests(TestMixin, TestCase):
         return page_view(request, page.name)
 
     def test_can_get_page(self):
-        page = mommy.make(Page, name="testname")
+        page = mommy.make(Page, active=True, name="testname")
         resp = self.client.get(
             reverse('website:page', kwargs={'page_name': page.name})
         )
@@ -145,6 +145,14 @@ class PageViewsTests(TestMixin, TestCase):
         resp = self._get_response(self.user, page)
         self.assertEqual(resp.status_code, 200)
 
+        # no staff messages shown
+        self.assertNotIn(
+            "THIS IS A RESTRICTED PAGE.", resp.rendered_content
+        )
+        self.assertNotIn(
+            "THIS PAGE IS NOT LIVE", resp.rendered_content
+        )
+
     def test_return_404_if_page_does_not_exist(self):
         resp = self.client.get(
             reverse('website:page', kwargs={'page_name': 'nonexistant'})
@@ -152,7 +160,7 @@ class PageViewsTests(TestMixin, TestCase):
         self.assertEqual(resp.status_code, 404)
 
     def test_cannot_get_restricted_page_if_not_logged_in(self):
-        page = mommy.make(Page, name="testname", restricted=True)
+        page = mommy.make(Page, active=True, name="testname", restricted=True)
         resp = self.client.get(
             reverse('website:page', kwargs={'page_name': page.name})
         )
@@ -162,52 +170,91 @@ class PageViewsTests(TestMixin, TestCase):
         )
 
     def test_cannot_get_restricted_page_without_permission(self):
-        page = mommy.make(Page, name="testname", restricted=True)
+        page = mommy.make(Page, active=True, name="testname", restricted=True)
         resp = self._get_response(self.user, page)
         self.assertEqual(resp.status_code, 302)
         self.assertIn(resp.url, reverse('permission_denied'))
 
     def test_can_get_restricted_page_if_has_permission(self):
-        page = mommy.make(Page, name="testname", restricted=True)
+        page = mommy.make(Page, active=True, name="testname", restricted=True)
         resp = self._get_response(self.restricted_user, page)
         self.assertEqual(resp.status_code, 200)
 
+        # staff message not shown on page
+        self.assertNotIn(
+            "THIS IS A RESTRICTED PAGE.", resp.rendered_content
+        )
+
     def test_can_get_restricted_page_if_staff_user(self):
-        page = mommy.make(Page, name="testname", restricted=True)
+        page = mommy.make(Page, active=True, name="testname", restricted=True)
         resp = self._get_response(self.staff_user, page)
         self.assertEqual(resp.status_code, 200)
 
+        # staff message shown on page
+        self.assertIn(
+            "THIS IS A RESTRICTED PAGE.", resp.rendered_content
+        )
+
     def test_get_correct_default_template_layout(self):
-        page = mommy.make(Page, name="testname")
+        page = mommy.make(Page, active=True, name="testname")
         resp = self._get_response(self.user, page)
 
         # default template is page.html
         self.assertEqual(resp.template_name, 'website/page.html')
 
     def test_get_default_template_layout_if_no_pictures(self):
-        page = mommy.make(Page, name="testname", layout='img-col-right')
+        page = mommy.make(Page, active=True, name="testname", layout='img-col-right')
         resp = self._get_response(self.user, page)
 
         # if no pictures, default template is used
         self.assertEqual(resp.template_name, 'website/page.html')
 
     def test_get_relevant_template_layout_if_pictures(self):
-        page = mommy.make(Page, name="testname", layout='img-col-right')
+        page = mommy.make(Page, active=True, name="testname", layout='img-col-right')
         mommy.make(Picture, page=page)
 
         resp = self._get_response(self.user, page)
         self.assertEqual(resp.template_name, 'website/page_col.html')
 
     def test_include_extra_html_for_about_page(self):
-        page = mommy.make(Page, name="testname")
+        page = mommy.make(Page, active=True, name="testname")
         resp = self._get_response(self.user, page)
         self.assertEqual(resp.context_data['include_html'], '')
 
-        page = mommy.make(Page, name="about")
+        page = mommy.make(Page, active=True, name="about")
         resp = self._get_response(self.user, page)
         self.assertEqual(
             resp.context_data['include_html'], 'website/about_extra.html'
         )
+
+    def test_cannot_get_inactive_page_if_not_staff(self):
+        page = mommy.make(Page, active=False, name="testname")
+        resp = self._get_response(self.user, page)
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn(resp.url, reverse('permission_denied'))
+
+        # permission denied page if restricted user and restricted page too
+        page.restricted = True
+        page.save()
+        resp = self._get_response(self.restricted_user, page)
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn(resp.url, reverse('permission_denied'))
+
+    def test_cannot_get_inactive_page_if_not_logged_in(self):
+        page = mommy.make(Page, active=False, name="testname")
+        resp = self.client.get(
+            reverse('website:page', kwargs={'page_name': page.name})
+        )
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn(resp.url, reverse('permission_denied'))
+
+    def test_can_get_inactive_page_if_staff_user(self):
+        page = mommy.make(Page, active=False, name="testname")
+        resp = self._get_response(self.staff_user, page)
+        self.assertEqual(resp.status_code, 200)
+
+        # message shown on page
+        self.assertIn("THIS PAGE IS NOT LIVE", resp.rendered_content)
 
 
 class ContactViewsTests(TestMixin, TestCase):
@@ -273,8 +320,8 @@ class ContactViewsTests(TestMixin, TestCase):
         )
 
     def test_populate_subject_based_on_previous_page(self):
-        class_page = mommy.make(Page, name='classes')
-        workshop_page = mommy.make(Page, name='workshops')
+        class_page = mommy.make(Page, active=True, name='classes')
+        workshop_page = mommy.make(Page, active=True, name='workshops')
         other_page = mommy.make(Page)
 
         referer = reverse(

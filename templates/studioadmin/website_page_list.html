@@ -23,6 +23,8 @@
                                 <th>Menu location</th>
                                 <th>Layout</th>
                                 <th>Permission to view</th>
+                                <th>Page visible</th>
+                                <th>View on site</th>
                                 <th class="table-center">Delete page</th>
                             </tr>
                             </thead>
@@ -38,6 +40,8 @@
                                     <td class="studioadmin-tbl">{{ page.instance.menu_location | format_menu }}</td>
                                     <td class="studioadmin-tbl">{{ page.instance.layout | format_layout }}</td>
                                     <td class="studioadmin-tbl">{%  if page.instance.restricted %}<span class="not-confirmed">RESTRICTED</span>{% else %}ALL{% endif %}</td>
+                                    <td class="studioadmin-tbl">{%  if page.instance.active %}LIVE{% else %}<span class="not-confirmed">HIDDEN</span>{% endif %}</td>
+                                    <td class="studioadmin-tbl table-center"><a href="{% url 'website:page' page.instance.name %}"><span class="fa fa-link"></span></a></td>
                                     <td class="studioadmin-tbl table-center">{{ page.DELETE }}<label for={{ page.DELETE_id }}></label>
                                 </tr>
                             {% endfor %}

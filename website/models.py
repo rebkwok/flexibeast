@@ -57,6 +57,11 @@ class Page(models.Model):
         help_text='Page only visible if user is logged in and has been given '
                   'permission'
     )
+    active = models.BooleanField(
+        default=False,
+        help_text="Unselect if you don't want this page to be visible on "
+                  "the site (irrespective of user permissions)"
+    )
 
     class Meta:
         permissions = (

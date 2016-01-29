@@ -63,7 +63,8 @@ def confirm_user_booking_payment(request, pk):
             logger.error(
                     'EXCEPTION "{}"" while sending email for booking payment '
                     'confirmation - booking id {} - user {}'
-                    'id {}'.format(e, booking.id, booking.user.username)
+                    'id {}'.format(
+                        e, booking.id, booking.user.username, booking.id)
                     )
 
         ActivityLog(log='Payment for event {} (booking id {}) for  '
