@@ -1,10 +1,10 @@
 
 .plain_bg {
-    background: rgba(8, 138, 8, 0.05) no-repeat center center fixed;
-    background: -webkit-linear-gradient(rgba(8, 138, 8, 0.01), rgba(8, 138, 8, 0.15)) no-repeat center center fixed;
-    background:    -moz-linear-gradient(rgba(8, 138, 8, 0.01), rgba(8, 138, 8, 0.15)) no-repeat center center fixed;
-    background:      -o-linear-gradient(rgba(8, 138, 8, 0.01), rgba(8, 138, 8, 0.15)) no-repeat center center fixed;
-    background:         linear-gradient(rgba(8, 138, 8, 0.01), rgba(8, 138, 8, 0.15)) no-repeat center center fixed;
+    /*background: rgba(117, 193, 95, 0.05) no-repeat center center fixed;*/
+    background: -webkit-linear-gradient(rgba(117, 193, 95, 0.01), rgba(117, 193, 95, 0.15)) no-repeat center center fixed;
+    background:    -moz-linear-gradient(rgba(117, 193, 95, 0.01), rgba(117, 193, 95, 0.15)) no-repeat center center fixed;
+    background:      -o-linear-gradient(rgba(117, 193, 95, 0.01), rgba(117, 193, 95, 0.15)) no-repeat center center fixed;
+    background:         linear-gradient(rgba(117, 193, 95, 0.01), rgba(117, 193, 95, 0.15)) no-repeat center center fixed;
     -webkit-background-size: cover;
 	-moz-background-size: cover;
 	-o-background-size: cover;
@@ -12,16 +12,25 @@
 }
 
 .about_bg {
-    background: rgba(8, 138, 8, 0.05) no-repeat center center fixed;
+    background: rgba(117, 193, 95, 0.05) no-repeat center center fixed;
     -webkit-background-size: cover;
 	-moz-background-size: cover;
 	-o-background-size: cover;
 	background-size: cover;
 }
+
+.logo_bg {
+	background: url(../images/logobg_faded.png) no-repeat center center fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+
 body {
 	background-color: transparent;
-	padding-left: 15;
-	margin-right: 15;
+	padding-left: 15px;
+	margin-right: 15px;
 }
 
 @media (max-width: 979px) {
@@ -38,16 +47,16 @@ body {
 
 /* Wrapper for page content to push down footer */
 .wrap {
-	padding-top: 50px;
-	min-height: 92%;
+	padding-top: 80px;
+	min-height: 91%;
 	/* Negative indent footer by its height */
-	margin: 0 auto -60px;
+	margin: 0 auto -40px;
 }
 
 /* Set the fixed height of the footer here */
 .push,
 .footer {
-	height: 55px;
+	height: 40px;
 }
 
 /* Set the fixed height of the footer here */
@@ -55,6 +64,10 @@ body {
 	height: 20px;
 }
 
+.nav-logo {
+    max-height: 60px;
+    margin-top: -5px;
+}
 
 .footer {
 	background-color: transparent;
@@ -168,7 +181,8 @@ ul li img {
 }
 
 .footer-logo-image {
-    height:50px;
+    max-height: 30px;
+    margin-bottom: 0px;
 }
 
 .instr-img {
@@ -254,8 +268,6 @@ color: #000;
     list-style: none;
     padding-left: 15px;
 }
-
-
 
 .sidebar-nav li {
   line-height: 25px;
@@ -393,26 +405,51 @@ color: #000;
     padding-top: 30px;
 }
 
-.navbar { background-color: #fff; border-color: #088A08}
-.navbar .container-fluid { background-color: #fff}
-.navbar .navbar-nav { background-color: #fff}
-.navbar .navbar-brand { background-color: #fff}
-.navbar .navbar-collapse { background-color: #fff}
-.navbar .navbar-nav>.active-nav>a:hover {background-color: #088A08; color: #fff}
-.navbar .navbar-nav>li>a:hover {background-color: #088A08; color: #fff}
+/*/!*tall dark navbar*!/*/
+/*.navbar-fixed-top, .navbar-header {min-height: 82px; background-color: rgba(117, 193, 95, 0);}*/
+/*.navbar { background-color: rgba(117, 193, 95, 0.05); border-color: #088A08;}*/
+/*.navbar .container-fluid { rgba(117, 193, 95, 0.25);}*/
+/*.navbar .navbar-brand { background-color: rgba(117, 193, 95, 0);}*/
+/*.navbar .navbar-nav>.active-nav>a:hover {color: #fff;}*/
+/*.navbar .navbar-nav>li>a:hover {color: #fff; }*/
+
+/*.navbar .navbar-nav>li>a {*/
+    /*margin-top: 15px;*/
+    /*color: darkslategrey;*/
+/*}*/
+
+/*.navbar .navbar-nav>li>a {*/
+    /*margin-top: 15px;*/
+    /*color: darkslategrey;*/
+/*}*/
+
+/*li > a.dropdown-toggle.timetable {*/
+    /*padding-top: 3px;*/
+    /*padding-bottom: 7px;*/
+/*}*/
+
+/*.nav-user {*/
+    /*padding-top: 15px;*/
+    /*color: green;*/
+/*}*/
 
 
+/*   normal navbar dark */
+.navbar { border-top: solid thin; border-color: #088A08;}
+.navbar .container-fluid { background-color: rgba(117, 193, 95, 0.4);}
+.navbar .navbar-nav>.active-nav>a:hover {color: #fff;}
+.navbar .navbar-nav>li>a:hover {color: #fff; }
+
+.navbar .navbar-nav>li>a {
+    color: darkslategrey;
+}
 
 li > a.dropdown-toggle.timetable {
     padding-top: 3px;
     padding-bottom: 7px;
 }
 
-a.navbar-brand {
-    padding-top: 13px;
-}
 .nav-user {
-    padding-top: 15px;
     color: green;
 }
 
@@ -453,8 +490,6 @@ a:visited>.btn, a:link>.btn {
 .expired .input-sm {
     color: #BDBDBD !important;
 }
-
-
 
 .not_paid_block td {
     color: red;
@@ -548,10 +583,10 @@ a.disabled {
 }
 
 .welcome-menu {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin-top: 2 !important;
-    margin-bottom: 0 !important;
+    padding-top: 0px; !important;
+    padding-bottom: 0px; !important;
+    margin-top: 4px; !important;
+    margin-bottom: 0px; !important;
     color: green;
 }
 

@@ -47,7 +47,7 @@
   <body>
       <div class="wrap">
         <!-- Fixed navbar -->
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div style="margin-top: 40px;" class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -57,7 +57,7 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="/" title="Home">
-                    <img class="nav-logo" src="{% static 'flex_bookings/images/logo_brand.png' %}">
+                    <img style="max-height:80px; margin-top: -50px; margin-left: 0; padding-left: 0;" src="{% static 'flex_bookings/images/logo_brand.png' %}">
                     </a>
                 </div>
                 <div class="navbar-collapse collapse">
@@ -226,11 +226,9 @@
                 <div class="col-sm-4">
 		            <div class="footer-link-box"><a class="footer-link" href="{% url 'website:contact' %}">Contact</a></div>
                 </div>
-
-
-{#                <div class="hidden-xs col-sm-3 footer-logo pull-right">#}
-{#                    <img class="pull-right img-responsive" style="max-height:50px; margin-bottom:5px"; src="{% static "website/images/logo_text_only.png" %}">#}
-{#                </div>#}
+                <div class="hidden-xs col-sm-3 footer-logo pull-right">
+                    <img class="pull-right img-responsive footer-logo-image" src="{% static 'flex_bookings/images/footerlogo.png' %}" %}">
+                </div>
             </div>
         </div>
     </div>
