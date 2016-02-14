@@ -160,7 +160,7 @@ class StaffReviewListView(StaffUserMixin, ListView):
                             ActivityLog.objects.create(
                                 log="Testimonial{} (id {}) approved by {}".format(
                                     " update" if review.edited else "",
-                                    review.id, review.user.username
+                                    review.id, request.user.username
                                 )
                             )
                         elif decision == 'reject' and view != 'rejected':
@@ -177,7 +177,7 @@ class StaffReviewListView(StaffUserMixin, ListView):
                                 log="Testimonial{} (id {}) rejected "
                                     "by {}".format(
                                     " update" if review.edited else "",
-                                    review.id, review.user.username
+                                    review.id, request.user.username
                                 )
                             )
 
