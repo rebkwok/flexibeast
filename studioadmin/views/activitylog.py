@@ -1,4 +1,8 @@
+import operator
+
 from datetime import datetime
+from functools import reduce
+
 from django.contrib import messages
 from django.db.models import Q
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
@@ -44,9 +48,12 @@ class ActivityLogListView(LoginRequiredMixin, StaffUserMixin, ListView):
             try:
                 search_date = datetime.strptime(search_date, '%d-%b-%Y')
                 start_datetime = search_date
-                end_datetime = search_date.replace(hour=23, minute=59, second=59, microsecond=999999)
+                end_datetime = search_date.replace(
+                    hour=23, minute=59, second=59, microsecond=999999
+                )
                 queryset = queryset.filter(
-                    Q(timestamp__gte=start_datetime) & Q(timestamp__lte=end_datetime)
+                    Q(timestamp__gte=start_datetime) &
+                    Q(timestamp__lte=end_datetime)
                 ).order_by('-timestamp')
             except ValueError:
                 messages.error(
@@ -57,10 +64,12 @@ class ActivityLogListView(LoginRequiredMixin, StaffUserMixin, ListView):
 
         if search_text:
             search_text = search_text.lower()
-            queryset = [
-                alog for alog in queryset if search_text in alog.log.lower()
-                or search_text == alog.log.lower()
-            ]
+
+            search_words = search_text.split()
+            search_qs = reduce(
+                operator.and_, (Q(log__icontains=x) for x in search_words)
+            )
+            queryset = queryset.filter(search_qs)
 
         return queryset
 
