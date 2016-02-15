@@ -368,7 +368,7 @@ color: #000;
 
 
 .sidebar_active{
-    color: #298A08
+    color: rgba(6, 105, 58, 0.8)
 }
 .sidebar_inactive{
     color: #173B0B
@@ -435,13 +435,16 @@ color: #000;
 
 
 /*   normal navbar dark */
-.navbar { border-top: solid thin; border-color: #088A08;}
-.navbar .container-fluid { background-color: rgba(117, 193, 95, 0.4);}
-.navbar .navbar-nav>.active-nav>a:hover {color: #fff;}
-.navbar .navbar-nav>li>a:hover {color: #fff; }
+/*.navbar { border-top: solid thin; border-color: #088A08;}*/
+.navbar-fixed-top, .navbar-header {min-height: 82px;}
+.navbar { border-top: solid thin; border-color: #fff;}
+.navbar .container-fluid { background-color: rgba(6, 105, 58, 1);}
+.navbar .navbar-nav>.active-nav>a:hover {color: darkseagreen;}
+.navbar .navbar-nav>li>a:hover {color: darkseagreen; }
 
 .navbar .navbar-nav>li>a {
-    color: darkslategrey;
+    margin-top: 15px;
+    color: #fff;
 }
 
 li > a.dropdown-toggle.timetable {
@@ -450,7 +453,7 @@ li > a.dropdown-toggle.timetable {
 }
 
 .nav-user {
-    color: green;
+    color: #fff;
 }
 
 a>.btn {
@@ -587,7 +590,7 @@ a.disabled {
     padding-bottom: 0px; !important;
     margin-top: 4px; !important;
     margin-bottom: 0px; !important;
-    color: green;
+    color: darkseagreen;
 }
 
 .table-center {
@@ -600,7 +603,7 @@ a.disabled {
   display:block; /* for use on default inline elements like span */
   margin: 9px 0;
   overflow: hidden;
-  background-color: rgba(117, 193, 95, 1);
+  background-color: rgba(6, 105, 58, 1);
 }
 
 .selectpicker {
@@ -960,7 +963,7 @@ a > span.fa.fa-print {
 }
 
 .panel-body-with-border {
-    border: solid thin rgba(117, 193, 95, 1);
+    border: solid thin rgba(6, 105, 58, 1);
 }
 
 .page-img-single {
@@ -1016,7 +1019,7 @@ a > span.fa.fa-print {
 }
 
 .label-testimonial {
-    background-color: #088A08;
+    background-color: rgba(6, 105, 58, 1);
 }
 
 a:hover > .label-testimonial {
@@ -1027,6 +1030,10 @@ a:hover > .label-testimonial {
 
 .label-as-badge {
     border-radius: 1em;
+    border-color: #fff;
+    border-style: solid;
+    border-width: thin;
+
 }
 
 .navbar .navbar-nav>li>a, .navbar .navbar-nav>li>a:hover {
@@ -1045,7 +1052,7 @@ li.notification-menu-item > a:hover,
     padding-right: 0px;
     margin-left: 0px;
     margin-right: 0px;
-    margin-top: 4px;
+    margin-top: 18px;
 }
 
 .navbar .navbar-nav>li.admin-menu-item>a,
@@ -1085,4 +1092,8 @@ li.notification-menu-item > a:hover,
     list-style: none;
     font-size: small;
     font-style: italic;
+}
+
+.panel-success .panel-header {
+    background-image: linear-gradient(to bottom, rgba(6, 105, 58, 0.2) 0, rgba(6, 105, 58, 0.3) 100%);
 }
