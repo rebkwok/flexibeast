@@ -15,10 +15,10 @@ install:
 
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
-  - python manage.py migrate --settings=flexibeast.settings.travis
+  - python manage.py migrate --settings=flexibeast.settings.test
 
 script:
-  - coverage run --source=flexibeast,flex_bookings,timetable,payments,gallery,reviews,studioadmin,accounts,website --omit=../*migrations*,../*tests*,../*wsgi*,../*__init__* manage.py test --settings=flexibeast.settings.travis
+  - coverage run --source=flexibeast,flex_bookings,timetable,payments,gallery,reviews,studioadmin,accounts,website --omit=../*migrations*,../*tests*,../*wsgi*,../*__init__* manage.py test --settings=flexibeast.settings.test
 
 after_success:
   coveralls

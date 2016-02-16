@@ -1,10 +1,11 @@
 .thumbnail-container {
-    width: 180px;
-    height: 180px;
+    width: 150px;
+    height: 150px;
     overflow: hidden;
     margin: 10px;
     position: relative;
-    border: 2px solid white;
+    border: thin solid rgba(6, 105, 58, 0.5);
+    border-radius: 5%;
 }
 
 
@@ -21,6 +22,48 @@ div.thumbnail-container > img {
 div.thumbnail-container > img.portrait {
   width: 100%;
   height: auto;
+}
+
+.category.thumbnail-container {
+    box-shadow: 0 0 0 1px rgba(6, 105, 58, 0.6), 0 0 0 2px #fff, 0 0 0 4px rgba(6, 105, 58, 0.6);
+    border-radius: 2%;
+}
+
+.category.thumbnail-container.no-photos {
+    padding: 20px
+}
+.category-caption {
+    margin-left: 8px;
+}
+
+div.category.thumbnail-container > img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 75px;
+  height: 75px;
+  border: solid thin lavender;
+}
+
+div.category.thumbnail-container > img.img-top-left {
+  -webkit-transform: translate(-100%,-100%);
+      -ms-transform: translate(-100%,-100%);
+          transform: translate(-100%,-100%);
+}
+div.category.thumbnail-container > img.img-top-right {
+  -webkit-transform: translate(-0%,-100%);
+      -ms-transform: translate(-0%,-100%);
+          transform: translate(-0%,-100%);
+}
+div.category.thumbnail-container > img.img-bottom-left {
+  -webkit-transform: translate(-100%,-0%);
+      -ms-transform: translate(-100%,-0%);
+          transform: translate(-100%,-0%);
+}
+div.category.thumbnail-container > img.img-bottom-right {
+  -webkit-transform: translate(-0%,-0%);
+      -ms-transform: translate(-0%,-0%);
+          transform: translate(-0%,-0%);
 }
 
 .gallery-tbl {
@@ -54,19 +97,24 @@ div.thumbnail-container > img.portrait {
 }
 
 .btn-group-vertical > .btn-gallery.btn-gallery-active {
-    background-color: #088A08;
+    background-color: rgba(6, 105, 58, 1);
     color: white;
 }
 
 .btn-group-vertical > .btn-gallery.btn-gallery-active > .badge {
     background-color: #fff;
-    color: #088A08;
+    color: rgba(6, 105, 58, 1);
     font-weight: bold;
 }
 
 .btn-gallery.btn-modal, .btn-gallery.btn-modal {
-    background-color: #088A08;
+    background-color: rgba(6, 105, 58, 1);
     color: white;
+    height: 20px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    font-size: smaller;
+    font-weight: normal;
 }
 
 .gallery-count {

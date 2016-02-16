@@ -1,5 +1,7 @@
 import os
 
+from model_mommy import mommy
+
 from tempfile import NamedTemporaryFile
 
 from django.conf import settings
@@ -8,8 +10,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.messages.storage.fallback import FallbackStorage
-
-from model_mommy import mommy
+from django.utils.html import strip_tags
 
 from gallery.models import Category, Image
 from gallery.tests.helpers import set_up_fb, _create_session
@@ -20,6 +21,13 @@ def create_image(photo, category):
     category, _ = Category.objects.get_or_create(name=category)
     return Image.objects.create(
         category=category, photo=photo, caption='This is an image'
+    )
+
+
+def format_content(content):
+    # strip tags, \n, \t and extra whitespace from content
+    return ' '.join(
+        strip_tags(content).replace('\n', '').replace('\t', '').split()
     )
 
 
@@ -86,11 +94,10 @@ class GalleryModelTests(TestCase):
 
 
 @override_settings(MEDIA_ROOT='/tmp/')
-class GalleryViewTests(TestCase):
+class GalleryMainViewTests(TestCase):
 
     def setUp(self):
         set_up_fb()
-        self.client = Client()
         self.factory = RequestFactory()
         self.user = mommy.make(User)
         self.staff_user = mommy.make(User)
@@ -103,6 +110,12 @@ class GalleryViewTests(TestCase):
         request.user = user
         return view_gallery(request)
 
+    def _get_altview_response(self, user, data={}):
+        url = reverse('gallery:alternative')
+        request = self.factory.get(url, data)
+        request.user = user
+        return view_gallery(request)
+
     def test_login_not_required(self):
         """
         test that page is accessible if there is no user logged in
@@ -111,6 +124,30 @@ class GalleryViewTests(TestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
+    def test_alt_view_login_not_required(self):
+        """
+        test that page is accessible if there is no user logged in
+        """
+        url = reverse('gallery:alternative')
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_alternative_gallery_view(self):
+        '''
+        test that context is being generated correctly
+        '''
+        file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
+        create_image(file.name, 'category1')
+        response = self.client.get(reverse('gallery:alternative'))
+        self.assertEqual(
+            response.status_code, 200,
+            'NOTE: FAILS IF NOT RUN WITH TEST SETTINGS'
+        )
+        self.assertTrue('images' in response.context)
+        self.assertTrue('categories' in response.context)
+
+        os.unlink(file.name)
+
     def test_gallery_view(self):
         '''
         test that context is being generated correctly
@@ -118,28 +155,37 @@ class GalleryViewTests(TestCase):
         file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
         create_image(file.name, 'category1')
         response = self.client.get(reverse('gallery:gallery'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('images' in response.context)
+        self.assertEqual(response.status_code, 200,)
         self.assertTrue('categories' in response.context)
 
         os.unlink(file.name)
 
-    def test_gallery_view_with_no_images(self):
+    def test_alt_gallery_view_with_no_images(self):
+        """
+        If no images exist, an appropriate message should be displayed.
+        """
+        response = self.client.get(reverse('gallery:alternative'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Coming soon")
+        self.assertQuerysetEqual(response.context['images'], [])
+
+
+    def test_gallery_view_with_no_categories(self):
         """
         If no images exist, an appropriate message should be displayed.
         """
         response = self.client.get(reverse('gallery:gallery'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Coming soon")
-        self.assertQuerysetEqual(response.context['images'], [])
+        self.assertQuerysetEqual(response.context['categories'], [])
 
-    def test_gallery_view_with_image(self):
+    def test_alt_gallery_view_with_image(self):
         """
         If image exists, it should be displayed.
         """
         file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
         testimg = create_image(file.name, 'category1')
-        response = self.client.get(reverse('gallery:gallery'))
+        response = self.client.get(reverse('gallery:alternative'))
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(
             response.context['images'],
@@ -147,6 +193,52 @@ class GalleryViewTests(TestCase):
         )
 
         os.unlink(file.name)
+
+    def test_gallery_view_with_category_but_no_images(self):
+        """
+        If image exists, it should be displayed.
+        """
+        mommy.make(Category)
+        response = self.client.get(reverse('gallery:gallery'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context_data['categories']), 1)
+        self.assertEqual(
+            list(response.context_data['categories']),
+            list(Category.objects.all())
+        )
+        self.assertIn(
+            'No photos in this album yet',
+            response.rendered_content,
+        )
+
+    def test_gallery_view_with_images(self):
+        """
+        If image exists, it should be displayed.
+        """
+        file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
+        testimg = create_image(file.name, 'category1')
+        response = self.client.get(reverse('gallery:gallery'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            settings.MEDIA_URL + testimg.photo.name,
+            response.rendered_content,
+        )
+        os.unlink(file.name)
+
+    def test_alt_gallery_view_with_logged_in_user(self):
+        """
+        With logged in (not staff) user, the edit gallery links are still
+        not shown
+        """
+        response = self._get_altview_response(self.user)
+        self.assertNotIn('View and edit Gallery', str(response.content))
+
+    def test_alt_gallery_view_with_logged_in_staff_user(self):
+        """
+        With staff user, the edit gallery links are shown
+        """
+        response = self._get_altview_response(self.staff_user)
+        self.assertIn('View and edit Gallery', str(response.content))
 
     def test_gallery_view_with_logged_in_user(self):
         """
@@ -163,7 +255,7 @@ class GalleryViewTests(TestCase):
         response = self._get_response(self.staff_user)
         self.assertIn('View and edit Gallery', str(response.content))
 
-    def test_gallery_view_filter(self):
+    def test_alt_gallery_view_filter(self):
         """
         Test gallery shows only images in selected category
         """
@@ -175,7 +267,7 @@ class GalleryViewTests(TestCase):
         testimg2 = create_image(file2.name, 'category2')
 
         response = self.client.get(
-            reverse('gallery:gallery'), {'category': [testimg.category.id]}
+            reverse('gallery:alternative'), {'category': [testimg.category.id]}
         )
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(
@@ -184,7 +276,7 @@ class GalleryViewTests(TestCase):
         )
 
         response = self.client.get(
-            reverse('gallery:gallery'), {'category': [testimg1.category.id]}
+            reverse('gallery:alternative'), {'category': [testimg1.category.id]}
         )
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(
@@ -198,6 +290,32 @@ class GalleryViewTests(TestCase):
 
 
 @override_settings(MEDIA_ROOT='/tmp/')
+class CategoryDetailViewTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        set_up_fb()
+        cls.category = mommy.make(Category, name="Test Cat Name")
+
+    def test_can_get_category_page(self):
+        url = reverse('gallery:category', args=[self.category.slug])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('Test Cat Name', resp.rendered_content)
+        self.assertIn('No photos in this album yet', resp.rendered_content)
+
+    def test_get_category_page_with_images(self):
+        url = reverse('gallery:category', args=[self.category.slug])
+        file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
+        image = mommy.make(Image, photo=file.name, category=self.category)
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('Test Cat Name', resp.rendered_content)
+        self.assertIn(settings.MEDIA_URL + image.photo.name, resp.rendered_content)
+        os.unlink(file.name)
+
+
+@override_settings(MEDIA_ROOT='/tmp/')
 class CategoryListViewTests(TestCase):
 
     def setUp(self):
@@ -205,7 +323,9 @@ class CategoryListViewTests(TestCase):
         self.client = Client()
         self.factory = RequestFactory()
         self.user = mommy.make(User)
-        self.staff_user = mommy.make(User)
+        self.staff_user = User.objects.create_user(
+            username='test', email='staff@test.com', password='test'
+        )
         self.staff_user.is_staff = True
         self.staff_user.save()
 
@@ -284,13 +404,50 @@ class CategoryListViewTests(TestCase):
         self.assertEqual(Category.objects.first().name, 'test')
         self.assertEqual(Category.objects.first().description, 'description')
 
+    def test_submit_with_no_changes(self):
+        category = mommy.make(Category, name='test', description='test')
+        formset_data = {
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 1,
+            'form-0-id': category.id,
+            'form-0-name': category.name,
+            'form-0-description': category.description
+        }
+        self.assertTrue(
+            self.client.login(
+                username=self.staff_user.username, password='test'
+            )
+        )
+        resp = self.client.post(
+            reverse('gallery:categories'), formset_data, follow=True
+        )
+        self.assertIn('No changes made', format_content(resp.rendered_content))
+
+    def test_submit_with_form_errors(self):
+        formset_data = {
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 0,
+            'form-0-description': 'test',
+        }
+        self.assertTrue(
+            self.client.login(
+                username=self.staff_user.username, password='test'
+            )
+        )
+        resp = self.client.post(
+            reverse('gallery:categories'), formset_data, follow=True
+        )
+        self.assertIn(
+            'Please correct the errors below',
+            format_content(resp.rendered_content)
+        )
+
     def test_add_category_description_not_required(self):
         formset_data = {
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 0,
             'form-0-name': 'test',
         }
-        self.assertFalse(Category.objects.exists())
         self._post_response(self.staff_user, formset_data)
 
         self.assertEqual(Category.objects.count(), 1)
@@ -462,10 +619,11 @@ class CategoryUpdateViewTests(TestCase):
 
     def setUp(self):
         set_up_fb()
-        self.client = Client()
         self.factory = RequestFactory()
         self.user = mommy.make(User)
-        self.staff_user = mommy.make(User)
+        self.staff_user = User.objects.create_user(
+            username='test', email='staff@test.com', password='test'
+        )
         self.staff_user.is_staff = True
         self.staff_user.save()
         self.category = mommy.make(Category, name='category')
@@ -590,3 +748,47 @@ class CategoryUpdateViewTests(TestCase):
                 ]
             }
         )
+
+    def test_delete_image(self):
+
+        testfile_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'testjpg.jpg'
+        )
+        from shutil import copyfile
+        copied_filepath = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'testjpgcopy.jpg'
+        )
+        copied_file = copyfile(testfile_path, copied_filepath)
+
+        with open(copied_file, 'rb') as file:
+            photo = SimpleUploadedFile(
+                file.name, content=file.read()
+            )
+
+        testimg = mommy.make(Image, category=self.category, photo=photo)
+        self.assertTrue(os.path.exists(copied_filepath))
+
+        formset_data = {
+            'name': self.category.name,
+            'description': self.category.description,
+            'images-TOTAL_FORMS': 1,
+            'images-INITIAL_FORMS': 1,
+            'images-0-id': testimg.id,
+            'images-0-photo': testimg.photo,
+            'images-0-DELETE': True,
+        }
+
+        self.assertTrue(self.category.images.exists())
+        url = reverse('gallery:edit_category', args=[self.category.id])
+        self.assertTrue(
+            self.client.login(
+                username=self.staff_user.username, password='test'
+            )
+        )
+        response = self.client.post(url, formset_data, follow=True)
+        self.category.refresh_from_db()
+        self.assertEqual(self.category.images.count(), 0)
+
+        os.unlink(copied_filepath)

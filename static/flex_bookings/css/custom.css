@@ -447,9 +447,21 @@ color: #000;
     color: #fff;
 }
 
+.navbar-default .navbar-nav .open .dropdown-menu>li>a {
+    color: lightgrey;
+}
+
 li > a.dropdown-toggle.timetable {
     padding-top: 3px;
     padding-bottom: 7px;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #fff;
+}
+
+.navbar-default .navbar-toggle:hover {
+    background-color: darkseagreen;
 }
 
 .nav-user {

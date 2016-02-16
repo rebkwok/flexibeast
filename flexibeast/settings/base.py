@@ -450,3 +450,5 @@ if HEROKU:
 PERMISSION_DENIED_URL = 'permission_denied'
 
 BOOKING_ON = env('BOOKING_ON')
+
+TESTING = False

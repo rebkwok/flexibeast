@@ -8,7 +8,7 @@
 <div class="container">
     <div class="page-header col-sm-12">
         <h1>
-            Gallery Categories
+            Gallery Albums
         </h1>
     </div>
 
@@ -21,11 +21,11 @@
                         <table class="table tablesorter" id="sortTable">
                             <thead>
                             <tr class="success">
-                                <th>Category Name</th>
+                                <th>Album Name</th>
                                 <th>Description</th>
                                 <th class="table-center">Number of images</th>
                                 <th class="table-center">Add/edit images</th>
-                                <th class="table-center">Delete category</br>and all attached images</th>
+                                <th class="table-center">Delete album</br>and all attached images</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -35,7 +35,7 @@
                                 <span class=hide>{{ category.id }}</span>
                                 {% if not category.instance.id %}
                                     <tr>
-                                        <td class="gallery-tbl" colspan="6"><strong>Add New Category:</strong></td>
+                                        <td class="gallery-tbl" colspan="6"><strong>Add New Album:</strong></td>
                                     </tr>
                                 {% endif %}
                                 <tr>

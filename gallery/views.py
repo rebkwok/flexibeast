@@ -10,7 +10,7 @@ from activitylog.models import ActivityLog
 
 from gallery.forms import CategoryForm, CategoriesFormset, ImageFormset
 from gallery.models import Category, Image
-from gallery.utils import StaffUserMixin, staff_required
+from gallery.utils import StaffUserMixin
 
 
 def view_gallery(request):
@@ -31,6 +31,30 @@ def view_gallery(request):
             'categories': categories,
             'images': images,
             'total_image_count': Image.objects.all().count()
+        }
+    )
+
+
+def gallery_menu_view(request):
+    categories = Category.objects.all().order_by('name')
+    return TemplateResponse(
+        request,
+        'gallery/gallery_menu.html',
+        {
+            'categories': categories,
+        }
+    )
+
+
+def category_detail_view(request, slug):
+
+    category = get_object_or_404(Category, slug=slug)
+    return TemplateResponse(
+        request,
+        'gallery/gallery_category.html',
+        {
+            'category': category,
+            'images': category.images.all()
         }
     )
 

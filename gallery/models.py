@@ -2,12 +2,15 @@ from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
+from django_extensions.db.fields import AutoSlugField
+
 from imagekit.models import ProcessedImageField
 
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
+    slug = AutoSlugField(populate_from='name', max_length=40, unique=True)
 
     def __str__(self):
         return self.name

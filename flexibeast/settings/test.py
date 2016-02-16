@@ -1,6 +1,6 @@
 from .base import *
 
-BOOKING_ON=True
+BOOKING_ON = True
 
 LOGGING = {
         'version': 1,
@@ -39,3 +39,5 @@ LOGGING = {
             },
         },
     }
+
+TESTING = True

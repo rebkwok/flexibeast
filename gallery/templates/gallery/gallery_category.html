@@ -6,33 +6,23 @@
 {% block content %}
 
 <div class="row container">
-    <div class="page-header col-sm-12">
+    <div class="col-sm-12">
         <h1>
-            Gallery{% if cat_selection != "All" %}: {{ cat_selection }}{% endif %}
+            <a href="{% url 'gallery:gallery' %}">Gallery</a>: {{ category }}
         </h1>
 
-            <h4>{% if cat_selection != "All" and cat_selection.description %}{{ cat_selection.description }}{% endif %}</h4>
-        {% if user.is_staff %}
-            <p><a href="{% url 'gallery:categories' %}">View and edit Gallery</a></p>
+            <h4>{% if category.description %}{{ category.description }}{% endif %}</h4>
+
+    {% if user.is_staff %}
+            <p>STAFF USERS ONLY: <a href="{% url 'gallery:edit_category' category.id %}">Edit this album</a></p>
         {% endif %}
     </div>
 
-    {% if categories %}
+    <span class="divider"></span>
 
-        <div class="row">
-            <div class="col-sm-4 col-md-3">
-                <form method="get">
-                    <div class="btn-group-vertical" role="group">
-                        <button class="btn btn-gallery {% if cat_selection == 'All' %}btn-gallery-active{% else %}btn-default{% endif %}"
-                                                       type="submit" name="category" value="All">All  <span class="gallery-count badge pull-right">{{ total_image_count }}</span>
-                        </button>
-                        {% for category in categories %}
-                            <button class="btn btn-gallery {% if cat_selection.id == category.id %}btn-gallery-active{% else %}btn-default{% endif %}"
-                                    type="submit" name="category" value="{{ category.id }}">{{ category.name}}  <span class="gallery-count badge pull-right">{{ category.images.count }} </span></button>
-                        {% endfor %}
-                    </div>
-                </form>
-            </div>
+
+    {% if images %}
+
             <div class="col-sm-8 col-md-9">
 
                     {% for image in images %}
@@ -66,15 +56,15 @@
                             </div>
                             <div class="modal-footer">
 
-                                <div class="col-md-2">
+                                <div class="col-xs-2">
                                     <button type="button" class="btn btn-gallery btn-modal" id="show-previous-image">Previous</button>
                                 </div>
 
-                                <div class="col-md-8 text-justify" id="image-gallery-caption">
+                                <div class="col-xs-9 text-justify" id="image-gallery-caption">
                                     This text will be overwritten by jQuery
                                 </div>
 
-                                <div class="col-md-2">
+                                <div class="col-xs-1">
                                     <button type="button" id="show-next-image" class="btn btn-gallery btn-modal">Next</button>
                                 </div>
                             </div>
@@ -82,10 +72,9 @@
                     </div>
                 </div>
             </div>
-        </div>
 
     {% else %}
-    <div class="col-sm-12">Coming soon</div>
+    <div class="col-sm-12">No photos in this album yet</div>
 
     {% endif %}
 
