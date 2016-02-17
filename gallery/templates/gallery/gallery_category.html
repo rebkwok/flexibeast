@@ -22,7 +22,7 @@
 
 
     {% if images %}
-
+        <p class="gallery-help">Click on thumbnails to enlarge</p>
             <div class="col-sm-8 col-md-9">
 
                     {% for image in images %}
@@ -56,15 +56,15 @@
                             </div>
                             <div class="modal-footer">
 
-                                <div class="col-xs-2">
+                                <div class="pull-left">
                                     <button type="button" class="btn btn-gallery btn-modal" id="show-previous-image">Previous</button>
                                 </div>
 
-                                <div class="col-xs-9 text-justify" id="image-gallery-caption">
+                                <div class="col-xs-8 text-justify" id="image-gallery-caption">
                                     This text will be overwritten by jQuery
                                 </div>
 
-                                <div class="col-xs-1">
+                                <div class="pull-right">
                                     <button type="button" id="show-next-image" class="btn btn-gallery btn-modal">Next</button>
                                 </div>
                             </div>

@@ -31,6 +31,9 @@ class Image(models.Model):
     category = models.ForeignKey(Category, related_name='images')
     caption = models.CharField(max_length=255, null=True, blank=True)
 
+    class Meta:
+        ordering = ('id',)
+
     def __str__(self):
         return "Photo id: " + str(self.id)
 
