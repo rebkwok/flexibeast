@@ -489,7 +489,27 @@ a:visited>.btn, a:link>.btn {
 
 td {
     font-size: 85%;
-	padding: 4 !important;
+	padding: 4px !important;
+}
+
+table.timetable > thead > tr > th {
+    font-size: 85%;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    padding-left: 4px !important;
+    padding-right: 2px !important;
+}
+
+table.timetable > tbody > tr > td {
+    font-size: 85%;
+    padding-top: 4px !important;
+    padding-bottom: 0px !important;
+    padding-left: 4px !important;
+    padding-right: 2px !important;
+}
+
+table.timetable > tfoot > tr > td {
+    font-size: 75%;
 }
 
 .table-btn, .disabled .btn .btn-success .table-btn {
