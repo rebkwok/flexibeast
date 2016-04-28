@@ -1109,3 +1109,19 @@ li.notification-menu-item > a:hover,
 .panel-success .panel-header {
     background-image: linear-gradient(to bottom, rgba(6, 105, 58, 0.2) 0, rgba(6, 105, 58, 0.3) 100%);
 }
+
+img.logo-brand {
+    -moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    filter: FlipH;
+    -ms-filter: "FlipH";
+}
+
+.logo-brand {
+    max-height:76px;
+    margin-top: -12px;
+    margin-left: 0;
+    padding-left: 0;
+}

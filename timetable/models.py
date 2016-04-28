@@ -4,6 +4,7 @@ from django.dispatch import receiver
 
 from flex_bookings.models import EventType
 
+
 class Session(models.Model):
     MON = '01MON'
     TUE = '02TUE'
@@ -22,14 +23,14 @@ class Session(models.Model):
         (SUN, 'Sunday')
     )
 
-    name=models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
     day = models.CharField(max_length=5, choices=DAY_CHOICES)
     time = models.TimeField()
     event_type = models.ForeignKey(EventType, null=True)
     description = models.TextField(blank=True, default="")
     location = models.CharField(max_length=255, default="Watermelon Studio")
     max_participants = models.PositiveIntegerField(
-        null=True, blank=True, default=10,
+        null=True, blank=True, default=9,
         help_text="Leave blank if no max number of participants"
     )
     contact_person = models.CharField(max_length=255, default="Alicia Alexandra")
@@ -56,3 +57,50 @@ def session_pre_save(sender, instance, *args, **kwargs):
         instance.advance_payment_required = False
         instance.payment_due_date = None
 
+
+class WeeklySession(models.Model):
+    """
+    An interim timetable session model while booking is not implemented for
+    FlexiBeast site.  Will be used to maintain/display weekly timetable; to
+    also include block info.
+    """
+
+    MON = '01MON'
+    TUE = '02TUE'
+    WED = '03WED'
+    THU = '04THU'
+    FRI = '05FRI'
+    SAT = '06SAT'
+    SUN = '07SUN'
+    DAY_CHOICES = (
+        (MON, 'Monday'),
+        (TUE, 'Tuesday'),
+        (WED, 'Wednesday'),
+        (THU, 'Thursday'),
+        (FRI, 'Friday'),
+        (SAT, 'Saturday'),
+        (SUN, 'Sunday')
+    )
+
+    name = models.CharField(max_length=255)
+    day = models.CharField(max_length=5, choices=DAY_CHOICES)
+    time = models.TimeField()
+    event_type = models.ForeignKey(EventType, null=True)
+    description = models.TextField(blank=True, default="")
+    location = models.CharField(max_length=255, default="Watermelon Studio")
+    max_participants = models.PositiveIntegerField(
+        null=True, blank=True, default=9,
+        help_text="Leave blank if no max number of participants"
+    )
+    contact_person = models.CharField(max_length=255, default="Alicia Alexandra")
+    contact_email = models.EmailField(default="flexibeast@hotmail.com")
+    cost = models.DecimalField(default=7.00, max_digits=8, decimal_places=2)
+
+    full = models.BooleanField(default=False)
+    block_info = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return "{} {} - {}".format(
+            dict(self.DAY_CHOICES)[self.day],
+            self.time.strftime('%H:%M'), self.name
+        )
