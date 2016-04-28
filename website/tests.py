@@ -298,7 +298,10 @@ class ContactViewsTests(TestMixin, TestCase):
             form.initial,
             {
                 'subject': 'General Enquiry',
-                'first_name': '', 'email_address': '', 'last_name': ''
+                'other_subject': '',
+                'first_name': '',
+                'email_address': '',
+                'last_name': ''
             }
         )
 
@@ -313,6 +316,7 @@ class ContactViewsTests(TestMixin, TestCase):
             form.initial,
             {
                 'subject': 'General Enquiry',
+                'other_subject': '',
                 'first_name': 'test',
                 'last_name': 'testname',
                 'email_address': 'test@test.com',

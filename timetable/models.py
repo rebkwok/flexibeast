@@ -87,7 +87,7 @@ class WeeklySession(models.Model):
     time = models.TimeField()
     event_type = models.ForeignKey(EventType, null=True)
     description = models.TextField(blank=True, default="")
-    location = models.CharField(max_length=255, default="Watermelon Studio")
+    location = models.CharField(max_length=255, default="The Watermelon Studio")
     max_participants = models.PositiveIntegerField(
         null=True, blank=True, default=9,
         help_text="Leave blank if no max number of participants"
@@ -99,8 +99,11 @@ class WeeklySession(models.Model):
     full = models.BooleanField(default=False)
     block_info = models.TextField(blank=True, null=True)
 
+    class Meta:
+        ordering = ('day', 'time')
+
     def __str__(self):
-        return "{} {} - {}".format(
-            dict(self.DAY_CHOICES)[self.day],
-            self.time.strftime('%H:%M'), self.name
+        return "{} - {} {}".format(
+            self.name, dict(self.DAY_CHOICES)[self.day],
+            self.time.strftime('%H:%M')
         )

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+{% load timetabletags %}
+
+{% block content %}
+
+    <div class="container-fluid row">
+
+        <h1 class="page-header">Timetable</h1>
+        {% if sessions %}
+        <div class="row">
+            <div class="col-sm-12">
+
+                <div class="panel panel-success">
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr class="success">
+                                <th>Day</th>
+                                <th>Time</th>
+                                <th>Class</th>
+                                <th>Location</th>
+                                <th>Block Information</th>
+                                <th>Spaces</th>
+                                {% if request.user.is_staff %}<th></th>{% endif %}
+                            </tr>
+
+                            {% for session in sessions %}
+                                <tr>
+                                    <td>{{ session.day | format_session_day }}</td>
+                                    <td>{{ session.time| date:"H:i" }}</td>
+                                    <td>{{ session.name }}</td>
+                                    <td>{{ session.location }}</td>
+                                    <td>{{ session.block_info | linebreaks }}</td>
+                                    <td id="spaces_{{ session.id }}">
+                                        {% include 'timetable/includes/spaces.txt' %}
+                                    </td>
+                                    {% if request.user.is_staff %}
+                                    <td>
+                                        <button data-session_id="{{ session.id }}" class="toggle_spaces_button btn table-btn btn-info">Change spaces</button>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+
+
+
+                </div>
+            </div>
+         </div>
+        {% else %}
+            <p>Coming soon</p>
+        {% endif %}
+
+    </div>
+
+
+
+{% endblock content %}
+
+{% block extra_scripts %}
+   <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+   <script type='text/javascript' src="{% static 'timetable/js/ajax_timetable_spaces.js' %}"></script>
+{% endblock %}

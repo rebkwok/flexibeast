@@ -34,6 +34,13 @@ class ContactForm(forms.Form):
             ),
             widget=forms.Select(attrs={'class': 'form-control input-xs disabled'})
         )
+        other_subject = forms.CharField(
+            max_length=255, required=False,
+            label='Subject',
+            initial='',
+            widget=forms.TextInput(
+                attrs={'class': 'form-control'})
+        )
 
         cc = forms.BooleanField(
             widget=forms.CheckboxInput(attrs={

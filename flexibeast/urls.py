@@ -14,6 +14,7 @@ urlpatterns = [
     ),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^gallery/', include('gallery.urls', namespace='gallery')),
+    url(r'^timetable/', include('timetable.urls', namespace='timetable')),
     url(r'^testimonials/', include('reviews.urls', namespace='reviews')),
     url(r'^page-not-available/$', permission_denied, name='permission_denied'),
     url(r'^accounts/profile/', include('accounts.urls', namespace='profile')),
