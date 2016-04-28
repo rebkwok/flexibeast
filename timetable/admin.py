@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django import forms
 from suit.widgets import EnclosedInput
-from timetable.models import Session, WeeklySession
+from timetable.models import Location, Session, WeeklySession
 from ckeditor.widgets import CKEditorWidget
 
 
@@ -28,3 +28,4 @@ class SessionAdmin(admin.ModelAdmin):
 
 admin.site.register(Session, SessionAdmin)
 admin.site.register(WeeklySession)
+admin.site.register(Location)

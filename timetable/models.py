@@ -5,6 +5,16 @@ from django.dispatch import receiver
 from flex_bookings.models import EventType
 
 
+class Location(models.Model):
+    short_name = models.CharField(max_length=255)
+    full_name = models.CharField(max_length=255)
+    address = models.TextField(blank=True, default="")
+    map_url = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return self.short_name
+
+
 class Session(models.Model):
     MON = '01MON'
     TUE = '02TUE'
@@ -87,7 +97,7 @@ class WeeklySession(models.Model):
     time = models.TimeField()
     event_type = models.ForeignKey(EventType, null=True)
     description = models.TextField(blank=True, default="")
-    location = models.CharField(max_length=255, default="The Watermelon Studio")
+    location = models.ForeignKey(Location, null=True, blank=True)
     max_participants = models.PositiveIntegerField(
         null=True, blank=True, default=9,
         help_text="Leave blank if no max number of participants"

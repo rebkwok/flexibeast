@@ -1,4 +1,3 @@
-{% if session.full %}This class is currently full.
-{% else %}There may be drop-in spaces available.<br/>
-    <a href="{% url 'website:contact' %}?enq={{ session.id }}">Contact me</a> for further information.
+{% if session.full %}Full
+{% else %}Spaces**
 {% endif %}
