@@ -1,3 +1,3 @@
-{% if session.full %}Full
-{% else %}Limited Spaces**
+{% if session.full %}<span class="full">Full</span>
+{% else %}<span class="spaces">Limited Spaces**</span>
 {% endif %}

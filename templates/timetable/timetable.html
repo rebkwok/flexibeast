@@ -110,7 +110,7 @@
             <div class="modal-body">
                 <h4 class="modal-title" id="location-full_name">Full Name</h4>
                 <div id="location-address">Address</div>
-                <iframe id="location-map" width=0% height=0px frameborder="0" style="" src=""></iframe>
+                <iframe id="location-map" frameborder="0"></iframe>
             </div>
             <div class="modal-footer"></div>
         </div>
@@ -122,7 +122,11 @@
 {% endblock content %}
 
 {% block extra_scripts %}
-   <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-   <script type='text/javascript' src="{% static 'timetable/js/ajax_timetable_spaces.js' %}"></script>
+    {% if is_debug_on %}
+       <script type='text/javascript' src="{% static 'timetable/js/underscore.js' %}"></script>
+    {% else %}
+    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+   {% endif %}
+    <script type='text/javascript' src="{% static 'timetable/js/ajax_timetable_spaces.js' %}"></script>
     <script src="{% static 'timetable/js/location_modal.js' %}"></script>
 {% endblock %}

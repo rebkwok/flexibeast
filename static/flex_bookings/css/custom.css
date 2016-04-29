@@ -1122,3 +1122,11 @@ img.logo-brand {
     margin-left: 0;
     padding-left: 0;
 }
+
+.full {
+    color: red;
+}
+
+.spaces {
+    color: green;
+}

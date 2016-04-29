@@ -13,7 +13,14 @@ $(document).ready(function() {
             $('#location-map').attr('style', 'border:2px solid black;');
             $('#location-map').attr('width', '100%;');
             $('#location-map').attr('height', '300px;');
-        };
+        }
+        else {
+            $('#location-map').attr('src', '');
+            $('#location-map').attr('style', 'border:none;');
+            $('#location-map').attr('width', '0%;');
+            $('#location-map').attr('height', '0px;');
+        }
+        ;
     }
 
     function updateDescModal(selector) {
