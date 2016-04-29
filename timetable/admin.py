@@ -26,6 +26,14 @@ class SessionAdmin(admin.ModelAdmin):
     form = SessionForm
 
 
+class WeeklySessionAdmin(admin.ModelAdmin):
+    list_display = ('day', 'time', 'name', 'location', 'full')
+    ordering = ('day', 'time')
+    fields = ('name', 'day', 'time', 'event_type', 'description', 'location',
+              'max_participants', 'contact_person', 'contact_email',
+              'cost', 'block_info', 'full')
+    model = WeeklySession
+
 admin.site.register(Session, SessionAdmin)
-admin.site.register(WeeklySession)
+admin.site.register(WeeklySession, WeeklySessionAdmin)
 admin.site.register(Location)

@@ -31,9 +31,19 @@
                                 <tr>
                                     <td>{{ session.day | format_session_day }}</td>
                                     <td>{{ session.time| date:"H:i" }}</td>
-                                    <td>{{ session.name }}</td>
+                                    <td>
+                                        {% if session.description %}
+                                            <a href="#DescriptionModal" role="button" data-toggle="modal" class="description-link"
+                                               data-title="{{ session.name }}"
+                                               data-description="{{ session.description }}"
+                                            >{{ session.name }}</a>
+                                        {% else %}
+                                            {{ session.name }}
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         <a href="#LocationModal" role="button" data-toggle="modal" class="location-link"
+                                           data-short_name="{{ session.location.short_name }}"
                                            data-full_name="{{ session.location.full_name }}"
                                            data-address="{{ session.location.address }}"
                                            data-map_url="{{ session.location.map_url }}"
@@ -73,6 +83,21 @@
 
     </div>
 
+<!-- Description Modal HTML -->
+<div id="DescriptionModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="description-title">Class Name</h4>
+            </div>
+            <div class="modal-body">
+                <div id="description-text">Description</div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
 
 <!-- Location Modal HTML -->
 <div id="LocationModal" class="modal fade">
@@ -80,15 +105,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="location-title">Full Name</h4>
+                <h3 class="modal-title" id="location-title">Short Name</h3>
             </div>
             <div class="modal-body">
+                <h4 class="modal-title" id="location-full_name">Full Name</h4>
                 <div id="location-address">Address</div>
-                <iframe id="location-map" width=100% height=200px frameborder="0" style="border:2px solid black" src=""></iframe>
+                <iframe id="location-map" width=0% height=0px frameborder="0" style="" src=""></iframe>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
+            <div class="modal-footer"></div>
         </div>
     </div>
 </div>

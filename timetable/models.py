@@ -9,7 +9,7 @@ class Location(models.Model):
     short_name = models.CharField(max_length=255)
     full_name = models.CharField(max_length=255)
     address = models.TextField(blank=True, default="")
-    map_url = models.CharField(max_length=255, blank=True, null=True)
+    map_url = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.short_name
@@ -97,7 +97,9 @@ class WeeklySession(models.Model):
     time = models.TimeField()
     event_type = models.ForeignKey(EventType, null=True)
     description = models.TextField(blank=True, default="")
-    location = models.ForeignKey(Location, null=True, blank=True)
+    location = models.ForeignKey(
+        Location, null=True, blank=True, on_delete=models.SET_NULL
+    )
     max_participants = models.PositiveIntegerField(
         null=True, blank=True, default=9,
         help_text="Leave blank if no max number of participants"
