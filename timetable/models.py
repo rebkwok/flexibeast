@@ -65,7 +65,6 @@ class Session(models.Model):
 def session_pre_save(sender, instance, *args, **kwargs):
     if not instance.cost:
         instance.advance_payment_required = False
-        instance.payment_due_date = None
 
 
 class WeeklySession(models.Model):
