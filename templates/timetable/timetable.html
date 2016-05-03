@@ -31,15 +31,12 @@
                                 <tr>
                                     <td>{{ session.day | format_session_day }}</td>
                                     <td>{{ session.time| date:"H:i" }}</td>
-                                    <td>
-                                        {% if session.description %}
+                                    <td>{% if session.description %}
                                             <a href="#DescriptionModal" role="button" data-toggle="modal" class="description-link"
                                                data-title="{{ session.name }}"
                                                data-description="{{ session.description }}"
                                             >{{ session.name }}</a>
-                                        {% else %}
-                                            {{ session.name }}
-                                        {% endif %}
+                                        {% else %}{{ session.name }}{% endif %}
                                     </td>
                                     <td>
                                         <a href="#LocationModal" role="button" data-toggle="modal" class="location-link"

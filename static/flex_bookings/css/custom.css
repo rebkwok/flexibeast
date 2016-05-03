@@ -493,23 +493,26 @@ td {
 }
 
 table.timetable > thead > tr > th {
-    font-size: 85%;
+    font-size: 90%;
     padding-top: 6px !important;
     padding-bottom: 6px !important;
-    padding-left: 4px !important;
-    padding-right: 2px !important;
+    padding-left: 15px !important;
+    padding-right: 15px !important;
 }
 
 table.timetable > tbody > tr > td {
-    font-size: 85%;
-    padding-top: 4px !important;
-    padding-bottom: 0px !important;
-    padding-left: 4px !important;
-    padding-right: 2px !important;
+    padding-top: 5px !important;
+    padding-bottom: 3px !important;
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+}
+
+table.timetable > tbody > tr > td > p {
+    margin: 0;
 }
 
 table.timetable > tfoot > tr > td {
-    font-size: 75%;
+    font-size: 80%;
 }
 
 .table-btn, .disabled .btn .btn-success .table-btn {
