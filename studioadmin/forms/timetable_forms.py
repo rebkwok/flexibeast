@@ -263,6 +263,16 @@ class WeeklySessionBaseFormSet(BaseModelFormSet):
         if form.instance:
             form.formatted_day = DAY_CHOICES[form.instance.day]
 
+            form.fields['full'] = forms.BooleanField(
+                widget=forms.CheckboxInput(attrs={
+                    'class': "regular-checkbox studioadmin-list",
+                    'id': 'full_{}'.format(index)
+                }),
+                required=False
+            )
+            form.full_id = 'full_{}'.format(index)
+
+
             form.fields['DELETE'] = forms.BooleanField(
                 widget=forms.CheckboxInput(attrs={
                     'class': 'delete-checkbox studioadmin-list',

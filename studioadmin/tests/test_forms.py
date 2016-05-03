@@ -9,7 +9,7 @@ from django.conf import settings
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from flex_bookings.models import Event, EventType, Block
+from flex_bookings.models import Event, EventType
 from studioadmin.forms import (
     ChooseUsersFormSet,
     DAY_CHOICES,
@@ -20,13 +20,15 @@ from studioadmin.forms import (
     PagesFormset,
     PictureFormset,
     TimetableSessionFormSet,
+    TimetableWeeklySessionFormSet,
     SessionAdminForm,
     UploadTimetableForm,
     UserBookingFormSet,
-    UserBlockFormSet
+    UserBlockFormSet,
+    WeeklySessionAdminForm
 )
-from timetable.models import Session
-from website.models import Page, Picture
+from timetable.models import Location, Session, WeeklySession
+from website.models import Page
 
 
 class EventFormSetTests(TestCase):
@@ -354,6 +356,122 @@ class SessionAdminFormTests(TestCase):
 
     def test_name_placeholder(self):
         form = SessionAdminForm(data=self.form_data())
+        name_field = form.fields['name']
+        self.assertEquals(
+            name_field.widget.attrs['placeholder'],
+            'Name of session e.g. Flexibility for Splits')
+
+
+class TimetableWeeklySessionFormSetTests(TestCase):
+
+    def setUp(self):
+        self.session = mommy.make(WeeklySession)
+        self.formset_data = {
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 1,
+            'form-0-id': str(self.session.id),
+        }
+
+    def test_event_formset_valid(self):
+        formset = TimetableWeeklySessionFormSet(data=self.formset_data)
+        self.assertTrue(formset.is_valid())
+
+    def test_additional_form_data(self):
+        formset = TimetableWeeklySessionFormSet(
+            data=self.formset_data, queryset=WeeklySession.objects.all())
+        form = formset.forms[0]
+        self.assertEquals(form.formatted_day, DAY_CHOICES[self.session.day])
+        self.assertEquals(form.full_id, 'full_0')
+
+    def test_can_delete(self):
+        session_to_delete = mommy.make(WeeklySession)
+        fset_data = self.formset_data.copy()
+        fset_data.update(
+            {
+                'form-TOTAL_FORMS': 2,
+                'form-INITIAL_FORMS': 2,
+                'form-1-DELETE': 'on',
+                'form-1-id': session_to_delete.id,
+            }
+        )
+        formset = TimetableWeeklySessionFormSet(
+            data=fset_data, queryset=WeeklySession.objects.all()
+        )
+        self.assertEqual(len(formset.deleted_forms), 1)
+        deleted_form = formset.deleted_forms[0]
+        self.assertEqual(deleted_form.cleaned_data['id'], session_to_delete)
+
+
+class WeeklySessionAdminFormTests(TestCase):
+
+    def setUp(self):
+        self.event_type_yc = mommy.make_recipe(
+            'flex_bookings.event_type_YC', subtype='other')
+        self.event_type_ev = mommy.make_recipe('flex_bookings.event_type_WS')
+
+        location = mommy.make(Location)
+        self.form_data = {
+            'name': 'test_event',
+            'event_type': self.event_type_yc.id,
+            'day': '01MON',
+            'time': '12:00',
+            'contact_email': 'test@test.com',
+            'contact_person': 'test',
+            'location': location.id
+        }
+
+    def test_form_valid(self):
+        form = WeeklySessionAdminForm(data=self.form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_form_with_invalid_contact_person(self):
+        data = self.form_data
+        data.update({'contact_person': ''})
+        form = WeeklySessionAdminForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertEquals(len(form.errors), 1)
+        self.assertIn('contact_person', form.errors.keys())
+        self.assertIn(['This field is required.'], form.errors.values())
+
+    def test_form_with_invalid_contact_email(self):
+        data = self.form_data
+        data.update({'contact_email': ''})
+        form = WeeklySessionAdminForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertEquals(len(form.errors), 1)
+        self.assertIn('contact_email', form.errors.keys())
+        self.assertIn(['This field is required.'], form.errors.values())
+
+        data.update({'contact_email': 'test_email'})
+        form = WeeklySessionAdminForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertEquals(len(form.errors), 1)
+        self.assertIn('contact_email', form.errors.keys())
+        self.assertIn(['Enter a valid email address.'], form.errors.values())
+
+    def test_event_type_queryset(self):
+        self.assertEqual(EventType.objects.count(), 2)
+        form = WeeklySessionAdminForm(data=self.form_data)
+
+        # form creates yoga class ev type if it doesn't already exist
+        self.assertEqual(EventType.objects.count(), 3)
+
+        ev_type_field = form.fields['event_type']
+        self.assertEqual(
+            set(EventType.objects.filter(event_type='CL')),
+            set(ev_type_field.queryset)
+        )
+        self.assertEquals(len(ev_type_field.queryset), 2)
+
+    def test_invalid_time(self):
+        data = self.form_data
+        data.update({'time': '25:00'})
+        form = WeeklySessionAdminForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('Invalid time format', str(form.errors['time']))
+
+    def test_name_placeholder(self):
+        form = WeeklySessionAdminForm(data=self.form_data)
         name_field = form.fields['name']
         self.assertEquals(
             name_field.widget.attrs['placeholder'],
