@@ -63,8 +63,6 @@ class ActivityLogListView(LoginRequiredMixin, StaffUserMixin, ListView):
                 return queryset
 
         if search_text:
-            search_text = search_text.lower()
-
             search_words = search_text.split()
             search_qs = reduce(
                 operator.and_, (Q(log__icontains=x) for x in search_words)
