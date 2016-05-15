@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static %}
+{% load timetabletags %}
+
+{% block content %}
+
+    <div class="container-fluid row">
+
+        <h2 class="page-header">Timetable</h2>
+        {% if sessions %}
+        <div class="row">
+            <div class="col-sm-12">
+
+                <div class="panel panel-success">
+
+                    <div class="table-responsive">
+                        <table class="table timetable">
+                            <thead>
+                            <tr class="success">
+                                <th>Day</th>
+                                <th>Time</th>
+                                <th>Class</th>
+                                <th>Location</th>
+                                <th>Block Information</th>
+                                <th>Availability</th>
+                                {% if request.user.is_staff %}<th></th>{% endif %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for session in sessions %}
+                                <tr>
+                                    <td>{{ session.day | format_session_day }}</td>
+                                    <td>{{ session.time| date:"H:i" }}</td>
+                                    <td>{% if session.description %}
+                                            <a href="#DescriptionModal" role="button" data-toggle="modal" class="description-link"
+                                               data-title="{{ session.name }}"
+                                               data-description="{{ session.description }}"
+                                            >{{ session.name }}</a>
+                                        {% else %}{{ session.name }}{% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="#LocationModal" role="button" data-toggle="modal" class="location-link"
+                                           data-short_name="{{ session.location.short_name }}"
+                                           data-full_name="{{ session.location.full_name }}"
+                                           data-address="{{ session.location.address }}"
+                                           data-map_url="{{ session.location.map_url }}"
+                                                >{{ session.location }}</a>
+                                    </td>
+                                    <td>{{ session.block_info | linebreaks }}</td>
+                                    <td id="spaces_{{ session.id }}">
+                                        {% include 'timetable/includes/spaces.txt' %}
+                                    </td>
+                                    {% if request.user.is_staff %}
+                                    <td>
+                                        <button data-session_id="{{ session.id }}" class="toggle_spaces_button btn table-btn btn-info">Change spaces</button>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td {% if request.user.is_staff %}colspan="7"{% else %}colspan="6"{% endif %}>
+                                    {% if classes_with_spaces %}**There may be drop-in spaces available in these classes.<br/>{% endif %}
+                                    <a href="{% url 'website:contact' %}?enq={{ session.id }}">Contact me</a> for further information.
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+
+
+                </div>
+            </div>
+         </div>
+        {% else %}
+            <p>Coming soon</p>
+        {% endif %}
+
+    </div>
+
+<!-- Description Modal HTML -->
+<div id="DescriptionModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="description-title">Class Name</h4>
+            </div>
+            <div class="modal-body">
+                <div id="description-text">Description</div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Location Modal HTML -->
+<div id="LocationModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 class="modal-title" id="location-title">Short Name</h3>
+            </div>
+            <div class="modal-body">
+                <h4 class="modal-title" id="location-full_name">Full Name</h4>
+                <div id="location-address">Address</div>
+                <iframe id="location-map" frameborder="0"></iframe>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock content %}
+
+{% block extra_scripts %}
+    {% if is_debug_on %}
+       <script type='text/javascript' src="{% static 'timetable/js/underscore.js' %}"></script>
+    {% else %}
+    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+   {% endif %}
+    <script type='text/javascript' src="{% static 'timetable/js/ajax_timetable_spaces.js' %}"></script>
+    <script src="{% static 'timetable/js/location_modal.js' %}"></script>
+{% endblock %}

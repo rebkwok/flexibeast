@@ -1,9 +1,10 @@
 import os
+from datetime import time
 from model_mommy import mommy
 from tempfile import NamedTemporaryFile
 
 from django.conf import settings
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail
 from django.core import management
@@ -12,24 +13,33 @@ from django.test import Client, RequestFactory, TestCase, override_settings
 
 from flex_bookings.tests.helpers import set_up_fb, _create_session
 
+from timetable.models import WeeklySession
 from website.forms import ContactForm
 from website.models import Page, Picture
 from website.views import contact as contact_view
-from website.views import page as page_view
 
 
 class TestMixin(object):
-    def setUp(self):
+
+    @classmethod
+    def setUpTestData(cls):
         set_up_fb()
-        self.client = Client()
-        self.factory = RequestFactory()
-        self.user = mommy.make_recipe('flex_bookings.user')
-        self.staff_user = mommy.make_recipe('flex_bookings.user')
-        self.staff_user.is_staff = True
-        self.staff_user.save()
+        cls.user = User.objects.create_user(
+            username='user', email='user@test.com', password='test'
+        )
+        cls.staff_user = User.objects.create_user(
+            username='staff_user', email='staff@test.com', password='test'
+        )
+        cls.staff_user.is_staff = True
+        cls.staff_user.save()
         perm = Permission.objects.get(codename='can_view_restricted')
-        self.restricted_user = mommy.make_recipe('flex_bookings.user')
-        self.restricted_user.user_permissions.add(perm)
+        cls.restricted_user = User.objects.create_user(
+            username='restricted_user', email='restr@test.com', password='test'
+        )
+        cls.restricted_user.user_permissions.add(perm)
+
+    def setUp(self):
+        self.factory = RequestFactory()
 
 
 class WebsiteFormsTests(TestCase):
@@ -129,20 +139,29 @@ class WebsiteModelsTests(TestCase):
 
 class PageViewsTests(TestMixin, TestCase):
 
-    def _get_response(self, user, page):
-        url = reverse('website:page', kwargs={'page_name': page.name})
-        request = self.factory.get(url)
-        request.user = user
-        return page_view(request, page.name)
+    @classmethod
+    def setUpTestData(cls):
+        super(PageViewsTests, cls).setUpTestData()
+        cls.restricted_page = mommy.make(
+            Page, active=True, name="testname", restricted=True
+        )
+        cls.restricted_page_url = reverse(
+            'website:page', kwargs={'page_name': cls.restricted_page.name}
+        )
+        cls.public_page = mommy.make(Page, active=True, name="testname1")
+        cls.public_page_url = reverse(
+            'website:page', kwargs={'page_name': cls.public_page.name}
+        )
+
+    def login(self, user):
+        self.client.login(username=user.username, password='test')
 
     def test_can_get_page(self):
-        page = mommy.make(Page, active=True, name="testname")
-        resp = self.client.get(
-            reverse('website:page', kwargs={'page_name': page.name})
-        )
+        resp = self.client.get(self.public_page_url)
         self.assertEqual(resp.status_code, 200)
 
-        resp = self._get_response(self.user, page)
+        self.login(self.user)
+        resp = self.client.get(self.public_page_url)
         self.assertEqual(resp.status_code, 200)
 
         # no staff messages shown
@@ -160,24 +179,21 @@ class PageViewsTests(TestMixin, TestCase):
         self.assertEqual(resp.status_code, 404)
 
     def test_cannot_get_restricted_page_if_not_logged_in(self):
-        page = mommy.make(Page, active=True, name="testname", restricted=True)
-        resp = self.client.get(
-            reverse('website:page', kwargs={'page_name': page.name})
-        )
+        resp = self.client.get(self.restricted_page_url)
         self.assertEqual(resp.status_code, 302)
         self.assertIn(
             resp.url, reverse('website:restricted_page_not_logged_in')
         )
 
     def test_cannot_get_restricted_page_without_permission(self):
-        page = mommy.make(Page, active=True, name="testname", restricted=True)
-        resp = self._get_response(self.user, page)
+        self.login(self.user)
+        resp = self.client.get(self.restricted_page_url)
         self.assertEqual(resp.status_code, 302)
         self.assertIn(resp.url, reverse('permission_denied'))
 
     def test_can_get_restricted_page_if_has_permission(self):
-        page = mommy.make(Page, active=True, name="testname", restricted=True)
-        resp = self._get_response(self.restricted_user, page)
+        self.login(self.restricted_user)
+        resp = self.client.get(self.restricted_page_url)
         self.assertEqual(resp.status_code, 200)
 
         # staff message not shown on page
@@ -186,8 +202,8 @@ class PageViewsTests(TestMixin, TestCase):
         )
 
     def test_can_get_restricted_page_if_staff_user(self):
-        page = mommy.make(Page, active=True, name="testname", restricted=True)
-        resp = self._get_response(self.staff_user, page)
+        self.login(self.staff_user)
+        resp = self.client.get(self.restricted_page_url)
         self.assertEqual(resp.status_code, 200)
 
         # staff message shown on page
@@ -196,52 +212,58 @@ class PageViewsTests(TestMixin, TestCase):
         )
 
     def test_get_correct_default_template_layout(self):
-        page = mommy.make(Page, active=True, name="testname")
-        resp = self._get_response(self.user, page)
-
+        resp = self.client.get(self.public_page_url)
         # default template is page.html
         self.assertEqual(resp.template_name, 'website/page.html')
 
     def test_get_default_template_layout_if_no_pictures(self):
-        page = mommy.make(Page, active=True, name="testname", layout='img-col-right')
-        resp = self._get_response(self.user, page)
+        self.public_page.layout = 'img-col-right'
+        self.public_page.save()
+        resp = self.client.get(self.public_page_url)
 
         # if no pictures, default template is used
         self.assertEqual(resp.template_name, 'website/page.html')
 
     def test_get_relevant_template_layout_if_pictures(self):
-        page = mommy.make(Page, active=True, name="testname", layout='img-col-right')
-        mommy.make(Picture, page=page)
+        self.public_page.layout='img-col-right'
+        self.public_page.save()
+        mommy.make(Picture, page=self.public_page)
 
-        resp = self._get_response(self.user, page)
+        resp = self.client.get(self.public_page_url)
         self.assertEqual(resp.template_name, 'website/page_col.html')
 
     def test_include_extra_html_for_about_page(self):
-        page = mommy.make(Page, active=True, name="testname")
-        resp = self._get_response(self.user, page)
+        resp = self.client.get(self.public_page_url)
         self.assertEqual(resp.context_data['include_html'], '')
 
         page = mommy.make(Page, active=True, name="about")
-        resp = self._get_response(self.user, page)
+        resp = self.client.get(
+            reverse('website:page', kwargs={'page_name': page.name})
+        )
         self.assertEqual(
             resp.context_data['include_html'], 'website/about_extra.html'
         )
 
     def test_cannot_get_inactive_page_if_not_staff(self):
-        page = mommy.make(Page, active=False, name="testname")
-        resp = self._get_response(self.user, page)
+        page = mommy.make(Page, active=False, name="testname2")
+        self.login(self.user)
+        resp = self.client.get(
+            reverse('website:page', kwargs={'page_name': page.name})
+        )
         self.assertEqual(resp.status_code, 302)
         self.assertIn(resp.url, reverse('permission_denied'))
 
         # permission denied page if restricted user and restricted page too
         page.restricted = True
         page.save()
-        resp = self._get_response(self.restricted_user, page)
+        resp = self.client.get(
+            reverse('website:page', kwargs={'page_name': page.name})
+        )
         self.assertEqual(resp.status_code, 302)
         self.assertIn(resp.url, reverse('permission_denied'))
 
     def test_cannot_get_inactive_page_if_not_logged_in(self):
-        page = mommy.make(Page, active=False, name="testname")
+        page = mommy.make(Page, active=False, name="testname3")
         resp = self.client.get(
             reverse('website:page', kwargs={'page_name': page.name})
         )
@@ -249,8 +271,11 @@ class PageViewsTests(TestMixin, TestCase):
         self.assertIn(resp.url, reverse('permission_denied'))
 
     def test_can_get_inactive_page_if_staff_user(self):
-        page = mommy.make(Page, active=False, name="testname")
-        resp = self._get_response(self.staff_user, page)
+        page = mommy.make(Page, active=False, name="testname4")
+        self.login(self.staff_user)
+        resp = self.client.get(
+            reverse('website:page', kwargs={'page_name': page.name})
+        )
         self.assertEqual(resp.status_code, 200)
 
         # message shown on page
@@ -298,7 +323,10 @@ class ContactViewsTests(TestMixin, TestCase):
             form.initial,
             {
                 'subject': 'General Enquiry',
-                'first_name': '', 'email_address': '', 'last_name': ''
+                'other_subject': '',
+                'first_name': '',
+                'email_address': '',
+                'last_name': ''
             }
         )
 
@@ -313,6 +341,7 @@ class ContactViewsTests(TestMixin, TestCase):
             form.initial,
             {
                 'subject': 'General Enquiry',
+                'other_subject': '',
                 'first_name': 'test',
                 'last_name': 'testname',
                 'email_address': 'test@test.com',
@@ -340,6 +369,19 @@ class ContactViewsTests(TestMixin, TestCase):
         resp = self._get_response(referer=referer)
         form = resp.context_data['form']
         self.assertEqual(form.initial['subject'], 'General Enquiry')
+
+        ttsession = mommy.make(
+            WeeklySession, name="Splits", day='01MON',
+            time=time(hour=19, minute=00)
+        )
+        resp = self.client.get(
+            reverse('website:contact') + '?enq={}'.format(ttsession.id)
+        )
+        form = resp.context_data['form']
+        self.assertEqual(form.initial['subject'], 'Booking Enquiry')
+        self.assertEqual(
+            str(form.initial['other_subject']), 'Splits - Monday 19:00'
+        )
 
     def test_process_valid_contact_form(self):
 
@@ -399,6 +441,30 @@ class ContactViewsTests(TestMixin, TestCase):
         self.assertEqual(email.to, ['flexibeasttest@gmail.com'])
         self.assertEqual(email.reply_to, ['test@test.com'])
         self.assertEqual(email.cc, ['test@test.com'])
+
+    def test_process_contact_form_with_additional_subject(self):
+
+        form_data = {
+            'subject': 'General Enquiry',
+            'other_subject': 'My subject',
+            'first_name': 'test',
+            'last_name': 'testname',
+            'email_address': 'test@test.com',
+            'message': 'Hello',
+            'cc': True
+        }
+
+        self._post_response(form_data)
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.to, ['flexibeasttest@gmail.com'])
+        self.assertEqual(email.reply_to, ['test@test.com'])
+        self.assertEqual(email.cc, ['test@test.com'])
+        self.assertEqual(
+            email.subject, '{} General Enquiry: My subject'.format(
+                settings.ACCOUNT_EMAIL_SUBJECT_PREFIX
+            )
+        )
 
     def test_message(self):
         form_data = {

@@ -11,7 +11,7 @@ from activitylog.models import ActivityLog
 
 from reviews.forms import ReviewForm, ReviewFormSet, ReviewSortForm
 from reviews.models import Review
-from reviews.utils import StaffUserMixin, staff_required
+from reviews.utils import StaffUserMixin
 
 
 class ReviewListView(ListView):

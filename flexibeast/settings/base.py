@@ -302,18 +302,22 @@ SUIT_CONFIG = {
             'app': 'reviews'
         },
         {
-            'app': 'auth',
-            'label': 'Users',
-            'models': ('user',),
+            'label': 'Accounts',
+            'models': (
+                'auth.user',
+                'account.emailaddress',
+                'account.emailconfirmation',
+                'socialaccount.socialaccount'
+            ),
             'icon': 'icon-user',
         },
-        # {
-        #     'label': 'Payments',
-        #     'models': ('payments.paypalbookingtransaction',
-        #                'payments.paypalblocktransaction',
-        #                'ipn.paypalipn'),
-        #     'icon': 'icon-asterisk',
-        # },
+        {
+            'label': 'Payments',
+            'models': ('payments.paypalbookingtransaction',
+                       'payments.paypalblocktransaction',
+                       'ipn.paypalipn'),
+            'icon': 'icon-asterisk',
+        },
         {
             'label': 'Activity Log',
             'app': 'activitylog',

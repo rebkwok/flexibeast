@@ -5,17 +5,6 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import HttpResponseRedirect
 
 
-def staff_required(func):
-    def decorator(request, *args, **kwargs):
-        if request.user.is_staff:
-            return func(request, *args, **kwargs)
-        else:
-            return HttpResponseRedirect(
-                reverse(settings.PERMISSION_DENIED_URL)
-            )
-    return wraps(func)(decorator)
-
-
 class StaffUserMixin(object):
 
     def dispatch(self, request, *args, **kwargs):

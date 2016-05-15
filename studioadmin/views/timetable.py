@@ -1,36 +1,17 @@
-import urllib.parse
-import ast
+
 import logging
-
-from datetime import datetime
-from functools import wraps
-
-
-from django.db.utils import IntegrityError
-from django import forms
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User, Permission
 
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.db.models import Q
-from django.template.loader import get_template
-from django.template import Context
-from django.template.response import TemplateResponse
 from django.shortcuts import HttpResponseRedirect, HttpResponse, redirect, \
     render, get_object_or_404
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
-from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.core.mail import send_mail
 
 from braces.views import LoginRequiredMixin
 
-from flex_bookings.models import Event, Booking, Block, WaitingListUser, \
-    BookingError
 from flex_bookings import utils
-from flex_bookings.email_helpers import send_support_email, send_waiting_list_email
 
 from timetable.models import Session
 from studioadmin.forms import DAY_CHOICES, SessionAdminForm, \
@@ -41,7 +22,6 @@ from activitylog.models import ActivityLog
 
 
 logger = logging.getLogger(__name__)
-
 
 
 @login_required

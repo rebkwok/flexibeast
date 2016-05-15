@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.core.mail import send_mail
 
+from timetable.models import WeeklySession
 from website.models import Page
 from website.forms import ContactForm
 
@@ -61,11 +62,15 @@ def process_contact_form(request):
 
     if form.is_valid():
         subject = form.cleaned_data['subject']
+        other_subject = form.cleaned_data.get('other_subject')
         email_address = form.cleaned_data['email_address']
         first_name = form.cleaned_data['first_name']
         last_name = form.cleaned_data['last_name']
         cc = form.cleaned_data['cc']
         message = form.cleaned_data['message']
+
+        if other_subject:
+            subject = "{}: {}".format(subject, other_subject)
 
         ctx = {
             'host': 'http://{}'.format(request.META.get('HTTP_HOST')),
@@ -157,21 +162,28 @@ def get_initial_contact_form(request):
     request.session['return_url'] = request.META.get(
         'HTTP_REFERER', request.get_full_path()
     )
+
+    tt_session_id = request.GET.get('enq')
+    if tt_session_id:
+        tt_session = WeeklySession.objects.get(id=tt_session_id)
+        subject = 'Booking Enquiry'
+    else:
+        page = request.session['return_url'].split('/')[-2]
+        if page == 'classes':
+            subject = 'Booking Enquiry'
+        elif page == 'workshops':
+            subject = 'Workshop Enquiry'
+        else:
+            subject = 'General Enquiry'
+
     first_name = request.session.get('first_name', '')
     last_name = request.session.get('last_name', '')
     email_address = request.session.get('email_address', '')
 
-    page = request.session['return_url'].split('/')[-2]
-    if page == 'classes':
-        subject = 'Booking Enquiry'
-    elif page == 'workshops':
-        subject = 'Workshop Enquiry'
-    else:
-        subject = 'General Enquiry'
-
     return ContactForm(initial={
         'first_name': first_name, 'last_name': last_name,
-        'email_address': email_address, 'subject': subject
+        'email_address': email_address, 'subject': subject,
+        'other_subject': tt_session if tt_session_id else ''
     })
 
 

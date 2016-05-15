@@ -1,29 +1,11 @@
-import urllib.parse
-import ast
 import logging
-
-from datetime import datetime
-from functools import wraps
-
-
-from django.db.utils import IntegrityError
-from django import forms
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User, Permission
 
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.db.models import Q
-from django.template.loader import get_template
-from django.template import Context
 from django.template.response import TemplateResponse
-from django.shortcuts import HttpResponseRedirect, HttpResponse, redirect, \
-    render, get_object_or_404
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
-from django.utils import timezone
+from django.shortcuts import HttpResponseRedirect, get_object_or_404
+from django.views.generic import CreateView, ListView, UpdateView
 from django.utils.safestring import mark_safe
-from django.core.mail import send_mail
 
 from braces.views import LoginRequiredMixin
 
@@ -274,8 +256,6 @@ class PageCreateView(LoginRequiredMixin, StaffUserMixin, CreateView):
                     {'form': form, 'picture_formset': picture_formset,
                      'sidenav_selection': 'add_page'}
                     )
-
-            return TemplateResponse(request, self.template_name, context)
 
         return HttpResponseRedirect(self.get_success_url())
 
