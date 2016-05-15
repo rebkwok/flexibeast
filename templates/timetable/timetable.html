@@ -61,7 +61,7 @@
                             <tfoot>
                             <tr>
                                 <td {% if request.user.is_staff %}colspan="7"{% else %}colspan="6"{% endif %}>
-                                    **There may be drop-in spaces available in these classes.<br/>
+                                    {% if classes_with_spaces %}**There may be drop-in spaces available in these classes.<br/>{% endif %}
                                     <a href="{% url 'website:contact' %}?enq={{ session.id }}">Contact me</a> for further information.
                                 </td>
                             </tr>

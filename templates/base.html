@@ -72,9 +72,12 @@
                                 {% endif %}
                             {% endif %}
                         {% endfor %}
-                        <li class="active-nav hidden-sm"><a href="{% url 'timetable:timetable' %}">Timetable</a></li>
-                        <li class="active-nav hidden-sm"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
-                        <li class="active-nav hidden-sm"><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
+
+{#                    Timetable, Gallery and Reviews always shown as a main menu option#}
+                    <li class="active-nav"><a href="{% url 'timetable:timetable' %}">Timetable</a></li>
+                    <li class="active-nav"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
+                    <li class="active-nav"><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
+
 {#                       More dropdown shows only those pages selected to in the More dropdown at larger screen sizes #}
                         {% if more_menu_options %}
                             <li class="dropdown hidden-sm">
@@ -107,6 +110,8 @@
                         </li>
                     {% endif %}
 
+
+
 {#                       More dropdown shows all options other than Timetable and booking if small screen size #}
 {#                        {% if menu_options %}#}
                             <li class="dropdown visible-sm">
@@ -117,9 +122,7 @@
                                         <li class="active-nav"><a href="{% url 'website:page' page.name %}">{{ page.menu_name }}</a></li>
                                     {% endif %}
                                 {% endfor %}
-                                <li class="active-nav"><a href="{% url 'timetable:timetable' %}">Timetable</a></li>
-                                <li class="active-nav"><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
-                                <li class="active-nav"><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
+
                               </ul>
                             </li>
 {#                        {% endif %}#}

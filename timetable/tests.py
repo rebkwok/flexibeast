@@ -133,23 +133,23 @@ class TimetableManagementTests(TestMixin, TestCase):
         management.call_command('create_locations_and_weekly_sessions')
         self.assertTrue(Location.objects.exists())
         self.assertTrue(WeeklySession.objects.exists())
-        self.assertEqual(Location.objects.count(), 1)
-        self.assertEqual(WeeklySession.objects.count(), 5)
+        self.assertEqual(Location.objects.count(), 2)
+        self.assertEqual(WeeklySession.objects.count(), 6)
 
     def test_locations_and_weekly_sessions_not_recreated(self):
         management.call_command('create_locations_and_weekly_sessions')
         self.assertTrue(Location.objects.exists())
         self.assertTrue(WeeklySession.objects.exists())
-        self.assertEqual(Location.objects.count(), 1)
-        self.assertEqual(WeeklySession.objects.count(), 5)
+        self.assertEqual(Location.objects.count(), 2)
+        self.assertEqual(WeeklySession.objects.count(), 6)
         session_ids = [sess.id for sess in WeeklySession.objects.all()]
 
         # call again; counts stay the same
         management.call_command('create_locations_and_weekly_sessions')
         self.assertTrue(Location.objects.exists())
         self.assertTrue(WeeklySession.objects.exists())
-        self.assertEqual(Location.objects.count(), 1)
-        self.assertEqual(WeeklySession.objects.count(), 5)
+        self.assertEqual(Location.objects.count(), 2)
+        self.assertEqual(WeeklySession.objects.count(), 6)
         session_ids1 = [sess.id for sess in WeeklySession.objects.all()]
 
         # sessions are the same,  not created again
@@ -158,20 +158,20 @@ class TimetableManagementTests(TestMixin, TestCase):
     def test_existing_sessions_restored_to_default(self):
         management.call_command('create_locations_and_weekly_sessions')
 
-        # get the Friday session
-        fri_sess = WeeklySession.objects.get(
-            day=WeeklySession.FRI, time=time(11, 0)
+        # get the Monday 7pm session
+        mon_sess = WeeklySession.objects.get(
+            day=WeeklySession.MON, time=time(19, 0)
         )
-        self.assertEqual(fri_sess.description, '')
-        fri_sess.description = 'new'
-        fri_sess.save()
+        self.assertEqual(mon_sess.description, '')
+        mon_sess.description = 'new'
+        mon_sess.save()
 
-        self.assertEqual(fri_sess.description, 'new')
+        self.assertEqual(mon_sess.description, 'new')
         management.call_command('create_locations_and_weekly_sessions')
 
-        fri_sess.refresh_from_db()
+        mon_sess.refresh_from_db()
         # description has been set back to default
-        self.assertEqual(fri_sess.description, '')
+        self.assertEqual(mon_sess.description, '')
 
     def test_create_timetable_sessions(self):
         self.assertFalse(Session.objects.exists())

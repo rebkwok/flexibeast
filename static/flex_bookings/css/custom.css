@@ -1074,6 +1074,14 @@ li.notification-menu-item > a:hover,
 
 }
 
+@media (max-width: 767px) {
+    .navbar .navbar-collapse .navbar-nav > li > a {
+        margin-top: 0px;
+        padding-top: 0px;
+        bottom: 0px;
+    }
+}
+
 .dropdown-menu .dropdown-menu {
 	position: static;
 	float: none;

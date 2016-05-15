@@ -13,6 +13,12 @@ class WeeklySessionListView(ListView):
     template_name = 'timetable/timetable.html'
     context_object_name = 'sessions'
 
+    def get_context_data(self, **kwargs):
+        context = super(WeeklySessionListView, self).get_context_data(**kwargs)
+        spaces = WeeklySession.objects.filter(full=False).exists()
+        context['classes_with_spaces'] = spaces
+        return context
+
 
 @login_required
 @staff_required
