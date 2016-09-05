@@ -137,6 +137,7 @@ TEMPLATES = [
                 "website.context_processors.menu_options",
                 "website.context_processors.reviews_pending",
                 "website.context_processors.booking_on",
+                "website.context_processors.out_of_office"
             ),
             'debug': DEBUG,
         },

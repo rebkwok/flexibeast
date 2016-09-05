@@ -192,6 +192,16 @@
           </div>
         {% endif %}
 
+      {% if out_of_office %}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="message alert alert-warning">
+                {{ out_of_office_msg }}
+                </div>
+            </div>
+        </div>
+      {% endif %}
+
     {% block body %}
         {% block content %}
             <div class="container-fluid">

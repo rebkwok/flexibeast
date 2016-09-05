@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from django.conf import settings
+from django.utils import timezone
 
 from website.models import Page
 
@@ -56,3 +59,20 @@ def reviews_pending(request):
 
 def booking_on(request):
     return {'booking_on': settings.BOOKING_ON}
+
+
+def out_of_office(request):
+    start_date = datetime(2016, 9, 5, tzinfo=timezone.utc)
+    end_date = datetime(2016, 9, 17, tzinfo=timezone.utc)
+
+    out_of_office_status = False
+    msg = ''
+    if start_date < timezone.now() < end_date:
+        out_of_office_status = True
+        msg = 'I am at a conference until 16th September and will reply to ' \
+          'any enquiries when I get back'
+
+    return {'out_of_office': out_of_office_status, 'out_of_office_msg': msg}
+
+
+
