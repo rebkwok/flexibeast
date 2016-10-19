@@ -17,6 +17,7 @@ from flex_bookings.models import Event, Booking, Block
 from flex_bookings.tests.helpers import set_up_fb, _create_session, setup_view
 # from studioadmin.forms import SimpleBookingRegisterFormSet
 
+from studioadmin.tests.utils import TestPermissionMixin
 from studioadmin.views.activitylog import ActivityLogListView
 from studioadmin.views.email_users import choose_users_to_email, \
     email_users_view
@@ -44,17 +45,6 @@ from studioadmin.views.misc import confirm_user_block_payment, \
 
 from timetable.models import Session
 
-
-class TestPermissionMixin(object):
-
-    def setUp(self):
-        set_up_fb()
-        self.client = Client()
-        self.factory = RequestFactory()
-        self.user = mommy.make_recipe('flex_bookings.user')
-        self.staff_user = mommy.make_recipe('flex_bookings.user')
-        self.staff_user.is_staff = True
-        self.staff_user.save()
 
 
 class ConfirmUserBookingPaymentViewTests(TestPermissionMixin, TestCase):

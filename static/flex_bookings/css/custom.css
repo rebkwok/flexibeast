@@ -847,16 +847,17 @@ a > span.fa.fa-print {
 }
 
 .fading {
-  width: 450px;
+  width: 650px;
   height: 320px;
   position: relative;
-  margin:0 auto;
+  margin: auto;
 }
 
 .fading > img {
   position: absolute;
   max-height: 320px;
-  width: auto; margin: auto;
+  width: auto;
+  margin: auto;
   opacity: 0;
   overflow: hidden;
   -webkit-animation: anim 14s infinite;

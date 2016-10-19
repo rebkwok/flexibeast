@@ -7,7 +7,7 @@
 {% block content %}
 
 
-<div class="container-fluid">
+<div class="container-fluid extra-top-margin">
 {% if user.is_staff %}
     {% if not page.active or page.restricted %}
         <div class="divider"></div>
@@ -21,7 +21,6 @@
 {% endif %}
 
 
-        <div class="container-fluid extra-top-margin">
         {% if include_html %}{% include include_html %}{% endif %}
 
         <div class="row">
@@ -44,7 +43,6 @@
 
         </div>
         </div>
-	</div>
 
 
 
