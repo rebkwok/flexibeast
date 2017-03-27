@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
+
+{% block extra_head %}
+    <link href="{% static 'account/css/account.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block body %}
-
 
     {% block content %}
     {% endblock %}
@@ -12,5 +17,4 @@
 
 {% block extra_body %}
 {% endblock extra_body %}
-
 

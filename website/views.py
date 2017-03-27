@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.core.mail import send_mail
 
+from reviews.models import Review
 from timetable.models import WeeklySession
 from website.models import Page
 from website.forms import ContactForm
@@ -23,6 +24,37 @@ TEMPLATES = {
     'img-col-left': 'website/page_col.html',
     'img-col-right': 'website/page_col.html',
 }
+
+
+def home(request):
+    reviews = Review.objects.filter(selected=True).order_by('-submission_date')
+    return TemplateResponse(
+        request, 'website/index.html',
+        {'nav_section': 'home', 'testimonials': reviews}
+    )
+
+def about(request):
+    return TemplateResponse(
+        request, 'website/about.html', {'nav_section': 'about'}
+    )
+
+
+def classes(request):
+    return TemplateResponse(
+        request, 'website/classes.html', {'nav_section': 'classes'}
+    )
+
+
+def private(request):
+    return TemplateResponse(
+        request, 'website/private_instruction.html', {'nav_section': 'private'}
+    )
+
+
+def workshops(request):
+    return TemplateResponse(
+        request, 'website/workshops.html', {'nav_section': 'workshops'}
+    )
 
 
 def page(request, page_name):

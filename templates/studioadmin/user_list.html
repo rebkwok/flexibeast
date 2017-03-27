@@ -3,31 +3,26 @@
 {% load commontags %}
 
 {% block studioadmincontent %}
-
-    <div class="container-fluid row">
+    <div class="studioadmin-container">
 
         <h2>Registered Users</h2>
-        <div class="row">
-        <div class="col-xs-12"
 
-        </div>
-            <div class="col-sm-12">
+                <div>
 
-                <div class="panel panel-success">
 
                     <div class="table-responsive">
-                                <form method="get">
-                                    <button class="btn remove_all_button btn-success"
-                                        type="submit" name="remove_all" id="remove_all_button">Remove from all</button>
-                                </form>
+
                         <table class="table tablesorter" id="sortTable">
                             <thead>
                             <tr class="success">
                                 <th class="table-center">Username <span class="fa fa-sort"></span></th>
                                 <th class="table-center">First Name <span class="fa fa-sort"></span></th>
                                 <th class="table-center">Last Name <span class="fa fa-sort"></span></th>
-                                <th class="table-center">Can view restricted<br/>webpages?<br>
-
+                                <th class="table-center">Can view restricted webpages?<br>
+                                    <form method="get">
+                                    <button class="btn table-btn remove_all_button btn-success"
+                                        type="submit" name="remove_all" id="remove_all_button">Remove from all</button>
+                                </form>
                                 </th>
                                 <th class="table-center">Time since<br/>access granted</th>
                                 {% if booking_on %}<th class="table-center">Bookings</th>{% endif %}
@@ -60,8 +55,6 @@
                     </div>
                 </div>
             </div>
-         </div>
 
-    </div>
 
 {% endblock studioadmincontent %}

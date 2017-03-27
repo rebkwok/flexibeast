@@ -4,8 +4,8 @@
 
 {% block content %}
 
-<div class="small-margin extra-top-margin container-fluid row">
-    <div class="col-sm-11">
+<div class="container container-top container-fluid">
+    <div class="col-sm-12">
        <div class="panel panel-success">
             <div class="panel-heading">
                 <h1 class="panel-title">Edit Your Account Profile</h1>
@@ -15,8 +15,8 @@
                     {{ form.as_p}}
 
 
-                    <input class="btn btn-success" type="submit" value="Update" />
-                    <a href="{% url 'profile:profile' %}"><div class="btn btn-warning">Cancel</div></a>
+                    <input class="btn btn-fb-success" type="submit" value="Update" />
+                    <a href="{% url 'profile:profile' %}"><div class="btn btn-fb-success-minor">Cancel</div></a>
                 </form>
             </br>
 

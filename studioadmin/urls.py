@@ -1,5 +1,7 @@
-from django.conf.urls import url
+from django.conf.urls import include, url
 from django.views.generic import RedirectView
+
+from gallery.views import CategoryListView, CategoryUpdateView
 from studioadmin.views.activitylog import ActivityLogListView
 from studioadmin.views.email_users import choose_users_to_email, \
     email_users_view
@@ -16,6 +18,14 @@ urlpatterns = [
     url(
         r'activitylog/$', ActivityLogListView.as_view(), name='activitylog'
     ),
+    #### GALLERY #####
+    url(r'^gallery/albums/$', CategoryListView.as_view(), name='gallery_categories'),
+    # Category detail view, show all images for edit/delete/add
+    url(
+        r'^gallery/albums/(?P<pk>\d+)$', CategoryUpdateView.as_view(),
+        name='gallery_category_edit'
+    ),
+    #### WEBSITE PAGES #####
     url(
         r'^website-pages/$',
         PageListView.as_view(), name='website_pages_list'

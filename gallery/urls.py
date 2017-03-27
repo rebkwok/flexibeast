@@ -1,10 +1,11 @@
 from django.conf import settings
 from django.conf.urls import url
 from gallery.views import category_detail_view, CategoryListView, \
-    CategoryUpdateView, gallery_menu_view, view_gallery
+    CategoryUpdateView, gallery_menu_view, view_gallery, gallery_website_view
 
 urlpatterns = [
-    url(r'^$', gallery_menu_view, name='gallery'),
+    # url(r'^$', gallery_menu_view, name='gallery'),
+    url(r'^$', gallery_website_view, name='gallery'),
     url(r'^album/(?P<slug>[\w-]+)$', category_detail_view, name='category'),
     ##### VIEWS FOR STAFF USER ONLY #####
     # Category list view, show all categories in list, allow  for edit of
@@ -15,7 +16,7 @@ urlpatterns = [
     url(
         r'^albums/(?P<pk>\d+)$', CategoryUpdateView.as_view(),
         name='edit_category'
-    ),
+    )
 ]
 
 

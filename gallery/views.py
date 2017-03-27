@@ -13,6 +13,19 @@ from gallery.models import Category, Image
 from gallery.utils import StaffUserMixin
 
 
+def gallery_website_view(request):
+    categories = Category.objects.all().order_by('name')
+    images = Image.objects.all()
+    return TemplateResponse(
+        request,
+        'website/gallery.html',
+        {
+            'categories': categories,
+            'images': images,
+            'nav_section': 'gallery'
+        }
+    )
+
 def view_gallery(request):
     categories = Category.objects.all().order_by('name')
     category_choice = request.GET.getlist('category', ['All'])[0]
@@ -54,7 +67,8 @@ def category_detail_view(request, slug):
         'gallery/gallery_category.html',
         {
             'category': category,
-            'images': category.images.all()
+            'images': category.images.all(),
+            'sidenav_selection': 'gallery'
         }
     )
 
@@ -68,6 +82,7 @@ class CategoryListView(StaffUserMixin, ListView):
     def get_context_data(self):
         context = super(CategoryListView, self).get_context_data()
         context['categories_formset'] = CategoriesFormset()
+        context['sidenav_selection'] = 'gallery'
         return context
 
     def post(self, request, *args, **kwargs):

@@ -1,0 +1,120 @@
+h1, h2 {
+    font-family: sans-serif;
+}
+
+.studioadmin-container {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.input-group > .studioadmin-list {
+    height: 25 !important;
+    border-radius: 45 !important;
+}
+
+.studioadmin-tbl {
+    padding-top: 5 !important;
+    padding-bottom: 5 !important;
+    white-space: nowrap;
+    font-size: small;
+	vertical-align: middle !important;
+
+}
+
+.studioadmin-help {
+    font-size: smaller;
+    font-style: italic;
+    font-weight: normal;
+}
+
+.studioadmincbox-help {
+    font-size: smaller;
+    font-style: italic;
+    vertical-align: top;
+}
+
+.table-btn, .disabled .btn .btn-success .table-btn {
+    padding-top: 0;
+    padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
+    margin-bottom: 2px;
+    font-size: 90%;
+	width: 9.2em;
+	color: #fff !important;
+    }
+
+table {
+    border: thin darkseagreen solid;
+}
+td {
+    font-size: 85%;
+	padding: 4px !important;
+    background: #fff;
+}
+
+.table-center {
+    text-align: center;
+}
+
+@media(max-width:767px){
+  .table-responsive{overflow-x:scroll;}
+}
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+::-webkit-scrollbar:vertical {
+    width: 12px;
+}
+
+::-webkit-scrollbar:horizontal {
+    height: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, .5);
+    border-radius: 10px;
+    border: 2px solid #ffffff;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background-color: #ffffff;
+}
+
+@media (max-width: 767px) {
+	h1 {
+		font-size: x-large;
+		font-weight: bold;
+	}
+	th {
+		font-size: 0.9em;
+		word-wrap: normal !important;
+		white-space: normal !important;
+	}
+}
+
+.wl-table-form {
+	margin: 0;
+}
+
+.filter-btn {
+    width: 13em;
+}
+
+.perm-btn {
+    width: 5em;
+}
+
+.aligned-label-container {
+    display: inline;
+}
+.aligned-label{
+    vertical-align: middle;
+}
+
+.new-inline-label{
+    margin-left: 10px;
+}

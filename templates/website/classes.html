@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+    {% block content %}
+
+    <section id="classes" class="transparent-bg">
+        <div class="container">
+           <div class="center wow fadeInDown">
+                <h1>Group Classes</h1>
+                <p class="lead">Classes are deliberately small with a maximum of 9 participants so students get maximum space and attention.
+                </p>
+            </div>
+
+            <ul class="classes-filter text-center">
+                <li><a class="btn btn-fb-success-minor" href="#yoga">Yoga</a></li>
+                <li><a class="btn btn-fb-success-minor" href="#flexibeast">Flexibeast</a></li>
+            </ul><!--/#portfolio-filter-->
+
+            <div class="center">
+                <img src="{% static 'website/images/group.jpg' %}" />
+            </div>
+        </div><!--/.row-->
+    </section><!--/#feature-->
+
+        <section id="yoga" class="transparent-bg"><!--/#yoga-->
+         <div class="container">
+            <div class="center wow fadeInDown">
+                <h2>Yoga</h2>
+                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12 wow fadeInDown">
+                    <h2>Vinyasa Flow</h2>
+                    <p>
+                        A physical and strong form of Yoga combining the flow of
+                        Ashtanga with the static poses of Iyengar. These classes aim to
+                        build strength and flexibility as well as promote alignment and
+                        improved posture. Classes are mixed ability and everybody works to
+                        their own level with modifications offered to suit individual need.
+                    </p>
+                </div>
+
+                <div class="col-sm-12 wow fadeInDown">
+                    <h2>Restorative</h2>
+                    <p>
+                        A more gentle form of Yoga combining flowing and static movements.
+                        These sessions are designed to promote wellness and balance in body and
+                        mind, bringing you back to your centre.
+                    </p>
+                </div>
+
+           </div>
+        </div>
+    </section><!--/#feature-->
+
+    <section id="flexibeast"><!--/#flexibeast-->
+         <div class="container">
+            <div class="center wow fadeInDown">
+                <h2>Flexibeast</h2>
+                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
+            </div>
+                <p class="lead">
+                    Alicia combines Yoga with modern techniques such as PNF and partner work in
+                    her own form of flexi training affectionately known as the FlexiBeast
+                    approach. This aims to promote flexibility by increasing range of movement
+                    around joints while strengthening and stabilising. All classes address both
+                    strength and stretch. This approach is designed to promote injury prevention.
+                    Classes provide a whole-body workout and will run in themes to enable concentrated
+                    goal focus at an appropriate pace.
+                </p>
+
+                <p class="lead">
+                   Classes are an hour and run in 6 week blocks, mats are provided.
+                </p>
+
+                <p class="lead">
+                    You don't have to be strong or bendy to start............we'll get there together.
+                </p>
+
+            <div class="row">
+                <div class="col-sm-12 wow fadeInDown">
+                    <h2>Sensible Splits</h2>
+                    <p>
+                        Like the name says, these classes focus on working towards splits or if you're
+                        there already taking it to the next level. We work to prepare the muscles
+                        you need to open up for splits so that you develop a consistent and safe
+                        practice with splits which are also strong. The classes combine Yoga with
+                        PNF and partner stretches for maximum results. We may also occasionally use props.
+                    </p>
+                </div>
+
+                <div class="col-sm-12 wow fadeInDown">
+                    <h2>Healthy Bendy Backs</h2>
+                    <p>
+                        These classes aim to stabilise the spine, increase range of movement and build
+                        strength. Using a combination of Yoga and Pilates with some partner stretching
+                        we also work the abdominals making sure the pelvis and shoulders are not missed
+                        out. This will also help to improve posture and is useful if you suffer from
+                        lower back pain.
+                    </p>
+                </div>
+
+                <div class="col-sm-12 wow fadeInDown">
+                    <h2>Happy Hips</h2>
+                    <p>
+                        This class addresses the whole pelvic girdle using Yoga, Pilates, PNF and
+                        partner work to stabilise and open the area. This class is useful if you're
+                        working towards a split or if you have difficulty in your lower back. Particularly
+                        beneficial for runners and cyclists who often have tightness in this area.
+                        Opening up the hips is useful across so many disciplines and feels amazing!
+                    </p>
+                </div>
+
+           </div>
+        </div>
+    </section><!--/#feature-->
+
+{% endblock %}

@@ -98,9 +98,6 @@ jQuery(document).ready(function () {
         scrollInput: false
     });
 
-    //http://digitalbush.com/projects/masked-input-plugin/
-    jQuery('#timemask').mask("99:99", {placeholder: "HH:MM"});
-
     //http://tablesorter.com/docs/
     jQuery("#sortTable").tablesorter();
 

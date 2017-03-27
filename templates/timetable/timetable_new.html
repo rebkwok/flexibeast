@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+{% load timetabletags %}
+
+{% block content %}
+
+    <section id="workshops" class="transparent-bg">
+        <div class="container">
+           <div class="center wow fadeInDown">
+                <h2>Timetable</h2>
+           </div>
+
+        <div class="row">
+        {% if sessions %}
+            {% for weekday_sessions in sessions_by_weekday %}
+                <div class="col-sm-6 col-xs-12">
+                    <ul class="list-group text-center">
+                        <li class="list-group-item list-group-item-timetable-heading">
+                            <h4>{{ weekday_sessions.weekday }}</h4>
+                        </li>
+                        {% for session in weekday_sessions.sessions %}
+                        <li class="list-group-item">{{ session.time| date:"H:i" }}
+                            <a href="#DescriptionModal" role="button"
+                               data-toggle="modal"
+                               class="description-link"
+                               data-title="{{ session.name }}"
+                               data-description="{{ session.description }}"
+                               data-blockinfo="{{ session.block_info }}"
+                               data-location="{{ session.location.full_name }}"
+                               data-address="{{ session.location.address }}"
+                            >{{ session.name }}</a> -
+                            <a href="#LocationModal" role="button"
+                               data-toggle="modal"
+                               class="location-link"
+                               data-short_name="{{ session.location.short_name }}"
+                               data-full_name="{{ session.location.full_name }}"
+                               data-address="{{ session.location.address }}"
+                               data-map_url="{{ session.location.map_url }}"
+                               data-spaces="{% if session in classes_with_spaces %}spaces**{% else %}full{% endif %}"
+                            >{{ session.location }}</a>
+
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+
+
+        {% else %}
+            <p>Coming soon</p>
+        {% endif %}
+
+        </div>
+    </div>
+
+<!-- Description Modal HTML -->
+<div id="DescriptionModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="description-title">Class Name</h4>
+            </div>
+            <div class="modal-body">
+                <h5>Location</h5>
+                <div id="location">Full Name</div>
+                <div id="location-address">Address</div>
+                <div id="description-text">Description</div>
+                <h5>Booking and Prices</h5>
+                <div id="block_info-text">Block Info</div>
+                <div class="top-space"><a class='btn btn-sm btn-fb-success' href="{% url 'website:contact' %}">Contact</a> for availability and to book</div>
+
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Location Modal HTML -->
+<div id="LocationModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 class="modal-title" id="location-title">Short Name</h3>
+            </div>
+            <div class="modal-body">
+                <h4 class="modal-title" id="location-full_name">Full Name</h4>
+                <div id="location-address">Address</div>
+                <iframe id="location-map" frameborder="0"></iframe>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock content %}
+
+{% block extra_scripts %}
+    {% if is_debug_on %}
+       <script type='text/javascript' src="{% static 'timetable/js/underscore.js' %}"></script>
+    {% else %}
+    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+   {% endif %}
+    <script type='text/javascript' src="{% static 'timetable/js/ajax_timetable_spaces.js' %}"></script>
+    <script src="{% static 'timetable/js/location_modal.js' %}"></script>
+{% endblock %}

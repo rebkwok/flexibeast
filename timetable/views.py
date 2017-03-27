@@ -10,11 +10,20 @@ from timetable.utils import staff_required
 class WeeklySessionListView(ListView):
 
     model = WeeklySession
-    template_name = 'timetable/timetable.html'
+    template_name = 'timetable/timetable_new.html'
     context_object_name = 'sessions'
 
     def get_context_data(self, **kwargs):
         context = super(WeeklySessionListView, self).get_context_data(**kwargs)
+        sessions_by_weekday = []
+        for day in WeeklySession.DAY_CHOICES:
+            sessions = WeeklySession.objects.filter(day=day[0])
+            if sessions:
+                sessions_by_weekday.append(
+                    {'weekday': day[1], 'sessions': sessions}
+                )
+        context['sessions_by_weekday'] = sessions_by_weekday
+
         spaces = WeeklySession.objects.filter(full=False).exists()
         context['classes_with_spaces'] = spaces
         return context

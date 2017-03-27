@@ -46,17 +46,17 @@ class TimetableViewsTests(TestMixin, TestCase):
             sorted([self.full_session.id, self.spaces_session.id])
         )
 
-    def test_toggle_spaces_button_only_shown_for_staff(self):
-        resp = self.client.get(self.url)
-        self.assertNotIn('toggle_spaces_button', resp.rendered_content)
-
-        self.client.login(username=self.user.username, password='test')
-        resp = self.client.get(self.url)
-        self.assertNotIn('toggle_spaces_button', resp.rendered_content)
-
-        self.client.login(username=self.staff_user.username, password='test')
-        resp = self.client.get(self.url)
-        self.assertIn('toggle_spaces_button', resp.rendered_content)
+    # def test_toggle_spaces_button_only_shown_for_staff(self):
+    #     resp = self.client.get(self.url)
+    #     self.assertNotIn('toggle_spaces_button', resp.rendered_content)
+    #
+    #     self.client.login(username=self.user.username, password='test')
+    #     resp = self.client.get(self.url)
+    #     self.assertNotIn('toggle_spaces_button', resp.rendered_content)
+    #
+    #     self.client.login(username=self.staff_user.username, password='test')
+    #     resp = self.client.get(self.url)
+    #     self.assertIn('toggle_spaces_button', resp.rendered_content)
 
     def test_toggle_spaces_only_allowed_for_staff(self):
         self.assertTrue(self.full_session.full)

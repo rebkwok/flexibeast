@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+    {% block bodyclass %}class="homepage"{% endblock %}
+
+    {% block content %}
+
+    <section id="main-slider" class="no-margin">
+        <div class="carousel slide">
+            <ol class="carousel-indicators">
+                <li data-target="#main-slider" data-slide-to="0" class="active"></li>
+                <li data-target="#main-slider" data-slide-to="1"></li>
+                <li data-target="#main-slider" data-slide-to="2"></li>
+            </ol>
+            <div class="carousel-inner">
+                <div class="carousel1 item active">
+                    <div class="container">
+                        <div class="row slide-margin">
+                            <div class="col-sm-6">
+                                <div class="carousel-content">
+                                    <h1 class="animation animated-item-1">Lorem ipsum dolor sit amet consectetur adipisicing elit</h1>
+                                    <h2 class="animation animated-item-2">Accusantium doloremque laudantium totam rem aperiam, eaque ipsa...</h2>
+{#                                    <a class="btn-slide animation animated-item-3" href="#">Read More</a>#}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="carousel-border"></div>
+                </div><!--/.item-->
+
+
+                <div class="carousel2 item">
+                    <div class="container">
+                        <div class="row slide-margin">
+                            <div class="col-sm-6">
+                                <div class="carousel-content">
+                                    <h1 class="animation animated-item-1">Lorem ipsum dolor sit amet consectetur adipisicing elit</h1>
+                                    <h2 class="animation animated-item-2">Accusantium doloremque laudantium totam rem aperiam, eaque ipsa...</h2>
+{#                                    <a class="btn btn-fb-success-minor animation animated-item-3" href="#">Read More</a>#}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="carousel-border"></div>
+                </div><!--/.item-->
+
+                <div class="carousel3 item">
+                    <div class="container">
+                        <div class="row slide-margin">
+                            <div class="col-sm-6">
+                                <div class="carousel-content">
+                                    <h1 class="animation animated-item-1">Lorem ipsum dolor sit amet consectetur adipisicing elit</h1>
+                                    <h2 class="animation animated-item-2">Accusantium doloremque laudantium totam rem aperiam, eaque ipsa...</h2>
+{#                                    <a class="btn btn-fb-success-minor animation animated-item-3" href="#">Read More</a>#}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-border"></div>
+                </div><!--/.item-->
+               </div><!--/.carousel-inner-->
+        </div><!--/.carousel-->
+        <a class="prev hidden-xs" href="#main-slider" data-slide="prev">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <a class="next hidden-xs" href="#main-slider" data-slide="next">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </section><!--/#main-slider-->
+
+    <section id="classes" >
+        <div class="container">
+           <div class="center wow fadeInDown">
+                <h2>Welcome</h2>
+                <p class="lead">Congratulations on taking the first step towards being a FlexiBeast! Here on the website,
+                    you'll find information about me and what I can offer. If there's anything that's not covered, pop to the
+                    contact section and I'll get back to you. My practice is holistic linking mind and body to keep you
+                    healthy and happy. I believe that flexibility training should be safe and open to everyone.
+                    You do not need to be strong or bendy to join our happy group, we'll get there together.</p>
+
+                <p class="pull-right">Namaste, Alicia</p>
+            </div>
+{##}
+{#            <div class="row">#}
+{#                <div class="features">#}
+{##}
+{#                    <div class="col-md-4 col-sm-6 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">#}
+{#                        <div class="feature-wrap">#}
+{#                            <a href="{% url 'website:classes' %}">#}
+{#                                <i><img class="yogaicon img-responsive" src="{% static 'website/fonts/png/001-man-doing-yoga.png' %}"/></i></a>#}
+{#                            <h2>Flexibeast</h2>#}
+{#                            <h3>Flexibility classes, particularly aimed at aerial and pole dance</h3>#}
+{#                        </div>#}
+{#                    </div><!--/.col-md-4-->#}
+{##}
+{#                    <div class="col-md-4 col-sm-6 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">#}
+{#                        <div class="feature-wrap">#}
+{#                            <a href="{% url 'website:classes' %}">#}
+{#                                <i><img class="yogaicon img-responsive" src="{% static 'website/fonts/png/002-backbend.png' %}"/></i>#}
+{#                            </a>#}
+{#                            <h2>Yoga</h2>#}
+{#                            <h3>Vinyassa Flow and Restorative Yoga classes</h3>#}
+{#                        </div>#}
+{#                    </div><!--/.col-md-4-->#}
+{##}
+{#                    <div class="col-md-4 col-sm-6 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">#}
+{#                        <div class="feature-wrap">#}
+{#                            <a href="{% url 'website:private' %}">#}
+{#                                <i><img class="yogaicon img-responsive" src="{% static 'website/fonts/png/003-man-practicing-yoga-posture.png' %}"/></i>#}
+{#                            </a>#}
+{#                            <h2>One-to-One</h2>#}
+{#                            <h3>Centred around your individual needs</h3>#}
+{#                        </div>#}
+{#                    </div><!--/.col-md-4-->#}
+{#                </div><!--/.features-->#}
+{#            </div><!--/.row-->    #}
+        </div><!--/.container-->
+    </section><!--/#feature-->
+
+    <section id="services" class="service-item">
+	   <div class="container">
+            <div class="center wow fadeInDown">
+                <h2>Classes and Workshops</h2>
+                <p class="lead">At locations in Edinburgh and the borders.</p>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <a href="{% url 'website:classes' %}"><div class="media services-wrap center wow fadeInDown">
+                        <div class="media-body">
+                            <h3 class="media-heading">Flexibility Classes</h3>
+                            <div class="feature-wrap">
+                                <div class="feature-wrap-i">
+                                <i><img class="yogaicon img-responsive" src="{% static 'website/fonts/png/yogaicon1.png' %}"/></i>
+                                </div>
+                            </div>
+                            <p>Sensible splits, healthy bendy backs, happy hips</p>
+                        </div>
+                        </div>
+                   </a>
+                </div>
+
+                <div class="col-sm-4">
+                    <a href="{% url 'website:classes' %}"><div class="media services-wrap center wow fadeInDown">
+                        <div class="media-body">
+                            <h3 class="media-heading">Yoga</h3>
+                            <div class="feature-wrap">
+                                <div class="feature-wrap-i">
+                                <i><img class="yogaicon img-responsive" src="{% static 'website/fonts/png/yogaicon2.png' %}"/></i>
+                                </div>
+                            </div>
+                            <p>Vinyassa flow, restorative, ashtanga</p>
+                        </div>
+                    </div></a>
+                </div>
+
+                <div class="col-sm-4">
+                    <a href="{% url 'website:private' %}"><div class="media services-wrap center wow fadeInDown">
+                        <div class="media-body">
+                            <h3 class="media-heading">Private Instruction</h3>
+                            <div class="feature-wrap">
+                                <div class="feature-wrap-i">
+                                    <i><img class="yogaicon img-responsive" src="{% static 'website/fonts/png/yogaicon3.png' %}"/></i>
+                                </div>
+                            </div>
+                            <p>
+                                Yoga, flexibility, fitness, diet, restorative
+                            </p>
+                        </div>
+                    </div></a>
+                </div>  
+
+            </div><!--/.row-->
+
+        </div><!--/.container-->
+    </section><!--/#services-->
+
+<section id="flexibeast-gallery">
+        <div class="container">
+            <div class="center wow fadeInDown">
+                <h2>Gallery</h2>
+                <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut <br> et dolore magna aliqua. Ut enim ad minim veniam</p>
+            </div>
+
+            <div class="row">
+                <div class="gallery-index-item col-xs-6 col-sm-4 col-md-3">
+                    <a href="{% url 'gallery:gallery' %}">
+                    <div class="flexibeast-gallery-wrap">
+                        <img class="img-responsive" src="{% static 'website/images/portfolio/recent/item1.jpg' %}" alt="">
+                        <div class="overlay">
+                            <div class="flexibeast-gallery-inner">
+                                <h3>Click for full gallery</h3>
+                                <p>We can put a description here</p>
+                            </div>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+
+                <div class="gallery-index-item col-xs-6 col-sm-4 col-md-3">
+                    <a href="{% url 'gallery:gallery' %}">
+                        <div class="flexibeast-gallery-wrap">
+                            <img class="img-responsive" src="{% static 'website/images/portfolio/recent/item2.jpg' %}" alt="">
+                            <div class="overlay">
+                                <div class="flexibeast-gallery-inner">
+                                    <h3>Click for full gallery</h3>
+                                    <p>We can put a description here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="gallery-index-item col-xs-6 col-sm-4 col-md-3">
+                    <a href="{% url 'gallery:gallery' %}">
+                        <div class="flexibeast-gallery-wrap">
+                            <img class="img-responsive" src="{% static 'website/images/portfolio/recent/item3.jpg' %}" alt="">
+                            <div class="overlay">
+                                <div class="flexibeast-gallery-inner">
+                                    <h3>Click for full gallery</h3>
+                                    <p>We can put a description here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="gallery-index-item col-xs-6 col-sm-4 col-md-3">
+                    <a href="{% url 'gallery:gallery' %}">
+                        <div class="flexibeast-gallery-wrap">
+                            <img class="img-responsive" src="{% static 'website/images/portfolio/recent/item4.jpg' %}" alt="">
+                            <div class="overlay">
+                                <div class="flexibeast-gallery-inner">
+                                    <h3>Click for full gallery</h3>
+                                    <p>We can put a description here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            </div><!--/.row-->
+        </div><!--/.container-->
+    </section><!--/#flexibeast-gallery-->
+
+
+    <section id="testimonials">
+        <div class="container">
+            <div class="center testimonials wow fadeInDown">
+                <h2>Testimonials</h2>
+            </div>
+
+            <div class="col-xs-12 wow fadeInDown">
+                    <div class="testimonials-container">
+                         <div class="marquee media testimonial-inner">
+
+                            <div class="media-body">
+                                {% for testimonial in testimonials %}
+                                    <h4 class="testimonial">
+                                            {{ testimonial.title }}
+                                    </h4>
+                                    <p class="testimonial">
+                                            {{ testimonial.review|linebreaksbr }}
+                                    </p>
+                                    <span><strong>-{{ testimonial.user_display_name }}</strong></span>
+                                {% endfor %}
+
+                            </div>
+                         </div>
+                    </div>
+            </div>
+
+        <a class="btn btn-fb-success-minor" href="{% url 'reviews:reviews' %}">Read More</a>
+        </div>
+    </section>
+
+    <section id="contact-info">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="media contact-info wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                        <div class="pull-left">
+                            <a href="#"><i class="fa fa-phone"></i></a>
+                        </div>
+                        <div class="media-body">
+                            <h2>Contact us</h2>
+                            <p>For more information or to book a class, please email <a href="mailto:flexibeast@hotmail.com" target="_blank">flexibeast@hotmail.com</a> or use the contact form <a href="#">here</a>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!--/.container-->    
+    </section><!--/#conatcat-info-->
+
+{% endblock %}

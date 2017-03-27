@@ -5,65 +5,75 @@
 {% block extra_head %}<link rel="stylesheet" href="{% static 'reviews/css/reviews.css' %}">{% endblock %}
 
 {% block content %}
-
-    <div class="page-header col-sm-12">
-        <h1>
-            Testimonials
-        </h1>
-
-        {% if user.is_staff %}
-            <p><a href="{% url 'reviews:staff_reviews' %}">ADMIN USE: Review and approve submitted testimonials</a></p>
-        {% endif %}
+    <section>
+    <div class="container">
+    <div class="row">
+        <div class="center wow fadeInDown">
+            <h2>
+                Testimonials
+            </h2>
+        </div>
 
         <div>
-            {% if user.is_authenticated %}
-                <a href="{% url 'reviews:add_review' %}"><div class="btn btn-success reviews-btn filter-btn">Add a testimonial</div></a>
-            {% else %}
-                <a class="btn btn-success reviews-btn filter-btn" href="{% url 'account_login' %}?next={{request.get_full_path}}">Sign in</a> to add a testimonial
-            {% endif %}
+
+            <div class="col-sm-6 pull-right">
+                {% if user.is_authenticated %}
+                    <a class="btn btn-fb-success-minor btn-fb-success-minor-sm pull-right" href="{% url 'reviews:add_review' %}">Add a testimonial</a>
+                {% else %}
+                    <a class="btn btn-fb-success-minor btn-fb-success-minor-sm" href="{% url 'account_login' %}?next={{request.get_full_path}}"><div>Sign in</div></a> to add a testimonial
+                {% endif %}
+            </div>
+            <div class="col-sm-6 pull-left">
+                <form class='reviews-filter' action="" method="get">
+                    <strong>{{ order_sort_form.order }}</strong>
+                </form>
+            </div>
         </div>
     </div>
 
-    <div class="col-sm-12">
-        <form class="filter-row" action="" method="get">
-            <strong>Sort testimonials by: {{ order_sort_form.order }}</strong>
-        </form>
-    </div>
-    {% if reviews %}
+    <div class="row">
+        {% if reviews %}
         {% for review in reviews %}
-            <div class="col-sm-12"><h4>
+        <div class="col-sm-12 review {% if forloop.last %}last{% endif %}">
+            <div class="col-sm-2">
+                <p>
+                    {% show_rating review.rating %}<br>
+                    <span class="fa fa-user"></span> {{ review.user_display_name }}<br>
+                     <span class="review-date">
+                    {% if review.edited and review.update_published %}
+                        {{ review.edited_date|date:'d M Y' }}
+                    {% else %}
+                        {{ review.submission_date|date:'d M Y' }}<br>
+                    {% endif %}</span>
+
+                    {% if review in user_reviews %}
+                        <div><a href="{% url 'reviews:edit_review' review.slug %}"><div class="btn btn-fb-success-minor btn-fb-success-minor-sm">Edit</div></a></div>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-sm-10 wow fadeInDown"><h4>
                 {% if not review.edited or review.update_published %}
                         {{ review.title }}
                 {% else %}
                     {{ review.previous_title }}
                 {% endif %}
-            </h4></div>
-            <div class="col-sm-2">
-                <p>
-                    {% show_rating review.rating %}<br>
-                    <span class="fa fa-user"></span> {{ review.user_display_name }}<br>
-                    <span class="review-date">Submitted: {{ review.submission_date|date:'d M Y' }}<br>
-                    {% if review.edited and review.update_published %}Edited: {{ review.edited_date|date:'d M Y' }}<br>{% endif %}</span>
-
-                    {% if review in user_reviews %}
-                        <div><a href="{% url 'reviews:edit_review' review.slug %}"><div class="btn btn-warning reviews-btn">Edit</div></a></div>
-                    {% endif %}
-                </p>
-            </div>
-            <div class="col-sm-10 review">
+            </h4>
+            <p>
                 {% if not review.edited or review.update_published %}
-                    <span class="fa fa-quote-left fa-pull-left fa-border"></span>{{ review.review|linebreaksbr }}
+                    {{ review.review|linebreaksbr }}
                 {% else %}
-                    <span class="fa fa-quote-left fa-pull-left fa-border"></span>{{ review.previous_review|linebreaksbr }}
+                    {{ review.previous_review|linebreaksbr }}
                 {% endif %}
+            </p>
             </div>
-
+        </div>
         {% endfor %}
     {% else %}
         <div class="col-sm-12">No testimonials available to view.</div>
     {% endif %}
-
-
+    </div> <!-- row -->
+    </div> <!-- container -->
+    </section>
 {% endblock %}
 
 {% block extra_scripts %}{% endblock %}

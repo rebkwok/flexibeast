@@ -847,17 +847,19 @@ a > span.fa.fa-print {
 }
 
 .fading {
-  width: 650px;
-  height: 320px;
+  width: 835px;
+  height: 310px;
   position: relative;
   margin: auto;
 }
 
 .fading > img {
+  display: block;
   position: absolute;
-  max-height: 320px;
+  max-width: 830px;
   width: auto;
-  margin: auto;
+  margin-left: auto;
+  margin-right: auto;
   opacity: 0;
   overflow: hidden;
   -webkit-animation: anim 14s infinite;
@@ -867,13 +869,33 @@ a > span.fa.fa-print {
   animation: anim 14s infinite;
 }
 
-@media only screen and (max-width:480px) {
+@media only screen and (max-width:767px) {
     .fading {
-        width: 320px;
-        height: 220px;
+        width: 650px;
+        height: 240px;
     }
     .fading > img {
-        max-width: 320px;
+        max-width: 650px;
+    }
+}
+
+@media only screen and (max-width:600px) {
+    .fading {
+        width: 500px;
+        height: 180px;
+    }
+    .fading > img {
+        max-width: 500px;
+    }
+}
+
+@media only screen and (max-width:480px) {
+    .fading {
+        width: 370px;
+        height: 140px;
+    }
+    .fading > img {
+        max-width: 370px;
     }
 }
 

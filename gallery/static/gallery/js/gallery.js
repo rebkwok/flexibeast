@@ -1,5 +1,5 @@
 $(document).ready(function(){
-
+    console.log('Here');
     loadGallery(true, 'a.gallery-thumbnail');
 
     //This function disables buttons when needed
@@ -38,6 +38,7 @@ $(document).ready(function(){
         });
 
         function updateGallery(selector) {
+            console.log('Here');
             var $sel = selector;
             current_image = $sel.data('image-id');
             $('#image-gallery-caption').text($sel.data('caption'));

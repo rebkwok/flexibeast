@@ -11,8 +11,6 @@ PAGE_LAYOUT_CHOICES = (
     ('1-img-top', 'One image, centred, top of page'),
     ('1-img-left', 'One image, left of text'),
     ('1-img-right', 'One image, right of text'),
-    ('img-col-left', 'Multiple small images in column, left of text'),
-    ('img-col-right', 'Multiple small images in column, right of text'),
 )
 
 MENU_CHOICES = (
@@ -38,18 +36,15 @@ class Page(models.Model):
         max_length=8,
         choices=MENU_CHOICES,
         default='dropdown',
-        help_text='Choose where to display the menu link.  Note that all '
-                  'options appear under the "More" dropdown at small screen '
-                  'sizes. Note that too many main menu links will cause the '
-                  'menu bar to become double normal height.'
+        help_text='NOTE: ONLY PAGES IN THE "MORE" DROPDOWN WILL BE DISPLAYED '
+                  'ON THE SITE.'
     )
     heading = models.CharField(max_length=255, null=True, blank=True)
     layout = models.CharField(
         max_length=15, choices=PAGE_LAYOUT_CHOICES, default='no-img',
         help_text="It is recommended to use landscape-oriented pictures for "
-                  "a single, top of page image; portrait-oriented pictures "
-                  "without too much detail for column layout.  One-image "
-                  "options will use the first uploaded image."
+                  "a single, top of page image.  If no image is checked as "
+                  "'main', the first uploaded image will be used."
     )
     content = models.TextField('Content')
     restricted = models.BooleanField(
