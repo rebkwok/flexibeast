@@ -10,7 +10,7 @@ from timetable.utils import staff_required
 class WeeklySessionListView(ListView):
 
     model = WeeklySession
-    template_name = 'timetable/timetable_new.html'
+    template_name = 'timetable/timetable_grid.html'
     context_object_name = 'sessions'
 
     def get_context_data(self, **kwargs):

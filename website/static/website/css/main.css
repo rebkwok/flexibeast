@@ -100,7 +100,6 @@ hr {
 
 .btn-fb-success:hover {
   background-color: #05AAB0;
-  color: #fff;
 }
 
 .btn-fb-success-minor {
@@ -111,7 +110,6 @@ hr {
 
 .btn-fb-success-minor:hover {
   border: 1px solid #05AAB0;
-  background-color: rgba(255, 255, 255, 0.3);
   color: #05AAB0;
 }
 
@@ -1827,7 +1825,7 @@ a:hover > .label-testimonial {
   box-sizing: border-box;
 }
 
-.gallery-items {
+.gallery-item {
   margin: 0;
   padding:0;
 }
@@ -1937,61 +1935,61 @@ a:hover > .label-testimonial {
 
 /* Start: Recommended Isotope styles */
 /**** Isotope Filtering ****/
-/*.isotope-item {*/
-  /*z-index: 2;*/
-/*}*/
+.isotope-item {
+  z-index: 2;
+}
 
-/*.isotope-hidden.isotope-item {*/
-  /*pointer-events: none;*/
-  /*z-index: 1;*/
-/*}*/
+.isotope-hidden.isotope-item {
+  pointer-events: none;
+  z-index: 1;
+}
 
 /*/!**** Isotope CSS3 transitions ****!/*/
-/*.isotope,*/
-/*.isotope .isotope-item {*/
-  /*-webkit-transition-duration: 0.8s;*/
-  /*-moz-transition-duration: 0.8s;*/
-  /*-ms-transition-duration: 0.8s;*/
-  /*-o-transition-duration: 0.8s;*/
-  /*transition-duration: 0.8s;*/
-/*}*/
+.isotope,
+.isotope .isotope-item {
+  -webkit-transition-duration: 0.8s;
+  -moz-transition-duration: 0.8s;
+  -ms-transition-duration: 0.8s;
+  -o-transition-duration: 0.8s;
+  transition-duration: 0.8s;
+}
 
-/*.isotope {*/
-  /*-webkit-transition-property: height, width;*/
-  /*-moz-transition-property: height, width;*/
-  /*-ms-transition-property: height, width;*/
-  /*-o-transition-property: height, width;*/
-  /*transition-property: height, width;*/
-/*}*/
+.isotope {
+  -webkit-transition-property: height, width;
+  -moz-transition-property: height, width;
+  -ms-transition-property: height, width;
+  -o-transition-property: height, width;
+  transition-property: height, width;
+}
 
-/*.isotope .isotope-item {*/
-  /*-webkit-transition-property: -webkit-transform, opacity;*/
-  /*-moz-transition-property: -moz-transform, opacity;*/
-  /*-ms-transition-property: -ms-transform, opacity;*/
-  /*-o-transition-property: -o-transform, opacity;*/
-  /*transition-property: transform, opacity;*/
-/*}*/
+.isotope .isotope-item {
+  -webkit-transition-property: -webkit-transform, opacity;
+  -moz-transition-property: -moz-transform, opacity;
+  -ms-transition-property: -ms-transform, opacity;
+  -o-transition-property: -o-transform, opacity;
+  transition-property: transform, opacity;
+}
 
-/*/!**** disabling Isotope CSS3 transitions ****!/*/
-/*.isotope.no-transition,*/
-/*.isotope.no-transition .isotope-item,*/
-/*.isotope .isotope-item.no-transition {*/
-  /*-webkit-transition-duration: 0s;*/
-  /*-moz-transition-duration: 0s;*/
-  /*-ms-transition-duration: 0s;*/
-  /*-o-transition-duration: 0s;*/
-  /*transition-duration: 0s;*/
-/*}*/
+/**** disabling Isotope CSS3 transitions ****/
+.isotope.no-transition,
+.isotope.no-transition .isotope-item,
+.isotope .isotope-item.no-transition {
+  -webkit-transition-duration: 0s;
+  -moz-transition-duration: 0s;
+  -ms-transition-duration: 0s;
+  -o-transition-duration: 0s;
+  transition-duration: 0s;
+}
 
-/*/!* End: Recommended Isotope styles *!/*/
-/*/!* disable CSS transitions for containers with infinite scrolling*!/*/
-/*.isotope.infinite-scrolling {*/
-  /*-webkit-transition: none;*/
-  /*-moz-transition: none;*/
-  /*-ms-transition: none;*/
-  /*-o-transition: none;*/
-  /*transition: none;*/
-/*}*/
+/* End: Recommended Isotope styles */
+/* disable CSS transitions for containers with infinite scrolling*/
+.isotope.infinite-scrolling {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -ms-transition: none;
+  -o-transition: none;
+  transition: none;
+}
 
 
 /**************************
@@ -2922,6 +2920,10 @@ shortcodes page css
 
 .list-group-item-timetable-heading h4 {
   color: #fff;
+}
+
+#timetable_page h3 {
+  font-family: sans-serif;
 }
 
 
