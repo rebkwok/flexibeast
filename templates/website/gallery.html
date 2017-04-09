@@ -20,17 +20,15 @@
             </ul><!--/#gallery-filter-->
 
             <div class="row">
-
                 <div class="gallery-items">
                     {% for image in images %}
-                    <div class="gallery-item category{{ image.category.id }} col-xs-12 col-sm-4 col-md-3">
+                    <div class="gallery-item category{{ image.category.id }} col-xs-6 col-sm-3">
                         <div class="flexibeast-gallery-wrap">
                             <img class="img-responsive" src="{{ MEDIA_URL }}{{ image.photo.name }}" alt="{{ image.photo.name }}">
                             <div class="overlay">
                                 <div class="flexibeast-gallery-inner">
                                     <h3>{{ image.category.name }}</h3>
                                     <p>{{ image.caption }}</p>
-{#                                    <a class="preview" href="{{ MEDIA_URL }}{{ image.photo.name }}" rel="prettyPhoto"><i class="fa fa-eye"></i> View</a>#}
                                     <a href="#"
                                        class="gallery-thumbnail preview"
                                        data-image-id=""
@@ -71,7 +69,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                    </div>
 
                 </div>
 
