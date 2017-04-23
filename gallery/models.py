@@ -4,7 +4,8 @@ from django.dispatch import receiver
 
 from django_extensions.db.fields import AutoSlugField
 
-from imagekit.models import ProcessedImageField
+from imagekit.models import ImageSpecField, ProcessedImageField
+from imagekit.processors import ResizeToFill
 
 
 class Category(models.Model):
@@ -27,6 +28,11 @@ class Image(models.Model):
         options={'quality': 70},
         null=True, blank=True,
     )
+
+    thumbnail = ImageSpecField(source='photo',
+                                      processors=[ResizeToFill(150, 150)],
+                                      format='JPEG',
+                                      options={'quality': 100})
 
     category = models.ForeignKey(Category, related_name='images')
     caption = models.CharField(max_length=255, null=True, blank=True)

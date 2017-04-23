@@ -11,14 +11,15 @@ jQuery(function($) {'use strict',
 	new WOW().init();
 
 	// gallery filter
-	$(window).load(function(){'use strict';
+	$(window).load(function(){
+
 		var $gallery_selectors = $('.gallery-filter >li>a');
 		var $gallery = $('.gallery-items');
 		$gallery.isotope({
 			itemSelector : '.gallery-item',
-			layoutMode : 'fitRows'
+			layoutMode : 'masonry'
 		});
-		
+
 		$gallery_selectors.on('click', function(){
 			$gallery_selectors.removeClass('active');
 			$(this).addClass('active');
