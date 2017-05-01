@@ -113,12 +113,13 @@
                         <li {% if nav_section == 'home' %}class="active"{%  endif %}><a href="{% url 'website:home' %}">Home</a></li>
                         <li {% if nav_section == 'about' %}class="active"{%  endif %}><a href="{% url 'website:about' %}">About</a></li>
                         <li class="dropdown
-                            {% if nav_section == 'classes' or nav_section == 'workshops' or nav_section == 'private' or nav_section == 'timetable' %}
+                            {% if nav_section == 'clinics' or nav_section == 'classes' or nav_section == 'workshops' or nav_section == 'private' or nav_section == 'timetable' %}
                                 active
                             {% endif %}">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Classes <i class="fa fa-angle-down"></i></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Services <i class="fa fa-angle-down"></i></a>
                             <ul class="dropdown-menu">
                                 <li><a href="{% url 'website:classes' %}">Classes</a></li>
+                                <li><a href="{% url 'website:stretch_clinics' %}">Stretch Clinics</a></li>
                                 <li><a href="{% url 'website:workshops' %}">Workshops</a></li>
                                 <li><a href="{% url 'website:private' %}">Private Instruction</a></li>
                                 <li><a href="{% url 'timetable:timetable' %}">Timetable</a></li>

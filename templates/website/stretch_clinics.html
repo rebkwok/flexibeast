@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+    {% block content %}
+
+    <section id="stretch-clinics" class="transparent-bg">
+        <div class="container">
+           <div class="center wow fadeInDown">
+                <h1>Stretch Clinics</h1>
+           </div>
+                <h2>What is a stretch clinic?</h2>
+
+                <p class="lead">It's a time and space to either work on goals or help to fix problems.</p>
+
+                <p>You can come solo or in small groups if you're all working towards the same goal. Appointments start at 60 minutes.</p>
+
+                <p>Issues addressed include hypermobility, injury recovery, flexibility and strengthening goals.</p>
+
+                <p>You can either self refer or be referred by Gwen at <a href="http://www.leithtreatments.com">Leith Treatments</a>.</p>
+
+            <div class="center">
+                <img src="{% static 'website/images/group.jpg' %}" />
+            </div>
+        </div><!--/.row-->
+    </section><!--/#feature-->
+
+{% endblock %}

@@ -51,6 +51,13 @@ def private(request):
     )
 
 
+def stretch_clinics(request):
+    return TemplateResponse(
+        request, 'website/stretch_clinics.html',
+        {'nav_section': 'stretch_clinics'}
+    )
+
+
 def workshops(request):
     return TemplateResponse(
         request, 'website/workshops.html', {'nav_section': 'workshops'}
