@@ -11,7 +11,7 @@ from django.core import management
 from django.core.urlresolvers import reverse
 from django.test import Client, RequestFactory, TestCase, override_settings
 
-from flex_bookings.tests.helpers import set_up_fb, _create_session
+from common.helpers import set_up_fb, _create_session
 
 from timetable.models import WeeklySession
 from website.forms import ContactForm

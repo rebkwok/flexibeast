@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from datetime import time
 from timetable.models import Location, WeeklySession
-from flex_bookings.models import EventType
 
 
 class Command(BaseCommand):
@@ -47,16 +46,7 @@ class Command(BaseCommand):
 
         self.stdout.write('Creating timetable weekly sessions.')
 
-        yc, _ = EventType.objects.get_or_create(
-            event_type='CL', subtype='Yoga class'
-        )
-        self.stdout.write('Event Type "{}" {}'.format(
-            yc, 'created' if created else 'already exists'
-        ))
-
-
         class_defaults = {
-            'event_type': yc,
             'location': watermelon,
             'description': '',
             'contact_person': "Alicia Alexandra",
@@ -94,14 +84,7 @@ class Command(BaseCommand):
             time=time(hour=20, minute=10),
             defaults=class_defaults
         )
-        # FRI CLASSES
-        # cl3 = WeeklySession.objects.update_or_create(
-        #     name="Booty Blast",
-        #     day=WeeklySession.FRI,
-        #     time=time(hour=11, minute=00),
-        #     defaults=class_defaults
-        # )
-        # SUN CLASSES
+
         cl4 = WeeklySession.objects.update_or_create(
             name="Healthy Bendy Backs",
             day=WeeklySession.SUN,

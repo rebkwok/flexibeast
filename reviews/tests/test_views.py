@@ -17,8 +17,8 @@ class ReviewTestMixin(object):
         set_up_fb()
         self.client = Client()
         self.factory = RequestFactory()
-        self.user = mommy.make_recipe('flex_bookings.user')
-        self.staff_user = mommy.make_recipe('flex_bookings.user')
+        self.user = mommy.make_recipe('common.user')
+        self.staff_user = mommy.make_recipe('common.user')
         self.staff_user.is_staff = True
         self.staff_user.save()
 

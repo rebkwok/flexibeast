@@ -2,7 +2,7 @@ from django.test import TestCase, RequestFactory
 from django.test.client import Client
 from django.contrib.auth.models import User, Permission
 
-from flex_bookings.tests.helpers import set_up_fb
+from common.helpers import set_up_fb
 
 
 class TestPermissionMixin(object):

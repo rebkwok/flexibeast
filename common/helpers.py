@@ -2,11 +2,10 @@ from model_mommy import mommy
 from django.contrib.sites.models import Site
 from django.conf import settings
 from importlib import import_module
-from django.test import RequestFactory
 
 
 def set_up_fb():
-    fbapp = mommy.make_recipe('flex_bookings.fb_app')
+    fbapp = mommy.make_recipe('common.fb_app')
     site = Site.objects.get_current()
     fbapp.sites.add(site.id)
 

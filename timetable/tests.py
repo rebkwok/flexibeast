@@ -7,9 +7,9 @@ from django.core.urlresolvers import reverse
 from django.core import management
 from django.test import TestCase
 
-from flex_bookings.tests.helpers import set_up_fb
+from common.helpers import set_up_fb
 
-from timetable.models import Location, Session, WeeklySession
+from timetable.models import Location, WeeklySession
 
 
 class TestMixin(object):
@@ -92,14 +92,6 @@ class TimetableViewsTests(TestMixin, TestCase):
 
 class TimeTableModelTests(TestCase):
 
-    def test_session_str(self):
-        session = mommy.make(
-            Session, name="Test", day=WeeklySession.MON, time=time(19, 0)
-        )
-        self.assertEqual(
-            str(session), "Monday 19:00 - Test"
-        )
-
     def test_weekly_session_str(self):
         wsession = mommy.make(
             WeeklySession, name="Test", day=WeeklySession.MON, time=time(19, 0)
@@ -113,15 +105,6 @@ class TimeTableModelTests(TestCase):
             Location, short_name="test", full_name="a test location"
         )
         self.assertEqual(str(location), 'test')
-
-    def test_session_fields_set_on_save(self):
-        """
-        If no cost, adv payment req is set to False
-        """
-        session = mommy.make(
-            Session, cost=0, advance_payment_required=True,
-        )
-        self.assertFalse(session.advance_payment_required)
 
 
 class TimetableManagementTests(TestMixin, TestCase):
@@ -172,10 +155,3 @@ class TimetableManagementTests(TestMixin, TestCase):
         mon_sess.refresh_from_db()
         # description has been set back to default
         self.assertEqual(mon_sess.description, '')
-
-    def test_create_timetable_sessions(self):
-        self.assertFalse(Session.objects.exists())
-        management.call_command('create_timetable')
-
-        self.assertTrue(Session.objects.exists())
-        self.assertEqual(Session.objects.count(), 3)

@@ -7,7 +7,7 @@ from reviews.models import Review
 class ReviewModelTests(TestCase):
 
     def setUp(self):
-        self.user = mommy.make_recipe('flex_bookings.user', first_name='Fred')
+        self.user = mommy.make_recipe('common.user', first_name='Fred')
 
     def test_new_review(self):
         """
