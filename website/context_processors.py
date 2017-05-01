@@ -57,10 +57,6 @@ def reviews_pending(request):
         return {}
 
 
-def booking_on(request):
-    return {'booking_on': settings.BOOKING_ON}
-
-
 def out_of_office(request):
     start_date = datetime(2016, 9, 5, tzinfo=timezone.utc)
     end_date = datetime(2016, 9, 17, tzinfo=timezone.utc)

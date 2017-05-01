@@ -29,13 +29,13 @@ BASE_DIR = root()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
-if SECRET_KEY is None:
+if SECRET_KEY is None:  # pragma: no cover
     print("No secret key!")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 # when env variable is changed it will be a string, not bool
-if str(DEBUG).lower() in ['true', 'on']:
+if str(DEBUG).lower() in ['true', 'on']:  # pragma: no cover
     DEBUG = True
 else:
     DEBUG = False
@@ -67,11 +67,9 @@ INSTALLED_APPS = (
     'imagekit',
     'ckeditor',
     'accounts',
-    'flex_bookings',
+    'common',
     'timetable',
     'studioadmin',
-    'paypal.standard.ipn',
-    'payments',
     'activitylog',
     'website',
     'gallery',
@@ -136,7 +134,6 @@ TEMPLATES = [
                 "website.context_processors.more_menu_options",
                 "website.context_processors.menu_options",
                 "website.context_processors.reviews_pending",
-                "website.context_processors.booking_on",
                 "website.context_processors.out_of_office"
             ),
             'debug': DEBUG,
@@ -161,7 +158,7 @@ DATABASES = {
     # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
 }
 
-if env('HEROKU'):
+if env('HEROKU'):  # pragma: no cover
     DATABASES['default'] = dj_database_url.config()
 
 # Internationalization
@@ -184,7 +181,7 @@ STATICFILES_DIRS = (root('static'),)
 
 STATIC_URL = '/static/'
 STATIC_ROOT = root('collected-static')
-if HEROKU:
+if HEROKU:  # pragma: no cover
     STATIC_ROOT = 'staticfiles'
 
 MEDIA_URL = '/media/'
@@ -195,7 +192,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'flexibeast.web@gmail.com'
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', None)
-if EMAIL_HOST_PASSWORD is None:
+if EMAIL_HOST_PASSWORD is None:  # pragma: no cover
     print("No email host password provided!")
 EMAIL_PORT = 587
 DEFAULT_FROM_EMAIL = 'flexibeast.web@gmail.com'
@@ -243,11 +240,11 @@ if not HEROKU:
                 'level': 'INFO',
                 'propagate': True,
             },
-            'payments': {
-                'handlers': ['console', 'file_app'],
-                'level': 'INFO',
-                'propagate': True,
-            },
+            # 'payments': {
+            #     'handlers': ['console', 'file_app'],
+            #     'level': 'INFO',
+            #     'propagate': True,
+            # },
             'studioadmin': {
                 'handlers': ['console', 'file_app'],
                 'level': 'INFO',
@@ -285,12 +282,12 @@ SUIT_CONFIG = {
             'icon': 'icon-star',
             'models': ('event', 'eventtype')
         },
-        {
-            'label': 'Bookings',
-            'app': 'flex_bookings',
-            'icon': 'icon-heart',
-            'models': ('booking', 'block')
-        },
+        # {
+        #     'label': 'Bookings',
+        #     'app': 'flex_bookings',
+        #     'icon': 'icon-heart',
+        #     'models': ('booking', 'block')
+        # },
         {
             'app': 'timetable',
             'label': 'Weekly timetable',
@@ -312,13 +309,13 @@ SUIT_CONFIG = {
             ),
             'icon': 'icon-user',
         },
-        {
-            'label': 'Payments',
-            'models': ('payments.paypalbookingtransaction',
-                       'payments.paypalblocktransaction',
-                       'ipn.paypalipn'),
-            'icon': 'icon-asterisk',
-        },
+        # {
+        #     'label': 'Payments',
+        #     'models': ('payments.paypalbookingtransaction',
+        #                'payments.paypalblocktransaction',
+        #                'ipn.paypalipn'),
+        #     'icon': 'icon-asterisk',
+        # },
         {
             'label': 'Activity Log',
             'app': 'activitylog',
@@ -399,7 +396,7 @@ CKEDITOR_JQUERY_URL = \
     '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
 
 # MAILCATCHER
-if env('USE_MAILCATCHER'):
+if env('USE_MAILCATCHER'):  # pragma: no cover
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = '127.0.0.1'
     EMAIL_HOST_USER = ''
@@ -407,12 +404,8 @@ if env('USE_MAILCATCHER'):
     EMAIL_PORT = 1025
     EMAIL_USE_TLS = False
 
-# DJANGO-PAYPAL
-PAYPAL_RECEIVER_EMAIL = env('PAYPAL_RECEIVER_EMAIL')
-PAYPAL_TEST = env('PAYPAL_TEST')
-
 # HEROKU logging
-if HEROKU:
+if HEROKU:  # pragma: no cover
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -453,7 +446,5 @@ if HEROKU:
 
 # for gallery app
 PERMISSION_DENIED_URL = 'permission_denied'
-
-BOOKING_ON = env('BOOKING_ON')
 
 TESTING = False

@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 
 from accounts.forms import SignupForm
 from accounts.views import ProfileUpdateView, profile
-from flex_bookings.tests.helpers import set_up_fb
+from common.helpers import set_up_fb
 from model_mommy import mommy
 
 

@@ -1,10 +1,8 @@
-import urllib.parse
 import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.template.loader import get_template
@@ -12,12 +10,9 @@ from django.template.response import TemplateResponse
 from django.shortcuts import HttpResponseRedirect, render
 from django.utils.safestring import mark_safe
 from django.core.mail.message import EmailMultiAlternatives
-
-from flex_bookings.email_helpers import send_support_email
-
+from common.email_helpers import send_support_email
 from studioadmin.forms import EmailUsersForm, ChooseUsersFormSet
 from studioadmin.views.utils import staff_required
-
 from activitylog.models import ActivityLog
 
 
