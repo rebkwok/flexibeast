@@ -116,14 +116,14 @@ class TimetableManagementTests(TestMixin, TestCase):
         management.call_command('create_locations_and_weekly_sessions')
         self.assertTrue(Location.objects.exists())
         self.assertTrue(WeeklySession.objects.exists())
-        self.assertEqual(Location.objects.count(), 2)
+        self.assertEqual(Location.objects.count(), 3)
         self.assertEqual(WeeklySession.objects.count(), 6)
 
     def test_locations_and_weekly_sessions_not_recreated(self):
         management.call_command('create_locations_and_weekly_sessions')
         self.assertTrue(Location.objects.exists())
         self.assertTrue(WeeklySession.objects.exists())
-        self.assertEqual(Location.objects.count(), 2)
+        self.assertEqual(Location.objects.count(), 3)
         self.assertEqual(WeeklySession.objects.count(), 6)
         session_ids = [sess.id for sess in WeeklySession.objects.all()]
 
@@ -131,7 +131,7 @@ class TimetableManagementTests(TestMixin, TestCase):
         management.call_command('create_locations_and_weekly_sessions')
         self.assertTrue(Location.objects.exists())
         self.assertTrue(WeeklySession.objects.exists())
-        self.assertEqual(Location.objects.count(), 2)
+        self.assertEqual(Location.objects.count(), 3)
         self.assertEqual(WeeklySession.objects.count(), 6)
         session_ids1 = [sess.id for sess in WeeklySession.objects.all()]
 

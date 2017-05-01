@@ -44,6 +44,22 @@ class Command(BaseCommand):
             watermelon, 'created' if created else 'already exists'
         ))
 
+        physio_defaults = {
+                'full_name': "The Physio Centres",
+                'address': "36 Henderson Row, Edinburgh, EH3 5DN",
+                'map_url': "https://www.google.com/maps/embed?pb=!1m14!1m8!"
+                           "1m3!1d2233.3658520105528!2d-3.2035194!3d55.96036"
+                           "24!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4887c794d"
+                           "a060d8d%3A0xf50c22cb9a160096!2sHenderson+Row%2C+"
+                           "Edinburgh+EH3+5DN!5e0!3m2!1sen!2suk!"
+                           "4v1493676965701"
+            }
+        physio, created = Location.objects.update_or_create(
+            short_name="Physio Centre", defaults=physio_defaults)
+        self.stdout.write('Location "{}" {}'.format(
+            physio, 'created' if created else 'already exists'
+        ))
+
         self.stdout.write('Creating timetable weekly sessions.')
 
         class_defaults = {
@@ -56,6 +72,9 @@ class Command(BaseCommand):
 
         bv_class_defaults = class_defaults.copy()
         bv_class_defaults.update(location=bellview)
+
+        ph_class_defaults = class_defaults.copy()
+        ph_class_defaults.update(location=physio)
 
         # Monday classes
         bv1 = WeeklySession.objects.update_or_create(
@@ -72,26 +91,27 @@ class Command(BaseCommand):
         )
 
         # Wednesday classes
-        cl1 = WeeklySession.objects.update_or_create(
+        ph1 = WeeklySession.objects.update_or_create(
             name="Sensible Splits",
             day=WeeklySession.WED,
             time=time(hour=19, minute=00),
-            defaults=class_defaults
+            defaults=ph_class_defaults
         )
-        cl2 = WeeklySession.objects.update_or_create(
+        ph2 = WeeklySession.objects.update_or_create(
             name="Sensible Splits",
             day=WeeklySession.WED,
             time=time(hour=20, minute=10),
-            defaults=class_defaults
+            defaults=ph_class_defaults
         )
 
-        cl4 = WeeklySession.objects.update_or_create(
+        # Sunday classes
+        cl1 = WeeklySession.objects.update_or_create(
             name="Healthy Bendy Backs",
             day=WeeklySession.SUN,
             time=time(hour=19, minute=00),
             defaults=class_defaults
         )
-        cl5 = WeeklySession.objects.update_or_create(
+        cl2 = WeeklySession.objects.update_or_create(
             name="Sensible Splits",
             day=WeeklySession.SUN,
             time=time(hour=20, minute=10),
@@ -101,8 +121,7 @@ class Command(BaseCommand):
         created_cls = []
         updated_cls = []
 
-        for cl in [bv1, bv2, cl1, cl2, cl4, cl5]:
-        # for cl in [cl1, cl2, cl3, cl4, cl5]:
+        for cl in [bv1, bv2, ph1, ph2, cl1, cl2]:
             if cl[1]:
                 created_cls.append(cl[0])
             else:
