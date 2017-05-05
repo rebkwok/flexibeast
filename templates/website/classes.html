@@ -4,12 +4,23 @@
 
     {% block content %}
 
-    <section id="classes" class="transparent-bg">
+    <section id="classes" class="transparent-bg banner-section">
         <div class="container">
-           <div class="center wow fadeInDown">
-                <h1>Group Classes</h1>
-                <p class="lead">Classes are deliberately small with a maximum of 9 participants so students get maximum space and attention.
-                </p>
+
+            <div class="center wow fadeInDown banner-header">
+                <div class="banner-wrap row">
+                        <div class="col-xs-2 col-sm-2 banner-img-col banner-img-col-header">
+                            <img src="{% static 'website/images/banner_img_left.png' %}"/>
+                        </div>
+                        <div class="col-xs-8 col-sm-8">
+                            <h1>Group Classes</h1>
+                        <p class="lead">Classes are deliberately small with a maximum of 9 participants so students get maximum space and attention.
+                        </p>
+                        </div>
+                        <div class="col-xs-2 col-sm-2 banner-img-col banner-img-col-header">
+                            <img src="{% static 'website/images/banner_img.png' %}"/>
+                        </div>
+                </div>
             </div>
 
             <ul class="classes-filter text-center">
@@ -17,17 +28,29 @@
                 <li><a class="btn btn-fb-success-minor" href="#flexibeast">FlexiBeast</a></li>
             </ul><!--/#portfolio-filter-->
 
-            <div class="center">
-                <img src="{% static 'website/images/group.jpg' %}" />
+            <div class="center row">
+                <div class="col-xs-12">
+                    <img class="main-img" src="{% static 'website/images/group.jpg' %}" />
+                </div>
             </div>
+
         </div><!--/.row-->
     </section><!--/#feature-->
 
-        <section id="yoga" class="transparent-bg"><!--/#yoga-->
+        <section id="yoga" class="transparent-bg banner-section"><!--/#yoga-->
          <div class="container">
-            <div class="center wow fadeInDown">
-                <h2>Yoga</h2>
-                <span class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></span>
+            <div class="center wow fadeInDown banner-subheader row">
+                <div class="banner-wrap row">
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img_left.png' %}"/>
+                        </div>
+                        <div class="col-xs-8 col-sm-10">
+                            <h2>Yoga</h2>
+                        </div>
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img.png' %}"/>
+                        </div>
+                </div>
             </div>
 
             <div class="row">
@@ -50,16 +73,26 @@
                         mind, bringing you back to your centre.
                     </p>
                 </div>
-
+                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
            </div>
+
         </div>
     </section><!--/#feature-->
 
-    <section id="flexibeast"><!--/#flexibeast-->
+    <section id="flexibeast" class="banner-section"><!--/#flexibeast-->
          <div class="container">
-            <div class="center wow fadeInDown">
-                <h2>FlexiBeast</h2>
-                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
+             <div class="center wow fadeInDown banner-subheader row">
+                <div class="banner-wrap row">
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img_left.png' %}"/>
+                        </div>
+                        <div class="col-xs-8 col-sm-10">
+                            <h2>Flexibeast</h2>
+                        </div>
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img.png' %}"/>
+                        </div>
+                </div>
             </div>
                 <p class="lead">
                     Alicia combines Yoga with modern techniques such as PNF and partner work in
@@ -112,7 +145,7 @@
                         Opening up the hips is useful across so many disciplines and feels amazing!
                     </p>
                 </div>
-
+                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
            </div>
         </div>
     </section><!--/#feature-->

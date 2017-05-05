@@ -4,17 +4,27 @@
 
     {% block content %}
 
-    <section id="private" class="transparent-bg">
+    <section id="private" class="transparent-bg banner-section">
         <div class="container">
-           <div class="center wow fadeInDown">
-                <h1>Private Instruction</h1>
-                <p class="lead">
-                    Alicia offers 1-1 sessions for clients. The purpose and structure
-                    of these sessions will vary according to client need. They can be
-                    used as a means of identifying and setting goals or addressing
-                    specific difficulties. The precise structure of each session
-                    will vary from client to client but the following is a rough outline of what can be offered.
-                </p>
+           <div class="center wow fadeInDown banner-header">
+                <div class="banner-wrap row">
+                        <div class="col-xs-2 col-sm-2 banner-img-col banner-img-col-header">
+                            <img src="{% static 'website/images/banner_img_left.png' %}"/>
+                        </div>
+                        <div class="col-xs-8 col-sm-8">
+                            <h1>Private Instruction</h1>
+                            <p class="lead">
+                                Alicia offers 1-1 sessions for clients. The purpose and structure
+                                of these sessions will vary according to client need. They can be
+                                used as a means of identifying and setting goals or addressing
+                                specific difficulties. The precise structure of each session
+                                will vary from client to client but the following is a rough outline of what can be offered.
+                            </p>
+                        </div>
+                        <div class="col-xs-2 col-sm-2 banner-img-col banner-img-col-header">
+                            <img src="{% static 'website/images/banner_img.png' %}"/>
+                        </div>
+                </div>
             </div>
 
             <ul class="classes-filter text-center">
@@ -26,18 +36,32 @@
                 <li><a class="btn btn-fb-success-minor" href="#stress">Stress Management</a></li>
             </ul><!--/#portfolio-filter-->
 
-            <div class="center">
-                <img src="{% static 'website/images/group.jpg' %}" />
+            <div class="center row">
+                <div class="col-xs-12">
+                    <img class="main-img" src="{% static 'website/images/group.jpg' %}" />
+                </div>
             </div>
+
         </div><!--/.row-->
     </section><!--/#feature-->
 
-        <section id="yoga" class="transparent-bg"><!--/#yoga-->
+        <section id="yoga" class="transparent-bg banner-section"><!--/#yoga-->
          <div class="container">
-            <div class="center wow fadeInDown">
-                <h2>Yoga</h2>
-                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
+
+            <div class="center wow fadeInDown banner-subheader">
+                <div class="banner-wrap row">
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img_left.png' %}"/>
+                        </div>
+                        <div class="col-xs-8 col-sm-10">
+                            <h2>Yoga</h2>
+                        </div>
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img.png' %}"/>
+                        </div>
+                </div>
             </div>
+
 
             <div class="row">
                 <div class="col-sm-12 wow fadeInDown">
@@ -48,15 +72,25 @@
                         general practice. The goal for the session will be agreed prior to the start.
                     </p>
                 </div>
+                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
            </div>
         </div>
     </section><!--/#yoga-->
 
-    <section id="flexibility" class="transparent-bg"><!--/#yoga-->
+    <section id="flexibility" class="transparent-bg banner-section"><!--/#yoga-->
          <div class="container">
-            <div class="center wow fadeInDown">
-                <h2>Flexibility</h2>
-                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
+            <div class="center wow fadeInDown banner-subheader row">
+                <div class="banner-wrap row">
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img_left.png' %}"/>
+                        </div>
+                        <div class="col-xs-8 col-sm-10">
+                            <h2>Flexibility</h2>
+                        </div>
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img.png' %}"/>
+                        </div>
+                </div>
             </div>
 
             <div class="row">
@@ -69,15 +103,25 @@
                         a mixture of strength and flexibility work and may include using props.
                     </p>
                 </div>
+                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
            </div>
         </div>
     </section><!--/#flexibility-->
 
-    <section id="fitness" class="transparent-bg"><!--/#fitness-->
+    <section id="fitness" class="transparent-bg banner-section"><!--/#fitness-->
          <div class="container">
-            <div class="center wow fadeInDown">
-                <h2>Fitness</h2>
-                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
+            <div class="center wow fadeInDown banner-subheader row">
+                <div class="banner-wrap row">
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img_left.png' %}"/>
+                        </div>
+                        <div class="col-xs-8 col-sm-10">
+                            <h2>Fitness</h2>
+                        </div>
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img.png' %}"/>
+                        </div>
+                </div>
             </div>
 
             <div class="row">
@@ -88,15 +132,25 @@
                         strength is a key goal but again sessions are tailored to meet need.
                     </p>
                 </div>
+                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
            </div>
         </div>
     </section><!--/#fitness-->
 
-    <section id="restorative" class="transparent-bg"><!--/#restorative-->
+    <section id="restorative" class="transparent-bg banner-section"><!--/#restorative-->
          <div class="container">
-            <div class="center wow fadeInDown">
-                <h2>Restorative</h2>
-                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
+            <div class="center wow fadeInDown banner-subheader row">
+                <div class="banner-wrap row">
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img_left.png' %}"/>
+                        </div>
+                        <div class="col-xs-8 col-sm-10">
+                            <h2>Restorative</h2>
+                        </div>
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img.png' %}"/>
+                        </div>
+                </div>
             </div>
 
             <div class="row">
@@ -110,15 +164,25 @@
                         in these sessions.
                     </p>
                 </div>
+                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
            </div>
         </div>
     </section><!--/#restorative-->
 
-     <section id="diet" class="transparent-bg"><!--/#diet-->
+     <section id="diet" class="transparent-bg banner-section"><!--/#diet-->
          <div class="container">
-            <div class="center wow fadeInDown">
-                <h2>Diet</h2>
-                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
+            <div class="center wow fadeInDown banner-subheader row">
+                <div class="banner-wrap row">
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img_left.png' %}"/>
+                        </div>
+                        <div class="col-xs-8 col-sm-10">
+                            <h2>Diet</h2>
+                        </div>
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img.png' %}"/>
+                        </div>
+                </div>
             </div>
 
             <div class="row">
@@ -130,15 +194,25 @@
                         understand your body and its needs.
                     </p>
                 </div>
+                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
            </div>
         </div>
     </section><!--/#diet-->
 
-    <section id="stress" class="transparent-bg"><!--/#stress-->
+    <section id="stress" class="transparent-bg banner-section"><!--/#stress-->
          <div class="container">
-            <div class="center wow fadeInDown">
-                <h2>Stress Management</h2>
-                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
+            <div class="center wow fadeInDown banner-subheader row">
+                <div class="banner-wrap row">
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img_left.png' %}"/>
+                        </div>
+                        <div class="col-xs-8 col-sm-10">
+                            <h2>Stress Management</h2>
+                        </div>
+                        <div class="col-xs-2 col-sm-1 banner-img-col">
+                            <img src="{% static 'website/images/banner_img.png' %}"/>
+                        </div>
+                </div>
             </div>
 
             <div class="row">
@@ -149,6 +223,7 @@
                         and practical strategies for dealing with day to day stressors.
                     </p>
                 </div>
+                <a class="btn btn-fb-success-minor pull-right" href="#"><i class="fa fa-lg fa-angle-up"></i></a>
            </div>
         </div>
     </section><!--/#stress-->

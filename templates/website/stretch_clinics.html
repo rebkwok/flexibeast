@@ -4,11 +4,24 @@
 
     {% block content %}
 
-    <section id="stretch-clinics" class="transparent-bg">
+    <section id="stretch-clinics" class="banner-section transparent-bg">
         <div class="container">
-           <div class="center wow fadeInDown">
-                <h1>Stretch Clinics</h1>
-           </div>
+
+           <div class="center wow fadeInDown banner-header">
+               <div class="banner-wrap row">
+                        <div class="col-xs-2 col-sm-2 banner-img-col banner-img-col">
+                            <img src="{% static 'website/images/banner_img_left.png' %}"/>
+                        </div>
+                        <div class="col-xs-8 col-sm-8">
+                            <h1>Stretch Clinics</h1>
+                        </div>
+                        <div class="col-xs-2 col-sm-2 banner-img-col banner-img-col">
+                            <img src="{% static 'website/images/banner_img.png' %}"/>
+                        </div>
+                </div>
+
+            </div>
+
                 <h2>What is a stretch clinic?</h2>
 
                 <p class="lead">It's a time and space to either work on goals or help to fix problems.</p>
@@ -17,11 +30,22 @@
 
                 <p>Issues addressed include hypermobility, injury recovery, flexibility and strengthening goals.</p>
 
+                <ul>
+                    <li>Injury recovery/prevention</li>
+                    <li>Can also help with poor posture and lower back pain</li>
+                    <li>FlexiBeast Clinics can help across a range of disciplines to improve performance by working on increasing range of movement and strength around joints</li>
+                    <li>Wherever you are in your flexibility journey clinics are a great way to focus on your individual needs</li>
+
+                </ul>
+
                 <p>You can either self refer or be referred by Gwen at <a href="http://www.leithtreatments.com">Leith Treatments</a>.</p>
 
-            <div class="center">
-                <img src="{% static 'website/images/group.jpg' %}" />
+            <div class="center row">
+                <div class="col-xs-12">
+                    <img class="main-img" src="{% static 'website/images/group.jpg' %}" />
+                </div>
             </div>
+
         </div><!--/.row-->
     </section><!--/#feature-->
 
