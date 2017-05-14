@@ -17,7 +17,8 @@ env = environ.Env(DEBUG=(bool, False),
                   PAYPAL_TEST=(bool, False),
                   USE_MAILCATCHER=(bool, False),
                   HEROKU=(bool, False),
-                  BOOKING_ON=(bool, False)
+                  BOOKING_ON=(bool, False),
+                  SHOW_DEBUG_TOOLBAR=(bool, True)
                   )
 
 environ.Env.read_env(root('flexibeast/.env'))  # reading .env file
@@ -129,7 +130,7 @@ TEMPLATES = [
                 # Required by allauth template tags
                 "django.template.context_processors.request",
                 "django.contrib.messages.context_processors.messages",
-                "django.core.context_processors.media",
+                "django.template.context_processors.media",
                 "website.context_processors.website_pages",
                 "website.context_processors.more_menu_options",
                 "website.context_processors.menu_options",
@@ -448,3 +449,19 @@ if HEROKU:  # pragma: no cover
 PERMISSION_DENIED_URL = 'permission_denied'
 
 TESTING = False
+
+
+def show_toolbar(request):  # pragma: no cover
+    return env('SHOW_DEBUG_TOOLBAR')
+
+
+# With Django 1.11, the TemplatesPanel in the debug toolbar makes everything
+# excessively slow
+# See https://github.com/jazzband/django-debug-toolbar/issues/910
+DEBUG_TOOLBAR_CONFIG = {
+    'DISABLE_PANELS': {
+        'debug_toolbar.panels.redirects.RedirectsPanel',
+        'debug_toolbar.panels.templates.TemplatesPanel'
+    },
+    "SHOW_TOOLBAR_CALLBACK": show_toolbar,
+}

@@ -475,16 +475,14 @@ class ContactViewsTests(TestMixin, TestCase):
             'message': 'Hello',
             'cc': True
         }
-        resp = self.client.post(reverse('website:contact'), form_data, follow=True)
-        messages = []
-        for c in resp.context:
-            messages = list(c.get('messages'))
+        resp = self.client.post(
+            reverse('website:contact'), form_data, follow=True
+        )
 
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].message,
-            "Thank you for your enquiry! Your email has been sent and we'll "
-            "get back to you as soon as possible."
+        self.assertIn(
+            "Thank you for your enquiry! Your email has been sent and "
+            "we&#39;ll get back to you as soon as possible.",
+            resp.rendered_content
         )
 
 

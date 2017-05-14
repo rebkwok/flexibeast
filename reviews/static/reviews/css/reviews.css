@@ -59,3 +59,15 @@ div .section-end {
     font-size: small;
     font-style: italic;
 }
+
+/*RADIO BUTTONS*/
+form ul.inline {
+    margin-left: 0;
+    padding: 0;
+		list-style: none;
+}
+
+form ul.inline li {
+    float: left;
+    padding-right: 7px;
+}

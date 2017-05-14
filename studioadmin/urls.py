@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.views.generic import RedirectView
 from studioadmin.views.activitylog import ActivityLogListView
 from studioadmin.views.email_users import choose_users_to_email, \
