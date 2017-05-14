@@ -1,6 +1,5 @@
 from .base import *
 
-# BOOKING_ON = True
 
 LOGGING = {
         'version': 1,
@@ -17,16 +16,6 @@ LOGGING = {
                 'level': 'INFO',
                 'propagate': True,
             },
-            'booking': {
-                'handlers': ['console'],
-                'level': 'INFO',
-                'propogate': True,
-            },
-            # 'payments': {
-            #     'handlers': ['console'],
-            #     'level': 'INFO',
-            #     'propogate': True,
-            # },
             'studioadmin': {
                 'handlers': ['console'],
                 'level': 'INFO',

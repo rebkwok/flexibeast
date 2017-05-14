@@ -92,7 +92,7 @@ class BaseReviewFormSet(BaseModelFormSet):
             initial = 'undecided'
 
         form.fields['decision'] = forms.ChoiceField(
-            widget=forms.RadioSelect(renderer=HorizontalRadioRenderer),
+            widget=forms.RadioSelect(attrs={'class': 'inline'}),
             choices=review_choices,
             initial=initial,
             required=False
@@ -112,13 +112,3 @@ REVIEW_CHOICES = (
   ('reject', mark_safe('<span class="fa fa-thumbs-down fa-lg" alt="reject" title="reject">')),
   ('undecided', mark_safe('<span class="fa fa-question-circle fa-lg" alt="undecided" title="undecided">')),
 )
-
-
-class HorizontalRadioRenderer(forms.RadioSelect.renderer):
-    """renders horizontal radio buttons.
-    found here:
-    https://wikis.utexas.edu/display/~bm6432/Django-Modifying+RadioSelect+Widget+to+have+horizontal+buttons
-    """
-
-    def render(self):
-        return mark_safe(u' &nbsp;&nbsp;&nbsp;'.join([u'%s\n' % w for w in self]))
