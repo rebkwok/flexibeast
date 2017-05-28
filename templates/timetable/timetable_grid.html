@@ -7,8 +7,13 @@
     <section id="timetable_page" class="transparent-bg">
         <div class="container">
            <div class="center wow fadeInDown">
-                <h1>Timetable</h1>
+                <h1>Timetable - Regular Classes</h1>
            </div>
+
+        <ul class="classes-filter text-center">
+                <li><a class="btn btn-fb-success" href="#">Regular Classes</a></li>
+                <li><a class="btn btn-fb-success-minor" href="{% url 'timetable:timetable_clinics' %}">Stretch Clinics</a></li>
+            </ul>
 
         <div class="row">
         {% if sessions %}

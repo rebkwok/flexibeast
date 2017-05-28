@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 from django.core.mail import send_mail
 
 from reviews.models import Review
-from timetable.models import WeeklySession
+from timetable.models import WeeklySession, StretchClinic
 from website.models import Page
 from website.forms import ContactForm
 
@@ -52,9 +52,10 @@ def private(request):
 
 
 def stretch_clinics(request):
+    clinics = StretchClinic.objects.filter(show_on_site=True).order_by('-date')
     return TemplateResponse(
         request, 'website/stretch_clinics.html',
-        {'nav_section': 'stretch_clinics'}
+        {'nav_section': 'stretch_clinics', 'clinics': clinics}
     )
 
 

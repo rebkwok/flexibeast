@@ -28,6 +28,7 @@ $(document).ready(function() {
         $('#description-title').text($sel.data('title'));
         $('#description-text').text($sel.data('description'));
         $('#block_info-text').text($sel.data('blockinfo'));
+        $('#cost-text').text($sel.data('costinfo'));
         $('#location').text($sel.data('location'));
         $('#location-address').text($sel.data('address'));
         $('#spaces-text').text($sel.data('spaces'));

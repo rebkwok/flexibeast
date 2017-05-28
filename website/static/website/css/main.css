@@ -1041,6 +1041,10 @@ p.testimonial {
     background-color: rgba(6, 105, 58, 1);
 }
 
+ul.social-share li a.non-icon.testimonial:hover {
+  background-color: transparent;
+}
+
 a:hover > .label-testimonial {
     background-color: #fff;
     color: #088A08;

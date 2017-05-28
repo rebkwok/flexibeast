@@ -1,0 +1,81 @@
+             <div class="row">
+                {% if clinics %}
+                        <div class="col-sm-8 col-sm-offset-2 col-xs-12">
+                            <ul class="list-group text-center">
+                                <li class="list-group-item list-group-item-timetable-heading">
+                                    <h4>Timetable</h4>
+                                </li>
+                                {% for clinic in clinics %}
+                                <li class="list-group-item">{{ clinic.date | date:"D d M Y"}} -
+                                    <a href="#DescriptionModal" role="button"
+                                       data-toggle="modal"
+                                       class="description-link"
+                                       data-title="Stretch Clinic {{ clinic.date | date:"D d M Y" }}"
+                                       data-description="{{ clinic.description }}"
+                                       data-location="{{ clinic.location.full_name }}"
+                                       data-address="{{ clinic.location.address }}"
+                                       data-costinfo="£ {{ clinic.cost }} / hr"
+                                       data-spaces="Availability: {% if clinic.spaces %}{{ clinic.spaces }} spaces{% else %}Full{% endif %}"
+                                    >Stretch Clinic</a> -
+                                    <a href="#LocationModal" role="button"
+                                       data-toggle="modal"
+                                       class="location-link"
+                                       data-short_name="{{ clinic.location.short_name }}"
+                                       data-full_name="{{ clinic.location.full_name }}"
+                                       data-address="{{ clinic.location.address }}"
+                                       data-map_url="{{ clinic.location.map_url }}"
+                                    >{{ clinic.location }}</a> - {% if clinic.spaces %}{{ clinic.spaces }} spaces{% else %}Full{% endif %}
+
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                {% else %}
+                    <p>Coming soon</p>
+                {% endif %}
+
+                </div>
+            </div>
+
+        <!-- Description Modal HTML -->
+        <div id="DescriptionModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="description-title">Title</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h4>Location</h4>
+                        <div id="location">Full Name</div>
+                        <div id="location-address">Address</div>
+                        <h4>Description</h4>
+                        <div id="description-text">Description</div>
+                        <h4>Booking and Prices</h4>
+                        <div id="cost-text">Cost Info</div>
+                        <div id="spaces-text">Spaces</div>
+                        <div class="top-space"><a class='btn btn-sm btn-fb-success-minor' href="{% url 'website:contact' %}">Contact</a> to confirm availability and to book</div>
+                    </div>
+                    <div class="modal-footer"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Location Modal HTML -->
+        <div id="LocationModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3 class="modal-title" id="location-title">Short Name</h3>
+                    </div>
+                    <div class="modal-body">
+                        <h4 class="modal-title" id="location-full_name">Full Name</h4>
+                        <div id="location-address">Address</div>
+                        <iframe id="location-map" frameborder="0"></iframe>
+                    </div>
+                    <div class="modal-footer"></div>
+                </div>
+            </div>
+        </div>

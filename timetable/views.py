@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.views.generic import ListView
 
-from timetable.models import WeeklySession
+from timetable.models import StretchClinic, WeeklySession
 from timetable.utils import staff_required
 
 
@@ -26,6 +26,21 @@ class WeeklySessionListView(ListView):
 
         spaces = WeeklySession.objects.filter(full=False).exists()
         context['classes_with_spaces'] = spaces
+        return context
+
+
+class StretchClinicListView(ListView):
+
+    model = StretchClinic
+    template_name = 'timetable/timetable_clinics.html'
+    context_object_name = 'clinics'
+
+    def get_context_data(self, **kwargs):
+        context = super(StretchClinicListView, self).get_context_data(**kwargs)
+        clinics = StretchClinic.objects.filter(
+            show_on_site=True
+        ).order_by('-date')
+        context['clinics'] = clinics
         return context
 
 

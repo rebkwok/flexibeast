@@ -39,7 +39,7 @@
                             <ul class="social-share">
                                 {% if request.user.is_authenticated and reviews_pending %}
                                         <li>
-                                            <a class="non-icon"  href="{% url 'reviews:staff_reviews' %}">
+                                            <a class="non-icon testimonial"  href="{% url 'reviews:staff_reviews' %}">
                                                 <span class="label label-testimonial label-as-badge"><span class="fa fa-bell-o"></span>{{ reviews_pending }}</span>
                                             </a>
                                         </li>
