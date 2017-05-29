@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -69,7 +70,7 @@ class WeeklySession(models.Model):
     )
     contact_person = models.CharField(max_length=255, default="Alicia Alexandra")
     contact_email = models.EmailField(default="flexibeast@hotmail.com")
-    cost = models.DecimalField(default=7.00, max_digits=8, decimal_places=2)
+    cost = models.DecimalField(default=7.50, max_digits=8, decimal_places=2)
 
     full = models.BooleanField(default=False)
     block_info = models.TextField(blank=True, null=True)
@@ -90,9 +91,9 @@ class StretchClinic(models.Model):
     location = models.ForeignKey(
         Location, null=True, blank=True, on_delete=models.SET_NULL
     )
-    max_participants = models.PositiveIntegerField(
-        null=True, blank=True, default=9,
-        help_text="Leave blank if no max number of participants"
+    max_spaces = models.PositiveIntegerField(
+        default=9,
+        help_text="Maximum number of clinic slots"
     )
     contact_person = models.CharField(max_length=255, default="Alicia Alexandra")
     contact_email = models.EmailField(default="flexibeast@hotmail.com")

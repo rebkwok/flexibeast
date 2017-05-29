@@ -118,3 +118,7 @@ td {
 .new-inline-label{
     margin-left: 10px;
 }
+
+.form-error {
+    color: red;
+}

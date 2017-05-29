@@ -1,0 +1,72 @@
+{% extends "studioadmin/base.html" %}
+{% load static %}
+{% load commontags timetabletags websitetags %}
+
+{% block studioadmincontent %}
+    <div class="studioadmin-container">
+
+        <h2>Regular Weekly Classes <a class="btn btn-success pull-right" href="{% url 'studioadmin:timetable_session_add' %}" >Add new class</a></h2>
+                <div class="panel">
+                    <form class="form-horizontal" method="post" action="">
+                    {% csrf_token %}
+                    <div class="table-responsive">
+                        <table class="table tablesorter" id="sortTable">
+                            <thead>
+                            <tr class="success">
+                                <th>Day</th>
+                                <th>Time</th>
+                                <th>Class name</br><span class="studioadmin-help">Click to edit</span></th>
+                                <th>Location</th>
+                                <th class="table-center">Delete class</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="SessionModal" tabindex="-1" role="dialog" aria-labelledby="SessionModalLabel"></div>
+                            <!-- /.modal -->
+
+                            {{ sessions_formset.management_form }}
+                            {% for weeklysession in sessions_formset %}
+                                <span class=hide>{{ weeklysession.id }}</span>
+                                <tr>
+                                    <td class="studioadmin-tbl">{{ weeklysession.instance.day|format_session_day_long }}</td>
+                                    <td class="studioadmin-tbl">{{ weeklysession.instance.time|date:"H:i" }}</td>
+                                    <td class="studioadmin-tbl"><a class="sessionedit" href="#" data-form="{% url 'studioadmin:sessionedit' weeklysession.instance.id %}" title="edit session">{{ weeklysession.instance.name }}</a></td>
+                                    <td class="studioadmin-tbl">{{ weeklysession.instance.location.short_name }}</td>
+                                    <td class="studioadmin-tbl table-center">{{ weeklysession.DELETE }}<label for={{ weeklysession.DELETE_id }}></label>
+                                </tr>
+                            {% endfor %}
+                            <tr>
+                                <td colspan="4"></td>
+                                <td class="studioadmin-tbl table-center">
+                                    <input class="btn btn-danger" name="formset_submitted" type="submit" value="Delete selected" />
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    </form>
+
+                    </div>
+                </div>
+
+{% endblock studioadmincontent %}
+
+{% block extra_scripts %}
+{#http://malsup.github.com/jquery.form.js#}
+<script src="{% static 'timetable/js/jquery.form.js' %}"></script>
+<script>
+    $(".sessionedit").click(function(ev) { // for each edit url
+        ev.preventDefault(); // prevent navigation
+        var url = $(this).data("form"); // get the form url
+        $("#SessionModal").load(url, function() { // load the url into the modal
+            $(this).modal('show'); // display the modal on url load
+        });
+
+        return false; // prevent the click propagation
+    });
+
+</script>
+{% endblock %}

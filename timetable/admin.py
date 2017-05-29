@@ -13,11 +13,11 @@ class WeeklySessionAdmin(admin.ModelAdmin):
 
 class StretchClinicAdmin(admin.ModelAdmin):
     list_display = (
-        'date', 'location', 'max_participants', 'spaces', 'show_on_site'
+        'date', 'location', 'max_spaces', 'spaces', 'show_on_site'
     )
     ordering = ('date',)
     fields = ('date', 'description', 'location',
-              'max_participants', 'contact_person', 'contact_email',
+              'max_spaces', 'contact_person', 'contact_email',
               'cost', 'spaces', 'show_on_site')
     model = StretchClinic
 

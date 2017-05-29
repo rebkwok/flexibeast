@@ -17,6 +17,13 @@
             <li><a href="{% url 'studioadmin:add_page' %}">Add new page</a></li>
           </ul>
         </li>
+        <li class="dropdown {% if sidenav_selection == 'timetable' %}active{% endif %}">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Timetables <span class="fa fa-caret-down"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="{% url 'studioadmin:timetable_sessions_list' %}">Regular Classes</a></li>
+            <li><a href="{% url 'studioadmin:timetable_clinics_list' %}">Stretch Clinics</a></li>
+          </ul>
+        </li>
         <li {% if sidenav_selection == 'gallery' %}class="active"{% endif %}>
             <a href="{% url 'studioadmin:gallery_categories' %}">Gallery</a>
         </li>
@@ -47,10 +54,6 @@
 
 {% endblock %}
 
-
-{% block extra_scripts %}
-    <script src="{% static 'flex_bookings/js/bootstrap-dropdown-multilevel.js' %}"></script>
-{% endblock %}
 
 {% block footer %}
     <div class="studioadmin-footer">

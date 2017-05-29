@@ -15,7 +15,7 @@ from studioadmin.forms import (
     PagesFormset,
     PictureFormset,
     TimetableWeeklySessionFormSet,
-    WeeklySessionAdminForm
+    EditSessionForm
 )
 from timetable.models import Location, WeeklySession
 from website.models import Page
@@ -61,7 +61,7 @@ class TimetableWeeklySessionFormSetTests(TestCase):
         self.assertEqual(deleted_form.cleaned_data['id'], session_to_delete)
 
 
-class WeeklySessionAdminFormTests(TestCase):
+class WeeklySessionEditFormTests(TestCase):
 
     def setUp(self):
 
@@ -70,53 +70,20 @@ class WeeklySessionAdminFormTests(TestCase):
             'name': 'test_event',
             'day': '01MON',
             'time': '12:00',
-            'contact_email': 'test@test.com',
-            'contact_person': 'test',
+            'cost': '7',
             'location': location.id
         }
 
     def test_form_valid(self):
-        form = WeeklySessionAdminForm(data=self.form_data)
+        form = EditSessionForm(data=self.form_data)
         self.assertTrue(form.is_valid())
-
-    def test_form_with_invalid_contact_person(self):
-        data = self.form_data
-        data.update({'contact_person': ''})
-        form = WeeklySessionAdminForm(data=data)
-        self.assertFalse(form.is_valid())
-        self.assertEquals(len(form.errors), 1)
-        self.assertIn('contact_person', form.errors.keys())
-        self.assertIn(['This field is required.'], form.errors.values())
-
-    def test_form_with_invalid_contact_email(self):
-        data = self.form_data
-        data.update({'contact_email': ''})
-        form = WeeklySessionAdminForm(data=data)
-        self.assertFalse(form.is_valid())
-        self.assertEquals(len(form.errors), 1)
-        self.assertIn('contact_email', form.errors.keys())
-        self.assertIn(['This field is required.'], form.errors.values())
-
-        data.update({'contact_email': 'test_email'})
-        form = WeeklySessionAdminForm(data=data)
-        self.assertFalse(form.is_valid())
-        self.assertEquals(len(form.errors), 1)
-        self.assertIn('contact_email', form.errors.keys())
-        self.assertIn(['Enter a valid email address.'], form.errors.values())
 
     def test_invalid_time(self):
         data = self.form_data
         data.update({'time': '25:00'})
-        form = WeeklySessionAdminForm(data=data)
+        form = EditSessionForm(data=data)
         self.assertFalse(form.is_valid())
         self.assertIn('Invalid time format', str(form.errors['time']))
-
-    def test_name_placeholder(self):
-        form = WeeklySessionAdminForm(data=self.form_data)
-        name_field = form.fields['name']
-        self.assertEquals(
-            name_field.widget.attrs['placeholder'],
-            'Name of session e.g. Flexibility for Splits')
 
 
 class ChooseUsersFormSetTests(TestCase):
