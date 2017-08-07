@@ -26,6 +26,7 @@ class WeeklySessionListView(ListView):
 
         spaces = WeeklySession.objects.filter(full=False).exists()
         context['classes_with_spaces'] = spaces
+        context['nav_section'] = 'services'
         return context
 
 
@@ -41,6 +42,7 @@ class StretchClinicListView(ListView):
             show_on_site=True
         ).order_by('-date')
         context['clinics'] = clinics
+        context['nav_section'] = 'services'
         return context
 
 

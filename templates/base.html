@@ -110,10 +110,7 @@
 
                         <li {% if nav_section == 'home' %}class="active"{%  endif %}><a href="{% url 'website:home' %}">Home</a></li>
                         <li {% if nav_section == 'about' %}class="active"{%  endif %}><a href="{% url 'website:about' %}">About</a></li>
-                        <li class="dropdown"
-                            {% if nav_section == 'clinics' or nav_section == 'classes' or nav_section == 'workshops' or nav_section == 'private' or nav_section == 'timetable' %}
-                                active
-                            {% endif %}">
+                        <li class="dropdown{% if nav_section == 'services' %} active{% endif %}">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Services <i class="fa fa-angle-down"></i></a>
                             <ul class="dropdown-menu">
                                 <li><a href="{% url 'website:classes' %}">Classes</a></li>
@@ -126,10 +123,10 @@
 
                         <li {% if nav_section == 'gallery' %}class="active"{% endif %}><a href="{% url 'gallery:gallery' %}">Gallery</a></li>
 
-                        <li class="dropdown">
+                        <li class="dropdown{% if nav_section == 'more' %} active{% endif %}">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">More <i class="fa fa-angle-down"></i></a>
                             <ul class="dropdown-menu">
-                                <li {% if nav_section == 'reviews' %}class="active"{% endif %}><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
+                                <li><a href="{% url 'reviews:reviews' %}">Testimonials</a></li>
                                 {% for page in website_pages %}
                                     {% if page.menu_name and page.menu_location == 'dropdown' %}
                                         {% if page|viewable:user %}

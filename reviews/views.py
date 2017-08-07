@@ -34,7 +34,7 @@ class ReviewListView(ListView):
         context['order_sort_form'] = form
         if order:
             context['reviews'] = self.get_queryset().order_by(order)
-        context['nav_section'] = 'reviews'
+        context['nav_section'] = 'more'
         return context
 
 

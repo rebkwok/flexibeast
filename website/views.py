@@ -41,13 +41,13 @@ def about(request):
 
 def classes(request):
     return TemplateResponse(
-        request, 'website/classes.html', {'nav_section': 'classes'}
+        request, 'website/classes.html', {'nav_section': 'services'}
     )
 
 
 def private(request):
     return TemplateResponse(
-        request, 'website/private_instruction.html', {'nav_section': 'private'}
+        request, 'website/private_instruction.html', {'nav_section': 'services'}
     )
 
 
@@ -55,13 +55,13 @@ def stretch_clinics(request):
     clinics = StretchClinic.objects.filter(show_on_site=True).order_by('-date')
     return TemplateResponse(
         request, 'website/stretch_clinics.html',
-        {'nav_section': 'stretch_clinics', 'clinics': clinics}
+        {'nav_section': 'services', 'clinics': clinics}
     )
 
 
 def workshops(request):
     return TemplateResponse(
-        request, 'website/workshops.html', {'nav_section': 'workshops'}
+        request, 'website/workshops.html', {'nav_section': 'services'}
     )
 
 
@@ -92,9 +92,10 @@ def page(request, page_name):
     except TemplateDoesNotExist:
         include_html = ''
 
-    return TemplateResponse(
-        request, template, {'page': page, 'include_html': include_html}
-    )
+    context = {
+        'page': page, 'include_html': include_html, 'nav_section': 'more'
+    }
+    return TemplateResponse(request, template, context)
 
 
 def process_contact_form(request):
