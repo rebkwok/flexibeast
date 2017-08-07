@@ -8,10 +8,10 @@
         <div class="container">
            <div class="center wow fadeInDown banner-header">
                 <div class="banner-wrap row">
-                        <div class="col-xs-2 col-sm-2 banner-img-col banner-img-col-header">
-                            <img src="{% static 'website/images/banner_img_left.png' %}"/>
-                        </div>
-                        <div class="col-xs-8 col-sm-8">
+{#                        <div class="col-xs-2 col-sm-2 banner-img-col banner-img-col-header">#}
+{#                            <img src="{% static 'website/images/banner_img_left_gp.png' %}"/>#}
+{#                        </div>#}
+                        <div class="col-xs-8 col-sm-offset-1 col-sm-9">
                             <h1>Private Instruction</h1>
                             <p class="lead">
                                 Alicia offers 1-1 sessions for clients. The purpose and structure
@@ -21,9 +21,15 @@
                                 will vary from client to client but the following is a rough outline of what can be offered.
                             </p>
                         </div>
-                        <div class="col-xs-2 col-sm-2 banner-img-col banner-img-col-header">
-                            <img src="{% static 'website/images/banner_img.png' %}"/>
+                        <div class="col-xs-4 col-sm-3 banner-img-col banner-img-col-header">
+                            <img src="{% static 'website/images/banner_img_gp_crop.png' %}"/>
                         </div>
+                </div>
+            </div>
+
+            <div class="center row">
+                <div class="col-xs-6 col-xs-offset-3">
+                    <img class="main-img" width="50%" src="{% static 'website/images/banner_img_gp_crop_nofade.png' %}" />
                 </div>
             </div>
 
@@ -36,11 +42,6 @@
                 <li><a class="btn btn-fb-success-minor" href="#stress">Stress Management</a></li>
             </ul><!--/#portfolio-filter-->
 
-            <div class="center row">
-                <div class="col-xs-12">
-                    <img class="main-img" src="{% static 'website/images/group.jpg' %}" />
-                </div>
-            </div>
 
         </div><!--/.row-->
     </section><!--/#feature-->
