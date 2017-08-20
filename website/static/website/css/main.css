@@ -219,11 +219,15 @@ div.banner-subheader {
 
 div.banner-header,
 div.banner-subheader,
-div.banner-header > div,
 div.banner-subheader > div  {
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   color: #fff;
+}
+
+div.banner-header > div {
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .banner-wrap {
@@ -274,7 +278,6 @@ section.banner-section .banner-subheader h2 {
 
 img.main-img {
   display: block;
-  width: 80%;
   height: auto;
 }
 
@@ -609,13 +612,9 @@ ul.social-share li.dropdown ul li a {
   padding: 0;
 }
 
-#main-slider .carousel .carousel-content {
-  margin-left: 22px;
-  margin-top: 100px;
-}
-
 #main-slider .carousel .slide-margin{
-  margin-top: 100px;
+  /*margin-top: 100px;*/
+  margin-top: 20px;
 }
 
 #main-slider .carousel h1, #main-slider .carousel h2 {
@@ -734,6 +733,10 @@ ul.social-share li.dropdown ul li a {
 
 #main-slider .next {
   right: 10px;
+}
+
+#main-slider .carousel-indicators {
+  bottom: 10px;
 }
 
 #main-slider .carousel-indicators li {
@@ -1919,12 +1922,16 @@ ul.sidebar-gallery {
 /*CLASSES*/
 /*********************************/
 
+ul.classes-filter {
+  padding-left: 0;
+}
+
 .classes-filter {
   list-style: none outside none;
 }
 .classes-filter li {
   display: inline-block;
-  margin: 0px 10px 5px 10px;
+  margin: 0px 10px 0px 10px;
 }
 
 
@@ -1933,12 +1940,21 @@ ul.sidebar-gallery {
 /*********************************/
 
 .list-group-item-timetable-heading {
-  background-color: #009966;
+  /*background-color: #009966;*/
+  background-color: #fff;
+  border-color: #009966;
+}
+
+.list-group-item-timetable {
+  border-color: #009966;
 }
 
 .list-group-item-timetable-heading h4 {
-  color: #fff;
+  /*color: #fff;*/
+  color: #009966;
 }
+
+
 
 #timetable_page h3 {
   font-family: sans-serif;

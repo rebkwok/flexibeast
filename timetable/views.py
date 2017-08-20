@@ -26,7 +26,7 @@ class WeeklySessionListView(ListView):
 
         spaces = WeeklySession.objects.filter(full=False).exists()
         context['classes_with_spaces'] = spaces
-        context['nav_section'] = 'services'
+        context['nav_section'] = 'timetable'
         return context
 
 

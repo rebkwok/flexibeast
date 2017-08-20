@@ -6,7 +6,7 @@
                                     <h4>Timetable</h4>
                                 </li>
                                 {% for clinic in clinics %}
-                                <li class="list-group-item">{{ clinic.date | date:"D d M Y"}} -
+                                <li class="list-group-item list-group-item-timetable">{{ clinic.date | date:"D d M Y"}} -
                                     <a href="#DescriptionModal" role="button"
                                        data-toggle="modal"
                                        class="description-link"
