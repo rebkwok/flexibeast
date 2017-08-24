@@ -199,12 +199,12 @@ div.banner-header {
   padding-bottom: 20px;
   margin-bottom: 20px;
   margin-top: -20px;
-  background-color: rgba(140, 198, 63, 0.5);
+  background-color: rgba(140, 198, 63, 0.7);
   /*background-image: url(../images/bg_workshops1.jpg);*/
   /*background-image:*/
     /*linear-gradient(to right, rgba(5, 170, 176, 0.5), rgba(0, 153, 102, 0.5), rgba(57, 181, 74, 0.5), rgba(140, 198, 63, 0.5)),*/
     /*url(../images/bg_workshops.jpg);*/
-  background-image: linear-gradient(to right, rgba(3, 164, 94, 0.5), rgba(83, 208, 212, 0.5));
+  background-image: linear-gradient(to right, rgba(3, 164, 94, 0.8), rgba(83, 208, 212, 0.8));
   background-size: cover;
 }
 
@@ -212,8 +212,8 @@ div.banner-subheader {
   padding: 5px 0px;
   margin-bottom: 20px;
   margin-top: 0px;
-  background-color: rgba(140, 198, 63, 0.5);
-  background-image: linear-gradient(to right, rgba(165, 222, 252, 0.5), rgba(97, 95, 147, 0.5));
+  background-color: rgba(140, 198, 63, 0.7);
+  background-image: linear-gradient(to right, rgba(165, 222, 252, 1), rgba(97, 95, 147, 1));
   background-size: cover;
 }
 
@@ -647,7 +647,7 @@ ul.social-share li.dropdown ul li a {
 }
 
 #main-slider .carousel .item.carousel1 {
-  background-image: url(../images/slider/1a.jpg);
+  background-image: url(../images/slider/main_banner_bridge.jpg);
 }
 
 #main-slider .carousel .carousel-border {
