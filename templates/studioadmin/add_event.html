@@ -10,12 +10,12 @@
 
    <div class="panel panel-success">
         <div class="panel-heading">
-            <h2 class="panel-title">Adding new Stretch Clinic</h2>
+            <h2 class="panel-title">Adding new {{ event_type_title | lower }}</h2>
         </div>
 
         <div class="panel-body panel-default">
 
-        <form id="clinic-form" method='post' class="form" role="form">
+        <form id="event-form" method='post' class="form" role="form">
 
                 {% csrf_token %}
                 {{ form.non_field_errors }}
@@ -27,7 +27,6 @@
                              <div class="col-xs-9 input-group">
                                  {% if field.name == 'cost' %}<span class="input-group-addon">£</span>{% endif %}
                                  {{ field }}
-                                 {% if field.name == 'cost' %}<span class="input-group-addon">per hour</span>{% endif %}
                                  <label for='id_{{ field.name }}'></label></div>
 
                             {% if field.errors %}

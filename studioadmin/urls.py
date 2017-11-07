@@ -6,8 +6,8 @@ from studioadmin.views.activitylog import ActivityLogListView
 from studioadmin.views.email_users import choose_users_to_email, \
     email_users_view
 from studioadmin.views.timetable import WeeklySessionListView, \
-    StretchClinicListView, WeeklySessionEditView, StretchClinicEditView, \
-    CreateWeeklySessionView, CreateStretchClinicView
+    EventListView, WeeklySessionEditView, EventEditView, \
+    CreateWeeklySessionView, CreateEventView
 from studioadmin.views.users import UserListView
 from studioadmin.views.website import PageListView, PageCreateView, \
     PageUpdateView
@@ -58,18 +58,23 @@ urlpatterns = [
     ),
     url(
         r'^timetable/stretch-clinics/$',
-        StretchClinicListView.as_view(), name='timetable_clinics_list'
+        EventListView.as_view(event_type='clinic'),
+        name='timetable_clinics_list'
     ),
     url(
-        r'^timetable/stretch-clinics/new$',
-        CreateStretchClinicView.as_view(), name='timetable_clinic_add'
+        r'^timetable/workshops/$', EventListView.as_view(event_type='workshop'),
+        name='timetable_workshops_list'
+    ),
+    url(
+        r'^timetable/(?P<event_type>\w+)/new$',
+        CreateEventView.as_view(), name='timetable_event_add'
     ),
     url(
         r'^timetable/sessionedit/(?P<pk>\d+)/$',
         WeeklySessionEditView.as_view(), name='sessionedit'
     ),
     url(
-        r'^timetable/clinicedit/(?P<pk>\d+)/$',
-        StretchClinicEditView.as_view(), name='clinicedit'
+        r'^timetable/edit/(?P<pk>\d+)/$',
+        EventEditView.as_view(), name='eventedit'
     ),
 ]

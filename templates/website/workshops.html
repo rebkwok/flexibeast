@@ -27,11 +27,7 @@
                    put hands on if needed (in the nicest way possible). </p>
             </div>
 
-            <div class="center row">
-                <div class="col-xs-8 col-xs-offset-2">
-                    <img class="main-img" src="{% static 'website/images/group.jpg' %}" />
-                </div>
-            </div>
+
         </div><!--/.row-->
 
     </section><!--/#workshops-->
@@ -39,9 +35,9 @@
     <div class="container">
         <p class="lead">Workshop topics can include:</p>
         <ul>
-            <li>Sensible Splits</li>
-            <li>Happy Hips</li>
-            <li>Healthy Bendy Backs</li>
+            <li>SensibleSplits</li>
+            <li>HappyHips</li>
+            <li>HealthyBendyBacks</li>
             <li>To The Core</li>
             <li>Partner Stretching</li>
             <li>FlexiBeast for Everyday</li>
@@ -49,5 +45,11 @@
             <li>Stress Management</li>
         </ul>
         </div>
+    {%  if events %}
+    <div class="container">
+    <h4>Upcoming workshop timetable:</h4>
+    {% include 'timetable/includes/event_data.html' %}
+    </div>
+        {% endif %}
 
 {% endblock %}

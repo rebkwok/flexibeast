@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 from django.core.mail import send_mail
 
 from reviews.models import Review
-from timetable.models import WeeklySession, StretchClinic
+from timetable.models import WeeklySession, Event
 from website.models import Page
 from website.forms import ContactForm
 
@@ -45,23 +45,24 @@ def classes(request):
     )
 
 
-def private(request):
+def retreats(request):
     return TemplateResponse(
-        request, 'website/private_instruction.html', {'nav_section': 'services'}
+        request, 'website/retreats.html', {'nav_section': 'services'}
     )
 
 
 def stretch_clinics(request):
-    clinics = StretchClinic.objects.filter(show_on_site=True).order_by('-date')
+    events = Event.objects.filter(show_on_site=True, event_type='clinic').order_by('-date')
     return TemplateResponse(
         request, 'website/stretch_clinics.html',
-        {'nav_section': 'services', 'clinics': clinics}
+        {'nav_section': 'services', 'events': events}
     )
 
 
 def workshops(request):
+    events = Event.objects.filter(show_on_site=True, event_type='workshop').order_by('-date')
     return TemplateResponse(
-        request, 'website/workshops.html', {'nav_section': 'services'}
+        request, 'website/workshops.html', {'nav_section': 'services', 'events': events}
     )
 
 

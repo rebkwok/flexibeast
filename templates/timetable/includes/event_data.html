@@ -1,30 +1,30 @@
              <div class="row">
-                {% if clinics %}
+                {% if events %}
                         <div class="col-sm-8 col-sm-offset-2 col-xs-12">
                             <ul class="list-group text-center">
                                 <li class="list-group-item list-group-item-timetable-heading">
                                     <h4>Timetable</h4>
                                 </li>
-                                {% for clinic in clinics %}
-                                <li class="list-group-item list-group-item-timetable">{{ clinic.date | date:"D d M Y"}} -
+                                {% for event in events %}
+                                <li class="list-group-item list-group-item-timetable">{{ event.date | date:"D d M Y"}} -
                                     <a href="#DescriptionModal" role="button"
                                        data-toggle="modal"
                                        class="description-link"
-                                       data-title="Stretch Clinic {{ clinic.date | date:"D d M Y" }}"
-                                       data-description="{{ clinic.description }}"
-                                       data-location="{{ clinic.location.full_name }}"
-                                       data-address="{{ clinic.location.address }}"
-                                       data-costinfo="£ {{ clinic.cost }} / hr"
-                                       data-spaces="Availability: {% if clinic.spaces %}{{ clinic.spaces }} spaces{% else %}Full{% endif %}"
-                                    >Stretch Clinic</a> -
+                                       data-title="{{ event.short_name }} {{ event.date | date:"D d M Y" }}"
+                                       data-description="{{ event.description }}"
+                                       data-location="{{ event.location.full_name }}"
+                                       data-address="{{ event.location.address }}"
+                                       data-costinfo="£ {{ event.cost }} / hr"
+                                       data-spaces="Availability: {% if event.spaces %}{{ event.spaces }} spaces{% else %}Full{% endif %}"
+                                    >{{ event.short_name }}</a> -
                                     <a href="#LocationModal" role="button"
                                        data-toggle="modal"
                                        class="location-link"
-                                       data-short_name="{{ clinic.location.short_name }}"
-                                       data-full_name="{{ clinic.location.full_name }}"
-                                       data-address="{{ clinic.location.address }}"
-                                       data-map_url="{{ clinic.location.map_url }}"
-                                    >{{ clinic.location }}</a> - {% if clinic.spaces %}{{ clinic.spaces }} spaces{% else %}Full{% endif %}
+                                       data-short_name="{{ event.location.short_name }}"
+                                       data-full_name="{{ event.location.full_name }}"
+                                       data-address="{{ event.location.address }}"
+                                       data-map_url="{{ event.location.map_url }}"
+                                    >{{ event.location }}</a> - {% if event.spaces %}{{ event.spaces }} spaces{% else %}Full{% endif %}
 
                                     </li>
                                 {% endfor %}

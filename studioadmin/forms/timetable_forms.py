@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from ckeditor.widgets import CKEditorWidget
 
-from timetable.models import DAY_CHOICES, WeeklySession, StretchClinic
+from timetable.models import DAY_CHOICES, WeeklySession, Event
 
 
 DAY_CHOICES_DICT = dict(DAY_CHOICES)
@@ -52,10 +52,10 @@ TimetableWeeklySessionFormSet = modelformset_factory(
     can_delete=True)
 
 
-class StretchClinicBaseFormSet(BaseModelFormSet):
+class EventBaseFormSet(BaseModelFormSet):
 
     def add_fields(self, form, index):
-        super(StretchClinicBaseFormSet, self).add_fields(form, index)
+        super(EventBaseFormSet, self).add_fields(form, index)
 
         if form.instance:
             form.fields['show_on_site'] = forms.BooleanField(
@@ -76,10 +76,10 @@ class StretchClinicBaseFormSet(BaseModelFormSet):
             )
             form.DELETE_id = 'DELETE_{}'.format(index)
 
-StretchClinicFormSet = modelformset_factory(
-    StretchClinic,
+EventsFormSet = modelformset_factory(
+    Event,
     fields=('show_on_site', ),
-    formset=StretchClinicBaseFormSet,
+    formset=EventBaseFormSet,
     extra=0,
     can_delete=True)
 
@@ -144,17 +144,20 @@ class EditSessionForm(forms.ModelForm):
         return super(EditSessionForm, self).clean()
 
 
-class EditStretchClinicForm(forms.ModelForm):
+class EditEventForm(forms.ModelForm):
 
     class Meta:
-        model = StretchClinic
+        model = Event
 
         fields = (
-            'date', 'description', 'location',
+            'short_name', 'date', 'description', 'location',
             'max_spaces', 'cost', 'spaces', 'show_on_site'
         )
 
         widgets = {
+            'short_name': forms.TextInput(
+                attrs={'class': "form-control input-sm"}
+            ),
             'date': forms.DateInput(
                 attrs={
                     'class': "form-control",
@@ -175,19 +178,20 @@ class EditStretchClinicForm(forms.ModelForm):
                 attrs={'class': "form-control input-sm"}
             ),
             'spaces': forms.TextInput(
-                attrs={'class': "form-control input-sm"}
+                attrs={'class': "form-control input-sm"},
             ),
             'show_on_site': forms.CheckboxInput,
         }
 
     def __init__(self, *args, **kwargs):
-        super(EditStretchClinicForm, self).__init__(*args, **kwargs)
-        self.fields['max_spaces'].label = 'Max clinic slots'
+        super(EditEventForm, self).__init__(*args, **kwargs)
         self.fields['spaces'].label = 'Spaces left'
 
     def clean(self):
-        if self.cleaned_data['spaces'] > self.cleaned_data['max_spaces']:
-            self.add_error('spaces', 'Spaces left cannot exceed max clinic slots')
+        spaces = self.cleaned_data.get('spaces')
+        max_spaces = self.cleaned_data.get('max_spaces')
+        if spaces and max_spaces and spaces > max_spaces:
+            self.add_error('spaces', 'Spaces left cannot exceed max spaces')
 
         date = self.data.get('date')
         if date:
@@ -198,7 +202,7 @@ class EditStretchClinicForm(forms.ModelForm):
                 uk = pytz.timezone('Europe/London')
                 self.cleaned_data['date'] = uk.localize(date).astimezone(pytz.utc)
                 if self.instance.id:
-                    old_clinic = StretchClinic.objects.get(id=self.instance.id)
+                    old_clinic = Event.objects.get(id=self.instance.id)
                     if old_clinic.date == self.cleaned_data['date']:
                         self.changed_data.remove('date')
             except ValueError:
@@ -206,5 +210,15 @@ class EditStretchClinicForm(forms.ModelForm):
                                        'date picker or enter date in the '
                                        'format dd Mmm YYYY')
 
-        return super(EditStretchClinicForm, self).clean()
+        return super(EditEventForm, self).clean()
+
+
+class CreateEventForm(EditEventForm):
+
+    def __init__(self, *args, **kwargs):
+        self.event_type = kwargs.pop('event_type')
+        super(CreateEventForm, self).__init__(*args, **kwargs)
+        self.fields['short_name'].initial = dict(
+            Event.EVENT_CHOICES
+        )[self.event_type].title()
 

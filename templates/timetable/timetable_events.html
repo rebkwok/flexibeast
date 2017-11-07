@@ -7,15 +7,16 @@
     <section id="timetable_page" class="transparent-bg">
         <div class="container">
            <div class="center wow fadeInDown">
-                <h1>Timetable - Stretch Clinics</h1>
+                <h1>Timetable - {{ event_title }}s</h1>
            </div>
 
         <ul class="classes-filter text-center">
                 <li><a class="btn btn-fb-success-minor" href="{% url 'timetable:timetable' %}">Regular Classes</a></li>
-                <li><a class="btn btn-fb-success" href="#">Stretch Clinics</a></li>
+                <li><a class="btn {% if event_type == 'clinic' %}btn-fb-success{% else %}btn btn-fb-success-minor{% endif %}" href="{% url 'timetable:timetable_clinics' %}">Stretch Clinics</a></li>
+                <li><a class="btn {% if event_type == 'workshop' %}btn-fb-success{% else %}btn btn-fb-success-minor{% endif %}" href="{% url 'timetable:timetable_workshops' %}">Workshops</a></li>
             </ul>
 
-             {% include 'timetable/includes/clinic_data.html' %}
+             {% include 'timetable/includes/event_data.html' %}
         </div>
 
     </section>

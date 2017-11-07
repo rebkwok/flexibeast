@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.views.generic import ListView
 
-from timetable.models import StretchClinic, WeeklySession
+from timetable.models import Event, WeeklySession
 from timetable.utils import staff_required
 
 
@@ -30,18 +30,21 @@ class WeeklySessionListView(ListView):
         return context
 
 
-class StretchClinicListView(ListView):
+class EventListView(ListView):
 
-    model = StretchClinic
-    template_name = 'timetable/timetable_clinics.html'
-    context_object_name = 'clinics'
+    model = Event
+    template_name = 'timetable/timetable_events.html'
+    context_object_name = 'events'
+    event_type = None
 
     def get_context_data(self, **kwargs):
-        context = super(StretchClinicListView, self).get_context_data(**kwargs)
-        clinics = StretchClinic.objects.filter(
-            show_on_site=True
+        context = super(EventListView, self).get_context_data(**kwargs)
+        events = Event.objects.filter(
+            show_on_site=True, event_type=self.event_type
         ).order_by('-date')
-        context['clinics'] = clinics
+        context['events'] = events
+        context['event_title'] = dict(Event.EVENT_CHOICES)[self.event_type]
+        context['event_type'] = self.event_type
         context['nav_section'] = 'services'
         return context
 

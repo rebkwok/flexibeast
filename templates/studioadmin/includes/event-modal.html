@@ -2,11 +2,11 @@
 
 <div class="modal-dialog modal-md">
     <div class="modal-content">
-        <form id="clinic-form" method='post' class="form" role="form" action='{% url 'studioadmin:clinicedit' form.instance.id %}'>
+        <form id="event-form" method='post' class="form" role="form" action='{% url 'studioadmin:eventedit' form.instance.id %}'>
 
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    <h4 class="modal-title" id="StretchClinicModalLabel">Stretch Clinic: {{ form.instance.date }}</h4>
+                    <h4 class="modal-title" id="EventModalLabel">{{ form.instance.short_name }}: {{ form.instance.date }}</h4>
             </div>
 
             <div class="modal-body">
@@ -43,11 +43,11 @@
 
         <script>
             var form_options = {
-                target: '#StretchClinicModal',
+                target: '#EventModal',
                 success: function() { }
             };
 
-            $('#clinic-form').ajaxForm(form_options);
+            $('#event-form').ajaxForm(form_options);
         </script>
 
     </div><!-- /.modal-content -->

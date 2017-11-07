@@ -4,8 +4,9 @@
 
 {% block studioadmincontent %}
     <div class="studioadmin-container">
-
-        <h2>Stretch Clinics <a class="btn btn-success pull-right" href="{% url 'studioadmin:timetable_clinic_add' %}" >Add new stretch clinic</a></h2>
+        <h2>{{ event_type_title|title}}s
+            <a class="btn btn-success pull-right"
+               href="{% url 'studioadmin:timetable_event_add' event_type %}" >Add new {{ event_type_title|lower }}</a></h2>
                 <div class="panel">
                     <form class="form-horizontal" method="post" action="">
                     {% csrf_token %}
@@ -14,36 +15,38 @@
                             <thead>
                             <tr class="success">
                                 <th>Date </br><span class="studioadmin-help">Click to edit</span></th>
+                                <th>Name</th>
                                 <th>Location</th>
                                 <th>Max spaces</th>
                                 <th>Spaces</th>
                                 <th>Show on site</th>
-                                <th class="table-center">Delete class</th>
+                                <th class="table-center">Delete</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             <!-- Modal -->
-                            <div class="modal fade" id="StretchClinicModal" tabindex="-1" role="dialog" aria-labelledby="StretchClinicModalLabel"></div>
+                            <div class="modal fade" id="EventModal" tabindex="-1" role="dialog" aria-labelledby="EventModalLabel"></div>
                             <!-- /.modal -->
 
-                            {{ clinics_formset.management_form }}
-                            {% for clinic in clinics_formset %}
-                                <span class=hide>{{ clinic.id }}</span>
+                            {{ events_formset.management_form }}
+                            {% for event in events_formset %}
+                                <span class=hide>{{ event.id }}</span>
                                 <tr>
-                                    <td class="studioadmin-tbl"><a class="clinicedit" href="#" data-form="{% url 'studioadmin:clinicedit' clinic.instance.id %}" title="edit clinic">{{ clinic.instance.date | date:"D d M Y" }}</a></td>
-                                    <td class="studioadmin-tbl">{{ clinic.instance.location.short_name }}</td>
-                                    <td class="studioadmin-tbl">{{ clinic.instance.max_spaces }}</td>
-                                    <td class="studioadmin-tbl">{{ clinic.instance.spaces }}</td>
-                                    <td class="studioadmin-tbl table-center">{{ clinic.show_on_site }}<label for={{ clinic.show_on_site_id }}></label></td>
-                                    <td class="studioadmin-tbl table-center">{{ clinic.DELETE }}<label for={{ clinic.DELETE_id }}></label>
+                                    <td class="studioadmin-tbl"><a class="eventedit" href="#" data-form="{% url 'studioadmin:eventedit' event.instance.id %}" title="edit {{ event_type}}">{{ event.instance.date | date:"D d M Y" }}</a></td>
+                                    <td class="studioadmin-tbl">{{ event.instance.short_name }}
+                                    <td class="studioadmin-tbl">{{ event.instance.location.short_name }}</td>
+                                    <td class="studioadmin-tbl">{{ event.instance.max_spaces }}</td>
+                                    <td class="studioadmin-tbl">{{ event.instance.spaces }}</td>
+                                    <td class="studioadmin-tbl table-center">{{ event.show_on_site }}<label for={{ event.show_on_site_id }}></label></td>
+                                    <td class="studioadmin-tbl table-center">{{ event.DELETE }}<label for={{ event.DELETE_id }}></label>
                                 </tr>
                             {% endfor %}
                             <tr>
                                 <td class="studioadmin-tbl">
                                     <input class="btn btn-success" name="formset_submitted" type="submit" value="Save" />
                                 </td>
-                                <td colspan="4"></td>
+                                <td colspan="5"></td>
                                 <td class="studioadmin-tbl table-center">
                                     <input class="btn btn-danger" name="formset_submitted" type="submit" value="Delete selected" />
                                 </td>
@@ -63,10 +66,10 @@
 {#http://malsup.github.com/jquery.form.js#}
 <script src="{% static 'timetable/js/jquery.form.js' %}"></script>
 <script>
-    $(".clinicedit").click(function(ev) { // for each edit url
+    $(".eventedit").click(function(ev) { // for each edit url
         ev.preventDefault(); // prevent navigation
         var url = $(this).data("form"); // get the form url
-        $("#StretchClinicModal").load(url, function() { // load the url into the modal
+        $("#EventModal").load(url, function() { // load the url into the modal
             $(this).modal('show'); // display the modal on url load
         });
 

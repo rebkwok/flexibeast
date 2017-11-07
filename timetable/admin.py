@@ -1,5 +1,5 @@
 from django.contrib import admin
-from timetable.models import Location, WeeklySession, StretchClinic
+from timetable.models import Location, WeeklySession, Event
 
 
 class WeeklySessionAdmin(admin.ModelAdmin):
@@ -11,17 +11,17 @@ class WeeklySessionAdmin(admin.ModelAdmin):
     model = WeeklySession
 
 
-class StretchClinicAdmin(admin.ModelAdmin):
+class EventAdmin(admin.ModelAdmin):
     list_display = (
-        'date', 'location', 'max_spaces', 'spaces', 'show_on_site'
+        'event_type', 'date', 'location', 'max_spaces', 'spaces', 'show_on_site'
     )
     ordering = ('date',)
-    fields = ('date', 'description', 'location',
+    fields = ('event_type', 'date', 'description', 'location',
               'max_spaces', 'contact_person', 'contact_email',
               'cost', 'spaces', 'show_on_site')
-    model = StretchClinic
+    model = Event
 
 
 admin.site.register(WeeklySession, WeeklySessionAdmin)
-admin.site.register(StretchClinic, StretchClinicAdmin)
+admin.site.register(Event, EventAdmin)
 admin.site.register(Location)
