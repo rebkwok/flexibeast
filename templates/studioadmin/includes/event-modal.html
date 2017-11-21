@@ -19,7 +19,6 @@
                              <div class="col-xs-3">{{ field.label_tag }}</div>
                              <div class="col-xs-9 input-group">{% if field.name == 'cost' %}<span class="input-group-addon">£</span>{% endif %}
                                  {{ field }}
-                                 {% if field.name == 'cost' %}<span class="input-group-addon">per hour</span>{% endif %}
                                  <label for='id_{{ field.name }}'></label></div>
 
                             {% if field.errors %}

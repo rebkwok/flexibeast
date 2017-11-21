@@ -14,7 +14,7 @@
                                        data-description="{{ event.description }}"
                                        data-location="{{ event.location.full_name }}"
                                        data-address="{{ event.location.address }}"
-                                       data-costinfo="£ {{ event.cost }} / hr"
+                                       data-costinfo="£ {{ event.cost }}"
                                        data-spaces="Availability: {% if event.spaces %}{{ event.spaces }} spaces{% else %}Full{% endif %}"
                                     >{{ event.short_name }}</a> -
                                     <a href="#LocationModal" role="button"
@@ -44,15 +44,14 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title" id="description-title">Title</h4>
+                        <h2 style="font-weight: bold;" class="modal-title" id="description-title">Title</h2>
                     </div>
                     <div class="modal-body">
-                        <h4>Location</h4>
+                        <div id="description-text">Description</div>
+                        <h2>Location</h2>
                         <div id="location">Full Name</div>
                         <div id="location-address">Address</div>
-                        <h4>Description</h4>
-                        <div id="description-text">Description</div>
-                        <h4>Booking and Prices</h4>
+                        <h2>Booking and Prices</h2>
                         <div id="cost-text">Cost Info</div>
                         <div id="spaces-text">Spaces</div>
                         <div class="top-space"><a class='btn btn-sm btn-fb-success-minor' href="{% url 'website:contact' %}">Contact</a> to confirm availability and to book</div>
