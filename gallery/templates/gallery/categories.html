@@ -1,20 +1,18 @@
-{% extends "base.html" %}
+{% extends "studioadmin/base.html" %}
 {% load staticfiles %}
 
-{% block extra_head %}<link rel="stylesheet" href="{% static 'gallery/css/gallery.css' %}">{% endblock %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'gallery/css/gallery.css' %}">
+{% endblock %}
 
-{% block content %}
+{% block studioadmincontent %}
 
-<div class="container">
-    <div class="page-header col-sm-12">
-        <h1>
+<div class="studioadmin-container">
+
+        <h2>
             Gallery Albums
-        </h1>
-    </div>
+        </h2>
 
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel panel-success">
                     <form class="form-horizontal" method="post" action="">
                     {% csrf_token %}
                     <div class="table-responsive">
@@ -35,7 +33,7 @@
                                 <span class=hide>{{ category.id }}</span>
                                 {% if not category.instance.id %}
                                     <tr>
-                                        <td class="gallery-tbl" colspan="6"><strong>Add New Album:</strong></td>
+                                        <td class="gallery-tbl" colspan="5"><strong>Add New Album:</strong></td>
                                     </tr>
                                 {% endif %}
                                 <tr>
@@ -43,7 +41,7 @@
                                     <td class="gallery-tbl"><span {% if category.description.errors %}class="form-error"{% endif %}>{{ category.description }}{{ category.description.errors }}</span></td>
                                     <td class="gallery-tbl table-center" {% if category.instance.id %}id="cat_{{ category.instance.id }}_imagecount"{% endif %}>{% if category.instance.id %}{{ category.image_count }}{% endif %}</td>
                                     <td class="gallery-tbl table-center">{% if category.instance.id %}
-                                        <a href="{% url 'gallery:edit_category' category.instance.id %}">
+                                        <a href="{% url 'studioadmin:gallery_category_edit' category.instance.id %}">
                                             <span class="fa fa-pencil-square-o fa-lg"></span>
                                         </a>
                                         {% endif %}
@@ -52,17 +50,13 @@
                                 </tr>
                             {% endfor %}
                             <tr>
-                                <td class="gallery-tbl" colspan="6"><input class="btn btn-success" name="formset_submitted" type="submit" value="Save changes" /></td>
+                                <td class="gallery-tbl" colspan="5"><input class="btn btn-success" name="formset_submitted" type="submit" value="Save changes" /></td>
                             </tr>
 
                             </tbody>
                         </table>
-                    </form>
-
                     </div>
-                </div>
-            </div>
-         </div>
+                    </form>
 
 </div>
 

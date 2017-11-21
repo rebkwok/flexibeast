@@ -1,29 +1,5 @@
 from django.contrib import admin
-from django import forms
-from suit.widgets import EnclosedInput
-from timetable.models import Location, WeeklySession
-from ckeditor.widgets import CKEditorWidget
-
-
-# class SessionForm(forms.ModelForm):
-#     description = forms.CharField(widget=CKEditorWidget())
-#
-#     class Meta:
-#         widgets = {
-#             # You can also use prepended and appended together
-#             'cost': EnclosedInput(prepend=u'\u00A3'),
-#         }
-#
-#
-# class SessionAdmin(admin.ModelAdmin):
-#     list_display = ('day', 'time', 'name')
-#     ordering = ('day', 'time')
-#     fields = ('name', 'day', 'time', 'event_type', 'description', 'location',
-#               'max_participants', 'contact_person', 'contact_email',
-#               'email_studio_when_booked', 'cost',
-#               'booking_open')
-#     model = Session
-#     form = SessionForm
+from timetable.models import Location, WeeklySession, Event
 
 
 class WeeklySessionAdmin(admin.ModelAdmin):
@@ -34,6 +10,18 @@ class WeeklySessionAdmin(admin.ModelAdmin):
               'cost', 'block_info', 'full')
     model = WeeklySession
 
-# admin.site.register(Session, SessionAdmin)
+
+class EventAdmin(admin.ModelAdmin):
+    list_display = (
+        'event_type', 'date', 'location', 'max_spaces', 'spaces', 'show_on_site'
+    )
+    ordering = ('date',)
+    fields = ('event_type', 'date', 'description', 'location',
+              'max_spaces', 'contact_person', 'contact_email',
+              'cost', 'spaces', 'show_on_site')
+    model = Event
+
+
 admin.site.register(WeeklySession, WeeklySessionAdmin)
+admin.site.register(Event, EventAdmin)
 admin.site.register(Location)

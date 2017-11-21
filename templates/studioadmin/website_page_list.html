@@ -3,14 +3,10 @@
 {% load commontags websitetags %}
 
 {% block studioadmincontent %}
-
-    <div class="container-fluid row">
+    <div class="studioadmin-container">
 
         <h2>Website Pages</h2>
-        <p>Please note you must have one page named "about".  This will be the home page.</p>
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel panel-success">
+                <div class="panel">
                     <form class="form-horizontal" method="post" action="">
                     {% csrf_token %}
                     <div class="table-responsive">
@@ -20,7 +16,6 @@
                                 <th>Page name</br><span class="studioadmin-help">Click to edit</span></th>
                                 <th>Page heading</th>
                                 <th>Menu name</th>
-                                <th>Menu location</th>
                                 <th>Layout</th>
                                 <th>Permission to view</th>
                                 <th>Page visible</th>
@@ -37,7 +32,6 @@
                                     <td class="studioadmin-tbl"><a href="{% url 'studioadmin:edit_page' page.instance.name %}">{{ page.instance.name }}</a></td>
                                     <td class="studioadmin-tbl">{{ page.instance.heading }}</td>
                                     <td class="studioadmin-tbl">{{ page.instance.menu_name }}</td>
-                                    <td class="studioadmin-tbl">{{ page.instance.menu_location | format_menu }}</td>
                                     <td class="studioadmin-tbl">{{ page.instance.layout | format_layout }}</td>
                                     <td class="studioadmin-tbl">{%  if page.instance.restricted %}<span class="not-confirmed">RESTRICTED</span>{% else %}ALL{% endif %}</td>
                                     <td class="studioadmin-tbl">{%  if page.instance.active %}LIVE{% else %}<span class="not-confirmed">HIDDEN</span>{% endif %}</td>
@@ -46,18 +40,17 @@
                                 </tr>
                             {% endfor %}
                             <tr>
-                                <td class="studioadmin-tbl" colspan="6"><input class="btn btn-success" name="formset_submitted" type="submit" value="Delete selected pages" /></td>
+                                <td class="studioadmin-tbl" colspan="8">
+                                    <a class="btn btn-success" href="{% url 'studioadmin:add_page' %}" >Add new page</a>
+                                    <input class="btn btn-danger pull-right" name="formset_submitted" type="submit" value="Delete selected pages" /></td>
                             </tr>
 
                             </tbody>
                         </table>
+                    </div>
                     </form>
 
                     </div>
                 </div>
-            </div>
-         </div>
-
-    </div>
 
 {% endblock studioadmincontent %}

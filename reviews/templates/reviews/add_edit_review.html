@@ -5,35 +5,40 @@
 
 {% block content %}
 
-<div class="row container">
-    <div class="page-header col-sm-12">
-        <h1>
-            {% if review %}
-                Edit testimonial
-            {% else %}
-                Add new testimonial
-            {% endif %}
-        </h1>
+    <section>
+<div class="container">
+    <div class="row">
+       <div class="center wow fadeInDown">
+            <h2>
+                {% if review %}
+                    Edit testimonial
+                {% else %}
+                    Add new testimonial
+                {% endif %}
+            </h2>
+        </div>
+        <div class="col-sm-12">
+        {% if form.instance.edited and not form.instance.reviewed and not form.instance.update_published %}
+            <p>The form below shows a submitted update which is still pending review.</p>
+        {% elif form.instance.edited and form.instance.reviewed and not form.instance.update_published %}
+            <p>The form below shows a submitted update which has not been accepted. You
+                may edit and resubmit it for review if you wish.</p>
+        {% endif %}
+            <form method="post" action="">
+                {% csrf_token %}
+                {% for field in form %}
+                <label>{{ field.label }}{% if field.field.required %}*{% endif %}</label>
+                    <div {% if field.errors %}class='form-error'{% endif %}>{{ field }}</div>
+                    {% if field.errors %}<span class="form-error">{{ field.errors }}</span>{% endif %}<br>
+                    <div class="review-help">{{ field.help_text }}</div><br>
+                {% endfor %}
 
-    {% if form.instance.edited and not form.instance.reviewed and not form.instance.update_published %}
-        <p>The form below shows a submitted update which is still pending review.</p>
-    {% elif form.instance.edited and form.instance.reviewed and not form.instance.update_published %}
-        <p>The form below shows a submitted update which has not been accepted. You
-            may edit and resubmit it for review if you wish.</p>
-    {% endif %}
-        <form method="post" action="">
-            {% csrf_token %}
-            {% for field in form %}
-            <label>{{ field.label }}{% if field.field.required %}*{% endif %}</label>
-                <div {% if field.errors %}class='form-error'{% endif %}>{{ field }}</div>
-                {% if field.errors %}<span class="form-error">{{ field.errors }}</span>{% endif %}<br>
-                <div class="review-help">{{ field.help_text }}</div><br>
-            {% endfor %}
-
-            <button type="submit" class="btn btn-success reviews-btn filter-btn">Submit</button>
-        </form>
+                <button type="submit" class="btn btn-fb-success-minor">Submit</button>
+            </form>
+        </div>
+    </div>
 </div>
-
+</section>
 {% endblock %}
 
 {% block extra_scripts %}

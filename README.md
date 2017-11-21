@@ -16,3 +16,7 @@
 - HEROKU: set to True if using Heroku to use different log settings
 - DEBUG: False for dev
 - TRAVIS: Set to True in .travis.yml
+
+
+Test with:
+./manage.py test --settings=flexibeast.settings/test

@@ -1,0 +1,27 @@
+h1, h2 {
+  font-family: sans-serif;
+}
+
+.container-top {
+  margin-top: 20px;
+}
+
+.panel {
+  background: #fff;
+}
+.panel-success>.panel-heading {
+  border: 1px solid #009966;
+  border-bottom: none;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+.panel-body {
+  background: #fff;
+  border: 1px solid #009966;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+div.socialaccount_providers.btn.btn-primary > li > a {
+  color: #fff;
+}

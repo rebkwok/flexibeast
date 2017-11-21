@@ -10,7 +10,8 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.core.mail import send_mail
 
-from timetable.models import WeeklySession
+from reviews.models import Review
+from timetable.models import WeeklySession, Event
 from website.models import Page
 from website.forms import ContactForm
 
@@ -23,6 +24,46 @@ TEMPLATES = {
     'img-col-left': 'website/page_col.html',
     'img-col-right': 'website/page_col.html',
 }
+
+
+def home(request):
+    reviews = Review.objects.filter(selected=True).order_by('-submission_date')
+    return TemplateResponse(
+        request, 'website/index.html',
+        {'nav_section': 'home', 'testimonials': reviews}
+    )
+
+def about(request):
+    return TemplateResponse(
+        request, 'website/about.html', {'nav_section': 'about'}
+    )
+
+
+def classes(request):
+    return TemplateResponse(
+        request, 'website/classes.html', {'nav_section': 'services'}
+    )
+
+
+def retreats(request):
+    return TemplateResponse(
+        request, 'website/retreats.html', {'nav_section': 'services'}
+    )
+
+
+def stretch_clinics(request):
+    events = Event.objects.filter(show_on_site=True, event_type='clinic').order_by('-date')
+    return TemplateResponse(
+        request, 'website/stretch_clinics.html',
+        {'nav_section': 'services', 'events': events}
+    )
+
+
+def workshops(request):
+    events = Event.objects.filter(show_on_site=True, event_type='workshop').order_by('-date')
+    return TemplateResponse(
+        request, 'website/workshops.html', {'nav_section': 'services', 'events': events}
+    )
 
 
 def page(request, page_name):
@@ -52,9 +93,10 @@ def page(request, page_name):
     except TemplateDoesNotExist:
         include_html = ''
 
-    return TemplateResponse(
-        request, template, {'page': page, 'include_html': include_html}
-    )
+    context = {
+        'page': page, 'include_html': include_html, 'nav_section': 'more'
+    }
+    return TemplateResponse(request, template, context)
 
 
 def process_contact_form(request):

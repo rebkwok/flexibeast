@@ -62,18 +62,6 @@ class ReviewListViewTests(ReviewTestMixin, TestCase):
         resp = self._get_response(self.user)
         self.assertEqual(resp.rendered_content.count('Edit'), 2)
 
-    def test_admin_link_if_staff_user(self):
-        resp = self._get_response(self.user)
-        self.assertNotIn(
-                'ADMIN USE: Review and approve submitted testimonials',
-                resp.rendered_content
-        )
-        resp = self._get_response(self.staff_user)
-        self.assertIn(
-                'ADMIN USE: Review and approve submitted testimonials',
-                resp.rendered_content
-        )
-
     def test_sorting_reviews(self):
         # default shows reviews ordered by most recent submission date
         resp = self.client.get(reverse('reviews:reviews'))

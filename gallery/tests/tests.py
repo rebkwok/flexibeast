@@ -194,23 +194,6 @@ class GalleryMainViewTests(TestCase):
 
         os.unlink(file.name)
 
-    def test_gallery_view_with_category_but_no_images(self):
-        """
-        If image exists, it should be displayed.
-        """
-        mommy.make(Category)
-        response = self.client.get(reverse('gallery:gallery'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context_data['categories']), 1)
-        self.assertEqual(
-            list(response.context_data['categories']),
-            list(Category.objects.all())
-        )
-        self.assertIn(
-            'No photos in this album yet',
-            response.rendered_content,
-        )
-
     def test_gallery_view_with_images(self):
         """
         If image exists, it should be displayed.
@@ -437,9 +420,9 @@ class CategoryListViewTests(TestCase):
         resp = self.client.post(
             reverse('gallery:categories'), formset_data, follow=True
         )
-        self.assertIn(
-            'Please correct the errors below',
-            format_content(resp.rendered_content)
+        self.assertEqual(
+            resp.context_data['categories_formset'].errors,
+            [{'name': ['This field is required.']}]
         )
 
     def test_add_category_description_not_required(self):

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+    {% block content %}
+
+    <section id="workshops" class="transparent-bg banner-section">
+        <div class="container">
+            <div class="center wow fadeInDown banner-header">
+                <div class="row">
+                    <h1>Workshops</h1>
+                    <p class="lead">
+                        A workshop is a slightly different environment to a class.
+                        We are able to go into more depth and to slow things down so you can
+                        work on technique and take things at a more steady pace because we have more
+                        time (not to say you won't sweat).  The main feedback from people who have
+                        come to workshops as well as classes is that they leave with a greater
+                        understanding and well and truly stretched. </p>
+                </div>
+
+            </div>
+
+            <div>
+            <p>
+                   Workshops will generally be 2-3 hours and numbers are strictly limited
+                   at 9.  This is to ensure that I have time to get round people,
+                   put hands on if needed (in the nicest way possible). </p>
+            </div>
+
+
+        </div><!--/.row-->
+
+    </section><!--/#workshops-->
+
+    <div class="container">
+        <p class="lead">Workshop topics can include:</p>
+        <ul>
+            <li>SensibleSplits</li>
+            <li>HappyHips</li>
+            <li>HealthyBendyBacks</li>
+            <li>To The Core</li>
+            <li>Partner Stretching</li>
+            <li>FlexiBeast for Everyday</li>
+            <li>Realistic Health</li>
+            <li>Stress Management</li>
+        </ul>
+        </div>
+    {%  if events %}
+    <div class="container">
+    <h4>Upcoming workshop timetable:</h4>
+    {% include 'timetable/includes/event_data.html' %}
+    </div>
+        {% endif %}
+
+{% endblock %}

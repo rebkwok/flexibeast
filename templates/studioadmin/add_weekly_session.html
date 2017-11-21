@@ -1,0 +1,49 @@
+{% extends "studioadmin/base.html" %}
+{% load static %}
+{% load commontags timetabletags %}
+
+{% block studioadmincontent %}
+
+{{ form.media }}
+
+<div class="studioadmin-container">
+
+   <div class="panel panel-success">
+        <div class="panel-heading">
+            <h2 class="panel-title">Adding new class</h2>
+        </div>
+
+        <div class="panel-body">
+
+        <form id="session-form" method='post' class="form" role="form">
+
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="form-group">
+                    {% for field in form %}
+                        <div class="row">
+                         <div class="col-xs-12">
+                             <div class="col-xs-3">{{ field.label_tag }}</div>
+                             <div class="col-xs-9 input-group">{% if field.name == 'cost' %}<span class="input-group-addon">£</span>{% endif %}{{ field }}<label for='id_{{ field.name }}'></label></div>
+
+                            {% if field.errors %}
+                                <div class="form-error col-xs-9 col-xs-offset-3">
+                                    {% for error in field.errors %}
+                                        <span class="fa fa-exclamation-triangle"></span>{{ error|escape }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        </div>
+                    {% endfor %}
+
+                </div>
+                <div>
+                    <input type="submit" class="btn btn-success" value="Save" />
+                </div>
+        </form>
+    </div>
+
+   </div>
+</div>
+{% endblock %}

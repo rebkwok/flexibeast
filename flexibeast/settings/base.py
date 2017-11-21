@@ -341,7 +341,7 @@ CKEDITOR_CONFIGS = {
          ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-',
           'JustifyLeft', 'JustifyCenter', 'JustifyRight', '-',
           'Table', 'HorizontalRule', 'Smiley', 'SpecialChar'],
-         ['Format', 'Font', 'FontSize']
+         ['Format', 'FontSize']
         ],
         'width': '100%',
         'AllowedContent': True,
@@ -353,13 +353,10 @@ CKEDITOR_CONFIGS = {
          ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-',
           'JustifyLeft', 'JustifyCenter', 'JustifyRight', '-',
           'Table', 'HorizontalRule', 'Smiley', 'SpecialChar'],
-         ['Format', 'Font', 'FontSize', 'Link']
+         ['Format', 'FontSize', 'Link']
         ],
         'width': '100%',
         'AllowedContent': True,
-        'font_names': 'Arial;Book Antiqua;Comic Sans MS;Courier New;Georgia;'
-                      'Lucida Sans Unicode;Tahoma,Times New Roman;'
-                      'Trebuchet MS;Verdana',
     },
     'studioadmin_min': {
         'toolbar': [
@@ -377,9 +374,6 @@ CKEDITOR_CONFIGS = {
         'title': '',
         'width': '100%',
         'AllowedContent': True,
-        'font_names': 'Arial;Book Antiqua;Comic Sans MS;Courier New;Georgia;'
-                      'Lucida Sans Unicode;Tahoma,Times New Roman;'
-                      'Trebuchet MS;Verdana',
         'extraAllowedContent': ['iframe[*]', '*[id]', '*(*)'],
         'toolbar': [
             ['Source', '-', 'Bold', 'Italic', 'Underline',
@@ -388,7 +382,7 @@ CKEDITOR_CONFIGS = {
              'Indent', '-',
             'JustifyLeft', 'JustifyCenter', 'JustifyRight', '-',
             'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'Link'],
-            ['Format', 'Font', 'FontSize']
+            ['Format', 'FontSize']
         ]
     },
 }

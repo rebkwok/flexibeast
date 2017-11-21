@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import pytz
 
 from datetime import datetime, date
 
@@ -9,7 +10,7 @@ from django.utils import timezone
 
 from ckeditor.widgets import CKEditorWidget
 
-from timetable.models import DAY_CHOICES, WeeklySession
+from timetable.models import DAY_CHOICES, WeeklySession, Event
 
 
 DAY_CHOICES_DICT = dict(DAY_CHOICES)
@@ -42,6 +43,7 @@ class WeeklySessionBaseFormSet(BaseModelFormSet):
             )
             form.DELETE_id = 'DELETE_{}'.format(index)
 
+
 TimetableWeeklySessionFormSet = modelformset_factory(
     WeeklySession,
     fields=('full', ),
@@ -50,22 +52,76 @@ TimetableWeeklySessionFormSet = modelformset_factory(
     can_delete=True)
 
 
-class WeeklySessionAdminForm(forms.ModelForm):
+class EventBaseFormSet(BaseModelFormSet):
 
-    cost = forms.DecimalField(
-        widget=forms.TextInput(
-            attrs={
-                'type': 'text',
-                'class': 'form-control',
-                'aria-describedby': 'sizing-addon2',
-            },
-        ),
-        initial=7,
-        required=False
-    )
+    def add_fields(self, form, index):
+        super(EventBaseFormSet, self).add_fields(form, index)
 
-    def __init__(self, *args, **kwargs):
-        super(WeeklySessionAdminForm, self).__init__(*args, **kwargs)
+        if form.instance:
+            form.fields['show_on_site'] = forms.BooleanField(
+                widget=forms.CheckboxInput(attrs={
+                    'class': "regular-checkbox studioadmin-list",
+                    'id': 'show_on_site_{}'.format(index)
+                }),
+                required=False
+            )
+            form.show_on_site_id = 'show_on_site_{}'.format(index)
+
+            form.fields['DELETE'] = forms.BooleanField(
+                widget=forms.CheckboxInput(attrs={
+                    'class': 'delete-checkbox studioadmin-list',
+                    'id': 'DELETE_{}'.format(index)
+                }),
+                required=False
+            )
+            form.DELETE_id = 'DELETE_{}'.format(index)
+
+EventsFormSet = modelformset_factory(
+    Event,
+    fields=('show_on_site', ),
+    formset=EventBaseFormSet,
+    extra=0,
+    can_delete=True)
+
+
+class EditSessionForm(forms.ModelForm):
+
+    class Meta:
+        model = WeeklySession
+
+        fields = (
+            'name', 'day', 'time', 'description', 'location',
+            'max_participants', 'cost', 'block_info'
+        )
+
+        widgets = {
+            'name': forms.TextInput(
+                attrs={'class': "form-control input-sm"}
+            ),
+            'day': forms.Select(
+                attrs={'class': "form-control input-sm"}
+            ),
+            'time': forms.TimeInput(
+                attrs={'class': 'form-control',
+                       'id': 'timepicker'},
+                format="%H:%M"
+            ),
+            'description': forms.Textarea(
+                attrs={'class': "form-control input-sm", 'rows': 4}
+            ),
+            'location': forms.Select(
+                attrs={'class': "form-control input-sm"}
+            ),
+            'max_participants': forms.TextInput(
+                attrs={'class': "form-control input-sm"}
+            ),
+            'cost': forms.TextInput(
+                attrs={'class': "form-control input-sm"}
+            ),
+            'block_info': forms.Textarea(
+                attrs={'class': "form-control input-sm", 'rows': 2}
+            ),
+        }
 
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -85,61 +141,84 @@ class WeeklySessionAdminForm(forms.ModelForm):
                 self.add_error('time', 'Invalid time format.  Select from the '
                                        'time picker or enter date and time in the '
                                        '24-hour format HH:MM')
-        super(WeeklySessionAdminForm, self).clean()
-        return cleaned_data
+        return super(EditSessionForm, self).clean()
+
+
+class EditEventForm(forms.ModelForm):
 
     class Meta:
-        model = WeeklySession
+        model = Event
+
         fields = (
-            'name', 'day', 'time', 'description', 'location',
-            'max_participants', 'contact_person', 'contact_email', 'cost',
-            'block_info', 'full'
+            'short_name', 'date', 'description', 'location',
+            'max_spaces', 'cost', 'spaces', 'show_on_site'
         )
+
         widgets = {
-            'description': CKEditorWidget(
-                attrs={'class': 'form-control container-fluid'},
-                config_name='studioadmin',
+            'short_name': forms.TextInput(
+                attrs={'class': "form-control input-sm"}
             ),
-            'block_info': CKEditorWidget(
-                attrs={'class': 'form-control container-fluid'},
-                config_name='studioadmin',
-            ),
-            'name': forms.TextInput(
-                attrs={'class': "form-control",
-                       'placeholder': 'Name of session e.g. '
-                                      'Flexibility for Splits'},
-            ),
-            'location': forms.TextInput(
-                attrs={'class': "form-control"}
-            ),
-            'max_participants': forms.TextInput(
-                attrs={'class': "form-control"}
-            ),
-            'contact_person': forms.TextInput(
-                attrs={'class': "form-control"}
-            ),
-            'contact_email': forms.EmailInput(
-                attrs={'class': "form-control"}
-            ),
-            'day': forms.Select(
-                choices=DAY_CHOICES,
-                attrs={'class': "form-control"}
-            ),
-            'time': forms.TimeInput(
-                attrs={'class': 'form-control',
-                       'id': 'timepicker'},
-                format="%H:%M"
-            ),
-            'booking_open': forms.CheckboxInput(
+            'date': forms.DateInput(
                 attrs={
-                    'class': "form-control regular-checkbox",
-                    'id': 'booking_open_id',
-                    }
+                    'class': "form-control",
+                    'id': "datepicker",
+                },
+                format='%d %b %Y'
             ),
-            'full': forms.CheckboxInput(
-                attrs={
-                    'class': "form-control regular-checkbox",
-                    'id': 'full_id',
-                    }
+            'description': forms.Textarea(
+                attrs={'class': "form-control input-sm", 'rows': 4}
             ),
+            'location': forms.Select(
+                attrs={'class': "form-control input-sm"}
+            ),
+            'max_spaces': forms.TextInput(
+                attrs={'class': "form-control input-sm"}
+            ),
+            'cost': forms.TextInput(
+                attrs={'class': "form-control input-sm"}
+            ),
+            'spaces': forms.TextInput(
+                attrs={'class': "form-control input-sm"},
+            ),
+            'show_on_site': forms.CheckboxInput,
         }
+
+    def __init__(self, *args, **kwargs):
+        super(EditEventForm, self).__init__(*args, **kwargs)
+        self.fields['spaces'].label = 'Spaces left'
+
+    def clean(self):
+        spaces = self.cleaned_data.get('spaces')
+        max_spaces = self.cleaned_data.get('max_spaces')
+        if spaces and max_spaces and spaces > max_spaces:
+            self.add_error('spaces', 'Spaces left cannot exceed max spaces')
+
+        date = self.data.get('date')
+        if date:
+            if self.errors.get('date'):
+                del self.errors['date']
+            try:
+                date = datetime.strptime(self.data['date'], '%d %b %Y')
+                uk = pytz.timezone('Europe/London')
+                self.cleaned_data['date'] = uk.localize(date).astimezone(pytz.utc)
+                if self.instance.id:
+                    old_clinic = Event.objects.get(id=self.instance.id)
+                    if old_clinic.date == self.cleaned_data['date']:
+                        self.changed_data.remove('date')
+            except ValueError:
+                self.add_error('date', 'Invalid date format.  Select from the '
+                                       'date picker or enter date in the '
+                                       'format dd Mmm YYYY')
+
+        return super(EditEventForm, self).clean()
+
+
+class CreateEventForm(EditEventForm):
+
+    def __init__(self, *args, **kwargs):
+        self.event_type = kwargs.pop('event_type')
+        super(CreateEventForm, self).__init__(*args, **kwargs)
+        self.fields['short_name'].initial = dict(
+            Event.EVENT_CHOICES
+        )[self.event_type].title()
+

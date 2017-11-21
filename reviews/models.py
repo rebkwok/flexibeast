@@ -33,6 +33,7 @@ class Review(models.Model):
 
     slug = AutoSlugField(populate_from='title', max_length=40, unique=True)
 
+    selected = models.BooleanField(default=False, help_text="Selected for display on home page")
 
     class Meta:
         ordering = ('-submission_date',)

@@ -9,14 +9,6 @@
     - ruby1.9.3
     - ruby2.0
 
-#- name: Ruby Update Alternatives
-#  become: true
-#  shell: update-alternatives --set ruby /usr/bin/ruby1.9.1
-
-#- name: Gem Update Alternatives
-#  become: true
-#  shell: update-alternatives --set gem /usr/bin/gem1.9.1
-
 - name: Fix gem types for mailcatcher (https://github.com/sj26/mailcatcher/issues/277)
   become: true
   gem: name=mime-types version=<3

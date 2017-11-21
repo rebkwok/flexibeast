@@ -1,4 +1,4 @@
-.btn.reviews-btn {
+.reviews-btn {
     padding-top: 0;
     padding-bottom: 0;
 	padding-left: 0;
@@ -6,7 +6,7 @@
     width: 6em;
 	line-height: 1;
 	font-size: 90%;
-	color: #fff !important;
+	color: #fff;
 }
 
 .btn.reviews-btn.filter-btn {
@@ -18,6 +18,11 @@
 	font-size: small;
 	font-style: italic;
 	padding-bottom: 20px;
+	border-bottom: solid thin dimgrey;
+}
+
+.review.last {
+	border-bottom: none;
 }
 
 .review-date {
@@ -34,7 +39,7 @@
 }
 
 .fa.fa-star, .fa.fa-star-o {
-	color: orange;
+	color: #8cc63f;
 }
 
 .review-changed > .fa.fa-star, .review-changed > .fa.fa-star-o {
@@ -58,6 +63,11 @@ div .section-end {
     list-style: none;
     font-size: small;
     font-style: italic;
+}
+
+.reviews-filter {
+	margin-top: 5px;
+	font-size: smaller;
 }
 
 /*RADIO BUTTONS*/

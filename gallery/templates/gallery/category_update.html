@@ -1,15 +1,17 @@
-{% extends "base.html" %}
+{% extends "studioadmin/base.html" %}
 {% load static %}
 {% load gallerytags %}
 
-{% block extra_head %}<link rel="stylesheet" href="{% static 'gallery/css/gallery.css' %}">{% endblock %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'gallery/css/gallery.css' %}">
+{% endblock %}
 
-{% block content %}
+{% block studioadmincontent %}
 
 {{ form.media }}
 
-<div class="extra-top-margin container-fluid row">
-    <div class="col-sm-12">
+<div class="studioadmin-container">
+
         <h2 class="page-header">Album: {{ category.name }}</h2>
 
             <div class="panel-body">
@@ -66,11 +68,9 @@
                     </div>
                 </form>
             </div>
-
         </div>
-    </div>
 
-{% endblock content %}
+{% endblock studioadmincontent %}
 
 {% block extra_scripts %}
         <script type="text/javascript" src="{% static 'gallery/js/bootstrap-filestyle.min.js' %}"> </script>

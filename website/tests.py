@@ -217,7 +217,7 @@ class PageViewsTests(TestMixin, TestCase):
         self.assertEqual(resp.template_name, 'website/page.html')
 
     def test_get_default_template_layout_if_no_pictures(self):
-        self.public_page.layout = 'img-col-right'
+        self.public_page.layout = '1-img-left'
         self.public_page.save()
         resp = self.client.get(self.public_page_url)
 
@@ -225,24 +225,12 @@ class PageViewsTests(TestMixin, TestCase):
         self.assertEqual(resp.template_name, 'website/page.html')
 
     def test_get_relevant_template_layout_if_pictures(self):
-        self.public_page.layout='img-col-right'
+        self.public_page.layout = '1-img-left'
         self.public_page.save()
         mommy.make(Picture, page=self.public_page)
 
         resp = self.client.get(self.public_page_url)
-        self.assertEqual(resp.template_name, 'website/page_col.html')
-
-    def test_include_extra_html_for_about_page(self):
-        resp = self.client.get(self.public_page_url)
-        self.assertEqual(resp.context_data['include_html'], '')
-
-        page = mommy.make(Page, active=True, name="about")
-        resp = self.client.get(
-            reverse('website:page', kwargs={'page_name': page.name})
-        )
-        self.assertEqual(
-            resp.context_data['include_html'], 'website/about_extra.html'
-        )
+        self.assertEqual(resp.template_name, 'website/page_side.html')
 
     def test_cannot_get_inactive_page_if_not_staff(self):
         page = mommy.make(Page, active=False, name="testname2")

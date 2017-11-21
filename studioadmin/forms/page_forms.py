@@ -11,7 +11,6 @@ from website.models import Page, Picture
 from floppyforms import ClearableFileInput
 
 
-
 class ImageThumbnailFileInput(ClearableFileInput):
     template_name = 'floppyforms/image_thumbnail.html'
 
@@ -79,6 +78,14 @@ class PageForm(forms.ModelForm):
         help_text="A unique identifier for this page. Use lowercase, no "
                   "spaces.  Forward slash (/) and hyphens (-) are allowed."
     )
+
+    def __init__(self, *args, **kwargs):
+        super(PageForm, self).__init__(*args, **kwargs)
+        if not self.instance.id or self.instance.menu_location == 'dropdown':
+            new_menu_choices = list(self.fields['menu_location'].choices)
+            new_menu_choices.remove(('main', 'Separate link in main menu'))
+            self.fields['menu_location'].choices = tuple(new_menu_choices)
+            self.fields['menu_location'].help_text = None
 
     class Meta:
         model = Page

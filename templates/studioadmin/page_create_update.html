@@ -6,8 +6,8 @@
 
 {{ form.media }}
 
-<div class="extra-top-margin container-fluid row">
-    <div class="col-sm-12">
+<div class="studioadmin-container">
+
        <div class="panel panel-success">
             <div class="panel-heading">
                 {% if page %}
@@ -29,7 +29,7 @@
 
                 <ul class="list-group">
                     <li class="list-group-item list-group-item-success">Page settings</li>
-                    <div class="list-group-item">
+                    <li class="list-group-item">
                         {% for field in form %}
                             <div class="form-group">
                                 <label class="control-label col-sm-2">{% if field.field.required %}*{% endif %}{{ field.label }}</label>
@@ -148,6 +148,7 @@
                     <div class="form-group">
                         <div class="col-sm-9">
                             <button type="submit" class="btn btn-success">Save</button>
+                             <a class="btn btn-warning" href="{% url 'studioadmin:website_pages_list' %}" >Back to page list</a>
                         </div>
                     </div>
                 </form>
@@ -155,7 +156,6 @@
 
         </div>
     </div>
- </div>
 
 {% endblock studioadmincontent %}
 

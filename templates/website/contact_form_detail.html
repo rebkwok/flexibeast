@@ -2,7 +2,7 @@
     <form class="form-horizontal" method="post" action="">
         {% csrf_token %}
 
-        <div class="form-group-sm col-sm-10">
+        <div class="form-group-sm">
 
             {% for field in form %}
 
@@ -23,7 +23,7 @@
         </div>
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
-                <button type="submit" class="btn btn-success">Send Email</button>
+                <button type="submit" class="btn btn-fb-success">Send Email</button>
             </div>
         </div>
     </form>

@@ -2,12 +2,14 @@
 
 {% load static %}
 
-{% block bg_class %}{% if page.name == 'about' %}about_bg{% else %}plain_bg{% endif %}{%  endblock %}
+{% block extra_head %}
+        <link href="{% static 'website/css/generated_pages.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
 
+<div class="generated-page container container-fluid">
 
-<div class="container-fluid extra-top-margin">
 {% if user.is_staff %}
     {% if not page.active or page.restricted %}
         <div class="divider"></div>
@@ -21,13 +23,11 @@
 {% endif %}
 
 
-        {% if include_html %}{% include include_html %}{% endif %}
+        {% if include_html %}<div class="row">{% include include_html %}</div>{% endif %}
 
-        <div class="row">
-        <div class="col-sm-10 col-xs-12 col-sm-offset-1">
 
             {% if page.pictures.count > 0 and page.layout != 'no-img' %}
-                <h1 class="centred-heading">{{ page.heading }}</h1>
+                <h1 class="center wow fadeInDown">{{ page.heading }}</h1>
                 {% for picture in page.pictures.all %}
                     {% if picture.main %}
                         <div class="page-img-single-container">
@@ -36,13 +36,11 @@
                     {% endif %}
                 {% endfor %}
             {% else %}
-                <h1>{{ page.heading }}</h1>
+                <h1 class="center wow fadeInDown">{{ page.heading }}</h1>
             {% endif %}
 
             {% include 'website/page_content.html' %}
 
-        </div>
-        </div>
 
 
 
