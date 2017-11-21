@@ -41,7 +41,12 @@ $(document).ready(function(){
             console.log('Here');
             var $sel = selector;
             current_image = $sel.data('image-id');
-            $('#image-gallery-caption').text($sel.data('caption'));
+            if($sel.data('caption') != null) {
+                $('#image-gallery-caption').text($sel.data('caption'));
+            } else {
+                $('#image-gallery-caption').text('');
+            }
+
             $('#image-gallery-title').text($sel.data('title'));
             $('#image-gallery-image').attr('src', $sel.data('image'));
             disableButtons(counter, $sel.data('image-id'));

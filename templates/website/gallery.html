@@ -29,7 +29,7 @@
                             <div class="overlay">
                                 <div class="flexibeast-gallery-inner">
                                     <h3>{{ image.category.name }}</h3>
-                                    <p>{{ image.caption }}</p>
+                                    {% if image.caption %}<p>{{ image.caption }}</p>{% endif %}
                                     <a href="#"
                                        class="gallery-thumbnail preview"
                                        data-image-id=""
