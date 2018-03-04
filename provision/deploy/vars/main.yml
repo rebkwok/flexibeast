@@ -1,5 +1,5 @@
 ---
 virtualenv_path: /src/flexibeast/venv
 project_root_path: /src/flexibeast
-python3_path: /usr/bin/python3
+python3_path: /usr/bin/python3.5
 settings_path: flexibeast.settings.base

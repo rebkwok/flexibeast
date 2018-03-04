@@ -3,17 +3,9 @@
   become: true
   apt: pkg={{ item }} state=installed
   with_items:
-    - rubygems-integration #for ubuntu 14.04 (older versions may user just rubygems)
     - libsqlite3-dev
+    - ruby
     - ruby-dev
-    - ruby1.9.3
-    - ruby2.0
-
-- name: Fix gem types for mailcatcher (https://github.com/sj26/mailcatcher/issues/277)
-  become: true
-  gem: name=mime-types version=<3
-  tags:
-  - mailcatcher-install-mime-types
 
 - name: Install Mailcatcher
   become: true

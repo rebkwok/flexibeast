@@ -14,11 +14,9 @@ import os
 root = environ.Path(__file__) - 3  # two folders back (/a/b/ - 3 = /)
 
 env = environ.Env(DEBUG=(bool, False),
-                  PAYPAL_TEST=(bool, False),
                   USE_MAILCATCHER=(bool, False),
                   HEROKU=(bool, False),
-                  BOOKING_ON=(bool, False),
-                  SHOW_DEBUG_TOOLBAR=(bool, True)
+                  SHOW_DEBUG_TOOLBAR=(bool, False)
                   )
 
 environ.Env.read_env(root('flexibeast/.env'))  # reading .env file
@@ -241,11 +239,6 @@ if not HEROKU:
                 'level': 'INFO',
                 'propagate': True,
             },
-            # 'payments': {
-            #     'handlers': ['console', 'file_app'],
-            #     'level': 'INFO',
-            #     'propagate': True,
-            # },
             'studioadmin': {
                 'handlers': ['console', 'file_app'],
                 'level': 'INFO',

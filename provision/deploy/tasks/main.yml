@@ -1,14 +1,32 @@
 ---
-- name: Setup Virtualenv
-  pip: virtualenv={{ virtualenv_path }} requirements={{ project_root_path }}/requirements.txt virtualenv_python=python3.4
+- name: Setup Virtualenv and upgrade setuptools and pip
+  pip:
+    name: "{{ item }}"
+    state: latest
+    virtualenv: "{{ virtualenv_path }}"
+    virtualenv_python: "{{ python3_path }}"
+  with_items:
+    - setuptools
+    - pip
+
+- name: Install requirements
+  pip:
+    virtualenv: "{{ virtualenv_path }}"
+    requirements: "{{ project_root_path }}/requirements.txt"
 
 - name: Install some dev tools
-  sudo: yes
   pip: name={{ item }} virtualenv={{ virtualenv_path }}
   with_items:
     - ipdb
     - ipython
     - django-extensions
+
+- name: Add .env file
+  template:
+    src: .env
+    dest: "{{ project_root_path }}/flexibeast/.env"
+    force: no
+
 
 - name: Django db
   django_manage: command={{ item }} app_path={{ project_root_path }} virtualenv={{ virtualenv_path }} settings={{ settings_path }}
@@ -19,10 +37,3 @@
   django_manage: command={{ item }} app_path={{ project_root_path }} virtualenv={{ virtualenv_path }} settings={{ settings_path }}
   with_items:
     - setup_fb
-#    - load_users
-#    - create_event_and_blocktypes
-#    - create_timetable
-#    - create_events
-#    - create_classes
-#    - create_bookings
-
