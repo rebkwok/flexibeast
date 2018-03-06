@@ -225,32 +225,38 @@ if not HEROKU:
                 'level': 'DEBUG',
                 'class': 'logging.StreamHandler',
                 'formatter': 'verbose'
-            }
+            },
+            'mail_admins': {
+                'level': 'ERROR',
+                'class': 'django.utils.log.AdminEmailHandler',
+                'include_html': True,
+            },
         },
         'loggers': {
             '': {
-                'handlers': ['console', 'file_app'],
+                'handlers': ['console', 'file_app', 'mail_admins'],
                 'level': 'WARNING',
                 'propagate': True,
             },
             'booking': {
-                'handlers': ['console', 'file_app'],
+                'handlers': ['console', 'file_app', 'mail_admins'],
                 'level': 'INFO',
                 'propagate': True,
             },
             'studioadmin': {
-                'handlers': ['console', 'file_app'],
+                'handlers': ['console', 'file_app', 'mail_admins'],
                 'level': 'INFO',
                 'propagate': True,
             },
             'timetable': {
-                'handlers': ['console', 'file_app'],
+                'handlers': ['console', 'file_app', 'mail_admins'],
                 'level': 'INFO',
                 'propagate': True,
             },
         },
     }
 
+ADMINS = [SUPPORT_EMAIL]
 
 # ####HEROKU#######
 
