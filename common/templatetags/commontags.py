@@ -23,7 +23,7 @@ def formatted_uk_date(date):
     return date.astimezone(uk).strftime("%d %b %Y %H:%M")
 
 
-@register.assignment_tag
+@register.simple_tag
 def check_debug():
     return settings.DEBUG
 

@@ -7,7 +7,7 @@ from tempfile import NamedTemporaryFile
 from django.conf import settings
 from django.test import Client, RequestFactory, TestCase, override_settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.utils.html import strip_tags

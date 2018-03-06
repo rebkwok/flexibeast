@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404
 from django.views.generic import UpdateView
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from braces.views import LoginRequiredMixin
 
 from allauth.account.views import LoginView

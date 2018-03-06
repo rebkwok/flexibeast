@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='review',
             name='user',
-            field=models.ForeignKey(verbose_name='author', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(verbose_name='author', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='review',

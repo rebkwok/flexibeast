@@ -81,7 +81,9 @@ class Picture(models.Model):
         options={'quality': 70},
         null=True, blank=True,
     )
-    page = models.ForeignKey(Page, related_name='pictures')
+    page = models.ForeignKey(
+        Page, related_name='pictures', on_delete=models.CASCADE
+    )
     main = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
@@ -101,5 +103,5 @@ class Picture(models.Model):
 
 
 class RestrictedAccessTracker(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     start_date = models.DateTimeField(default=timezone.now)

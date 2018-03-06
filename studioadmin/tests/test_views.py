@@ -1,10 +1,10 @@
 import pytz
 
 from datetime import datetime, timedelta
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 from model_mommy import mommy
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core import mail
 from django.test import TestCase, RequestFactory
 from django.test.client import Client

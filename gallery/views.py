@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.shortcuts import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib import messages
 from django.template.response import TemplateResponse
 from django.utils.safestring import mark_safe

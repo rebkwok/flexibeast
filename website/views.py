@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect, \
     get_object_or_404
 from django.template.response import TemplateResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.core.mail.message import EmailMessage, EmailMultiAlternatives
 from django.template.loader import get_template, select_template
@@ -73,7 +73,7 @@ def page(request, page_name):
         return HttpResponseRedirect(reverse(settings.PERMISSION_DENIED_URL))
 
     if page.restricted:
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             return HttpResponseRedirect(
                 reverse('website:restricted_page_not_logged_in')
             )

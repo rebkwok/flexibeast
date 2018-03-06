@@ -8,7 +8,7 @@ from django.contrib.auth.models import Permission, User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail
 from django.core import management
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import Client, RequestFactory, TestCase, override_settings
 
 from common.helpers import set_up_fb, _create_session

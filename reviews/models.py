@@ -7,7 +7,9 @@ from django_extensions.db.fields import AutoSlugField
 
 class Review(models.Model):
 
-    user = models.ForeignKey(User, verbose_name='author')
+    user = models.ForeignKey(
+        User, verbose_name='author', on_delete=models.CASCADE
+    )
     user_display_name = models.CharField(
         max_length=255, blank=True,
         verbose_name='username that will be displayed on the site',

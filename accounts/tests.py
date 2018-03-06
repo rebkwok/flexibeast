@@ -1,6 +1,6 @@
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from accounts.forms import SignupForm
 from accounts.views import ProfileUpdateView, profile

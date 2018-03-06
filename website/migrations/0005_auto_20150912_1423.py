@@ -26,6 +26,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='picture',
             name='page',
-            field=models.ForeignKey(to='website.Page', related_name='pictures'),
+            field=models.ForeignKey(to='website.Page', related_name='pictures', on_delete=models.CASCADE),
         ),
     ]

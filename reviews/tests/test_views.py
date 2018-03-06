@@ -2,7 +2,7 @@ from model_mommy import mommy
 
 from django.conf import settings
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, RequestFactory
 from django.test.client import Client
 

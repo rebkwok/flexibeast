@@ -1,7 +1,7 @@
 import logging
 
 from django.contrib import messages
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.template.response import TemplateResponse
 from django.shortcuts import HttpResponseRedirect, get_object_or_404
 from django.views.generic import CreateView, ListView, UpdateView

@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('subheading', models.CharField(null=True, blank=True, max_length=255)),
                 ('content', models.TextField(verbose_name='Content (note line breaks do not display on the summary page)')),
                 ('index', models.PositiveIntegerField()),
-                ('page', models.ForeignKey(to='website.Page', related_name='subsections')),
+                ('page', models.ForeignKey(to='website.Page', related_name='subsections', on_delete=models.CASCADE)),
             ],
         ),
         migrations.RemoveField(

@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponseRedirect
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.conf import settings
 from django.contrib import messages
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Q
 
 from braces.views import LoginRequiredMixin
@@ -25,7 +25,7 @@ class ReviewListView(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ReviewListView, self).get_context_data()
-        if not self.request.user.is_anonymous():
+        if not self.request.user.is_anonymous:
             user_reviews = Review.objects.filter(user=self.request.user)
             context['user_reviews'] = user_reviews
 
@@ -72,7 +72,7 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
 
     def dispatch(self, request, *args, **kwargs):
         review = self.get_object()
-        if request.user.is_authenticated() and review.user != request.user:
+        if request.user.is_authenticated and review.user != request.user:
             return HttpResponseRedirect(settings.PERMISSION_DENIED_URL)
         return super(ReviewUpdateView, self).dispatch(request, *args, **kwargs)
 

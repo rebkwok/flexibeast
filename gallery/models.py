@@ -34,7 +34,9 @@ class Image(models.Model):
                                       format='JPEG',
                                       options={'quality': 100})
 
-    category = models.ForeignKey(Category, related_name='images')
+    category = models.ForeignKey(
+        Category, related_name='images', on_delete=models.CASCADE
+    )
     caption = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:

@@ -16,3 +16,4 @@ local/
 media/
 htmlcov/
 provision/.vaultpass
+provision/vagrant.retry

@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
                 ('photo', models.ImageField(upload_to='gallery')),
                 ('caption', models.CharField(max_length=255, blank=True, null=True)),
-                ('category', models.ForeignKey(to='gallery.Category')),
+                ('category', models.ForeignKey(to='gallery.Category', on_delete=models.CASCADE)),
             ],
         ),
     ]

@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('edited', models.BooleanField(default=False)),
                 ('update_published', models.BooleanField(default=False)),
                 ('edited_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('-submission_date',),
