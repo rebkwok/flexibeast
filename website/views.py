@@ -247,3 +247,8 @@ def permission_denied(request):
 
 def restricted_page_not_logged_in(request):
     return render(request, 'website/restricted_page_not_logged_in.html')
+
+
+def privacy_policy(request):
+    return render(request, 'website/privacy_policy.html')
+

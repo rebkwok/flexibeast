@@ -1,7 +1,8 @@
 from django.urls import path
 
 from website.views import about, classes, contact, home, page, \
-    restricted_page_not_logged_in, retreats, stretch_clinics, workshops
+    privacy_policy, restricted_page_not_logged_in, retreats, \
+    stretch_clinics, workshops
 
 
 app_name = 'website'
@@ -18,7 +19,7 @@ urlpatterns = [
     path('stretch-clinics/', stretch_clinics, name='stretch_clinics'),
     path('workshops/', workshops, name='workshops'),
     path('retreats/', retreats, name='retreats'),
-
+    path('privacy-policy/', privacy_policy, name='privacy_policy'),
     path('<str:page_name>/', page, name='page'),
     # path('', page, {'page_name': 'about'}, name='about'),
     path('', home, name='home'),
