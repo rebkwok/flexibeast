@@ -14,6 +14,7 @@ env: >
   DEFAULT_STUDIO_EMAIL=flexibeasttest@gmail.com
   LOG_FOLDER=log_folder
   HEROKU=False
+  TRAVIS=True
   SHOW_DEBUG_TOOLBAR=False
 
 install:
@@ -23,10 +24,10 @@ install:
 
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
-  - python manage.py migrate --settings=flexibeast.settings.test
+  - python manage.py migrate
 
 script:
-  - coverage run --source=flexibeast,flex_bookings,timetable,payments,gallery,reviews,studioadmin,accounts,website --omit=../*migrations*,../*tests*,../*wsgi*,../*__init__* manage.py test --settings=flexibeast.settings.test
+  - coverage run --source=flexibeast,flex_bookings,timetable,payments,gallery,reviews,studioadmin,accounts,website --omit=../*migrations*,../*tests*,../*wsgi*,../*__init__* manage.py test
 
 after_success:
   coveralls

@@ -11,16 +11,16 @@ import dj_database_url
 import environ
 import os
 
-root = environ.Path(__file__) - 3  # two folders back (/a/b/ - 3 = /)
+root = environ.Path(__file__) - 2  # two folders back (/a/b/ - 3 = /)
 
 env = environ.Env(DEBUG=(bool, False),
                   USE_MAILCATCHER=(bool, False),
                   HEROKU=(bool, False),
+                  TRAVIS=(bool, False),
                   SHOW_DEBUG_TOOLBAR=(bool, False)
                   )
 
 environ.Env.read_env(root('flexibeast/.env'))  # reading .env file
-
 BASE_DIR = root()
 #
 # Quick-start development settings - unsuitable for production
@@ -173,6 +173,7 @@ USE_L10N = True
 USE_TZ = True
 
 HEROKU = env('HEROKU')
+TRAVIS = env('TRAVIS')
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 STATICFILES_DIRS = (root('static'),)
@@ -197,8 +198,13 @@ DEFAULT_FROM_EMAIL = 'flexibeast.web@gmail.com'
 DEFAULT_STUDIO_EMAIL = env('DEFAULT_STUDIO_EMAIL')
 SUPPORT_EMAIL = 'rebkwok@gmail.com'
 
+
+import sys
+TESTING = 'test' in sys.argv
+
+
 # #####LOGGING######
-if not HEROKU:
+if not HEROKU and not TRAVIS and not TESTING:
     LOG_FOLDER = env('LOG_FOLDER')
 
     LOGGING = {
@@ -440,8 +446,6 @@ if HEROKU:  # pragma: no cover
 # for gallery app
 PERMISSION_DENIED_URL = 'permission_denied'
 
-TESTING = False
-
 
 def show_toolbar(request):  # pragma: no cover
     return env('SHOW_DEBUG_TOOLBAR')
@@ -457,3 +461,32 @@ DEBUG_TOOLBAR_CONFIG = {
     },
     "SHOW_TOOLBAR_CALLBACK": show_toolbar,
 }
+
+if TESTING or TRAVIS:
+    LOGGING = {
+            'version': 1,
+            'disable_existing_loggers': False,
+            'handlers': {
+                'console': {
+                    'level': 'DEBUG',
+                    'class': 'logging.StreamHandler',
+                }
+            },
+            'loggers': {
+                'django.request': {
+                    'handlers': ['console'],
+                    'level': 'INFO',
+                    'propagate': True,
+                },
+                'studioadmin': {
+                    'handlers': ['console'],
+                    'level': 'INFO',
+                    'propogate': True,
+                },
+                'timetable': {
+                    'handlers': ['console'],
+                    'level': 'INFO',
+                    'propogate': True,
+                },
+            },
+        }
