@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.views.generic import RedirectView
 from django.conf.urls.static import static
 
-from accounts.views import CustomLoginView
+from accounts.views import CustomLoginView, data_privacy_policy, cookie_policy
 
 from website.views import permission_denied
 
@@ -20,6 +20,12 @@ urlpatterns = [
     path('accounts/profile/', include('accounts.urls')),
     path('accounts/login/', CustomLoginView.as_view(), name='login'),
     path('accounts/', include('allauth.urls')),
+    path(
+        'data-privacy-policy/', data_privacy_policy, name='data_privacy_policy'
+    ),
+    path(
+        'cookie-policy/', cookie_policy, name='cookie_policy'
+    ),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('favicon.ico/',
         RedirectView.as_view(url=settings.STATIC_URL+'favicon.ico',

@@ -10,6 +10,8 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.core.mail import send_mail
 
+from accounts.models import DataPrivacyPolicy
+from accounts.utils import has_active_data_privacy_agreement
 from reviews.models import Review
 from timetable.models import WeeklySession, Event
 from website.models import Page
@@ -80,6 +82,14 @@ def page(request, page_name):
         elif not request.user.is_staff and not \
             request.user.has_perm('website.can_view_restricted'):
             return HttpResponseRedirect(reverse(settings.PERMISSION_DENIED_URL))
+        elif (
+            DataPrivacyPolicy.current_version() > 0 and
+                request.user.is_authenticated and not
+                has_active_data_privacy_agreement(request.user)
+        ):
+            return HttpResponseRedirect(
+                reverse('accounts:data_privacy_review') + '?next=' + request.path
+            )
 
     template = TEMPLATES['no-img']
     if page.pictures.count() > 0:

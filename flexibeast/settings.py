@@ -55,6 +55,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'cookielaw',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -310,7 +311,9 @@ SUIT_CONFIG = {
                 'auth.user',
                 'account.emailaddress',
                 'account.emailconfirmation',
-                'socialaccount.socialaccount'
+                'socialaccount.socialaccount',
+                'accounts.dataprivacypolicy',
+                'accounts.signeddataprivacy',
             ),
             'icon': 'icon-user',
         },

@@ -51,7 +51,8 @@ class WebsiteFormsTests(TestCase):
             'last_name': 'User',
             'email_address': 'test@test.com',
             'subject': 'General Enquiry',
-            'message': 'message'
+            'message': 'message',
+            'data_privacy_accepted': True
         }
 
         form = ContactForm(data)
@@ -63,7 +64,8 @@ class WebsiteFormsTests(TestCase):
             'last_name': 'User',
             'email_address': 'test@test.com',
             'subject': 'General Enquiry',
-            'message': 'message'
+            'message': 'message',
+            'data_privacy_accepted': True
         }
 
         form = ContactForm(data)
@@ -314,7 +316,7 @@ class ContactViewsTests(TestMixin, TestCase):
                 'other_subject': '',
                 'first_name': '',
                 'email_address': '',
-                'last_name': ''
+                'last_name': '',
             }
         )
 
@@ -379,7 +381,8 @@ class ContactViewsTests(TestMixin, TestCase):
             'last_name': 'testname',
             'email_address': 'test@test.com',
             'message': 'Hello',
-            'cc': False
+            'cc': False,
+            'data_privacy_accepted': True
         }
 
         self._post_response(form_data)
@@ -400,7 +403,8 @@ class ContactViewsTests(TestMixin, TestCase):
             'first_name': 'test',
             'last_name': 'testname',
             'email_address': 'test@test.com',
-            'cc': False
+            'cc': False,
+            'data_privacy_accepted': True
         }
 
         resp = self._post_response(form_data)
@@ -420,7 +424,8 @@ class ContactViewsTests(TestMixin, TestCase):
             'last_name': 'testname',
             'email_address': 'test@test.com',
             'message': 'Hello',
-            'cc': True
+            'cc': True,
+            'data_privacy_accepted': True
         }
 
         self._post_response(form_data)
@@ -439,7 +444,8 @@ class ContactViewsTests(TestMixin, TestCase):
             'last_name': 'testname',
             'email_address': 'test@test.com',
             'message': 'Hello',
-            'cc': True
+            'cc': True,
+            'data_privacy_accepted': True
         }
 
         self._post_response(form_data)
@@ -461,7 +467,8 @@ class ContactViewsTests(TestMixin, TestCase):
             'last_name': 'testname',
             'email_address': 'test@test.com',
             'message': 'Hello',
-            'cc': True
+            'cc': True,
+            'data_privacy_accepted': True
         }
         resp = self.client.post(
             reverse('website:contact'), form_data, follow=True
