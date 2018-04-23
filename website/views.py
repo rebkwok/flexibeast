@@ -194,6 +194,8 @@ def process_contact_form(request):
         request.session['first_name'] = first_name
         request.session['last_name'] = last_name
         request.session['email_address'] = email_address
+        # required field, so must be True if form valid
+        request.session['data_privacy_accepted'] = True
 
         return_url = request.session.get(
             'return_url', reverse('website:contact')
@@ -231,11 +233,13 @@ def get_initial_contact_form(request):
     first_name = request.session.get('first_name', '')
     last_name = request.session.get('last_name', '')
     email_address = request.session.get('email_address', '')
+    data_privacy_accepted = request.session.get('data_privacy_accepted', False)
 
     return ContactForm(initial={
         'first_name': first_name, 'last_name': last_name,
         'email_address': email_address, 'subject': subject,
-        'other_subject': tt_session if tt_session_id else ''
+        'other_subject': tt_session if tt_session_id else '',
+        'data_privacy_accepted': data_privacy_accepted,
     })
 
 

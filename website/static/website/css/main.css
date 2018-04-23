@@ -2005,3 +2005,9 @@ form.mock-bs-form > p > input[type='text'],
      width: 100%;
   }
 }
+
+.form-error {
+  color: red;
+  font-size: small;
+  font-style: italic;
+}

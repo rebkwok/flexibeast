@@ -317,6 +317,7 @@ class ContactViewsTests(TestMixin, TestCase):
                 'first_name': '',
                 'email_address': '',
                 'last_name': '',
+                'data_privacy_accepted': False,
             }
         )
 
@@ -324,6 +325,7 @@ class ContactViewsTests(TestMixin, TestCase):
             'first_name': 'test',
             'last_name': 'testname',
             'email_address': 'test@test.com',
+            'data_privacy_accepted': True,
         }
         resp = self._get_response(session_data=session_data)
         form = resp.context_data['form']
@@ -335,6 +337,7 @@ class ContactViewsTests(TestMixin, TestCase):
                 'first_name': 'test',
                 'last_name': 'testname',
                 'email_address': 'test@test.com',
+                'data_privacy_accepted': True,
             }
         )
 
