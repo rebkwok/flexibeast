@@ -1,12 +1,29 @@
+from decimal import Decimal
+
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User
+from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 
 from .forms import SignupForm
-from .models import DataPrivacyPolicy, SignedDataPrivacy
+from .models import CookiePolicy, DataPrivacyPolicy, SignedDataPrivacy
+from .utils import has_active_data_privacy_agreement
 from .views import ProfileUpdateView, profile
 from common.helpers import set_up_fb
 from model_mommy import mommy
+
+
+def make_data_privacy_agreement(user):
+    if not has_active_data_privacy_agreement(user):
+        if DataPrivacyPolicy.current_version() == 0:
+            mommy.make(
+                DataPrivacyPolicy, content='Foo', version=1
+            )
+        mommy.make(
+            SignedDataPrivacy, user=user,
+            version=DataPrivacyPolicy.current_version()
+        )
 
 
 class SignUpFormTests(TestCase):
@@ -112,3 +129,110 @@ class ProfileTest(TestCase):
         resp = profile(request)
 
         self.assertEquals(resp.status_code, 200)
+
+
+class DataPrivacyPolicyModelTests(TestCase):
+
+    def test_no_policy_version(self):
+        self.assertEqual(DataPrivacyPolicy.current_version(), 0)
+
+    def test_policy_versioning(self):
+        self.assertEqual(DataPrivacyPolicy.current_version(), 0)
+
+        DataPrivacyPolicy.objects.create(content='Foo')
+        self.assertEqual(DataPrivacyPolicy.current_version(), Decimal('1.0'))
+
+        DataPrivacyPolicy.objects.create(content='Foo1')
+        self.assertEqual(DataPrivacyPolicy.current_version(), Decimal('2.0'))
+
+        DataPrivacyPolicy.objects.create(content='Foo2', version=Decimal('2.6'))
+        self.assertEqual(DataPrivacyPolicy.current_version(), Decimal('2.6'))
+
+        DataPrivacyPolicy.objects.create(content='Foo3')
+        self.assertEqual(DataPrivacyPolicy.current_version(), Decimal('3.0'))
+
+    def test_cannot_make_new_version_with_same_content(self):
+        DataPrivacyPolicy.objects.create(content='Foo')
+        self.assertEqual(DataPrivacyPolicy.current_version(), Decimal('1.0'))
+        with self.assertRaises(ValidationError):
+            DataPrivacyPolicy.objects.create(content='Foo')
+
+    def test_policy_str(self):
+        dp = DataPrivacyPolicy.objects.create(content='Foo')
+        self.assertEqual(
+            str(dp), 'Data Privacy Policy - Version {}'.format(dp.version)
+        )
+
+
+class CookiePolicyModelTests(TestCase):
+
+    def test_policy_versioning(self):
+        CookiePolicy.objects.create(content='Foo')
+        self.assertEqual(CookiePolicy.current().version, Decimal('1.0'))
+
+        CookiePolicy.objects.create(content='Foo1')
+        self.assertEqual(CookiePolicy.current().version, Decimal('2.0'))
+
+        CookiePolicy.objects.create(content='Foo2', version=Decimal('2.6'))
+        self.assertEqual(CookiePolicy.current().version, Decimal('2.6'))
+
+        CookiePolicy.objects.create(content='Foo3')
+        self.assertEqual(CookiePolicy.current().version, Decimal('3.0'))
+
+    def test_cannot_make_new_version_with_same_content(self):
+        CookiePolicy.objects.create(content='Foo')
+        self.assertEqual(CookiePolicy.current().version, Decimal('1.0'))
+        with self.assertRaises(ValidationError):
+            CookiePolicy.objects.create(content='Foo')
+
+    def test_policy_str(self):
+        dp = CookiePolicy.objects.create(content='Foo')
+        self.assertEqual(
+            str(dp), 'Cookie Policy - Version {}'.format(dp.version)
+        )
+
+
+class DataPrivacyViewTests(TestCase):
+
+    def test_get_data_privacy_view(self):
+        # no need to be a logged in user to access
+        resp = self.client.get(reverse('data_privacy_policy'))
+        self.assertEqual(resp.status_code, 200)
+
+
+class CookiePolicyViewTests(TestCase):
+
+    def test_get_cookie_view(self):
+        # no need to be a logged in user to access
+        resp = self.client.get(reverse('cookie_policy'))
+        self.assertEqual(resp.status_code, 200)
+
+
+class SignedDataPrivacyCreateViewTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('profile:data_privacy_review')
+        cls.data_privacy_policy = mommy.make(DataPrivacyPolicy, version=None)
+        cls.user = User.objects.create_user(
+            username='test', email='test@test.com', password='test'
+        )
+        make_data_privacy_agreement(cls.user)
+
+    def setUp(self):
+        super(SignedDataPrivacyCreateViewTests, self).setUp()
+        self.client.login(username=self.user.username, password='test')
+
+    def test_user_already_has_active_signed_agreement(self):
+        # dp agreement is created in setup
+        self.assertTrue(has_active_data_privacy_agreement(self.user))
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(resp.url, reverse('website:home'))
+
+        # make new policy
+        cache.clear()
+        mommy.make(DataPrivacyPolicy, version=None)
+        self.assertFalse(has_active_data_privacy_agreement(self.user))
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
