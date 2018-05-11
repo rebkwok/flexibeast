@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 
-from .forms import SignupForm
+from .forms import DataPrivacyAgreementForm, SignupForm
 from .models import CookiePolicy, DataPrivacyPolicy, SignedDataPrivacy
 from .utils import has_active_data_privacy_agreement
 from .views import ProfileUpdateView, profile
@@ -236,3 +236,27 @@ class SignedDataPrivacyCreateViewTests(TestCase):
         self.assertFalse(has_active_data_privacy_agreement(self.user))
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 200)
+
+    def test_create_new_agreement(self):
+        # make new policy
+        cache.clear()
+        mommy.make(DataPrivacyPolicy, version=None)
+        self.assertFalse(has_active_data_privacy_agreement(self.user))
+
+        self.client.post(self.url, data={'confirm': True})
+        self.assertTrue(has_active_data_privacy_agreement(self.user))
+
+
+class DataPrivacyAgreementFormTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = mommy.make(User)
+        mommy.make(DataPrivacyPolicy)
+
+    def test_confirm_required(self):
+        form = DataPrivacyAgreementForm(next_url='/')
+        self.assertFalse(form.is_valid())
+
+        form = DataPrivacyAgreementForm(next_url='/', data={'confirm': True})
+        self.assertTrue(form.is_valid())
