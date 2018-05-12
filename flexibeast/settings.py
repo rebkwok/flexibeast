@@ -312,6 +312,7 @@ SUIT_CONFIG = {
                 'account.emailaddress',
                 'account.emailconfirmation',
                 'socialaccount.socialaccount',
+                'accounts.cookiepolicy',
                 'accounts.dataprivacypolicy',
                 'accounts.signeddataprivacy',
             ),
