@@ -12,7 +12,8 @@ from django.urls import reverse
 from .admin import CookiePolicyAdminForm, DataPrivacyPolicyAdminForm
 from .forms import DataPrivacyAgreementForm, SignupForm
 from .models import CookiePolicy, DataPrivacyPolicy, SignedDataPrivacy
-from .utils import has_active_data_privacy_agreement
+from .utils import active_data_privacy_cache_key, \
+    has_active_data_privacy_agreement
 from .views import ProfileUpdateView, profile
 from common.helpers import set_up_fb
 
@@ -122,16 +123,27 @@ class ProfileTest(TestCase):
 
     def setUp(self):
         set_up_fb()
+        self.user = User.objects.create_user(
+            username='testprofileuser', email='test@profile.test',
+            password='test'
+        )
         self.factory = RequestFactory()
+        self.url = url = reverse('profile:profile')
 
     def test_profile_view(self):
-        user = mommy.make(User)
-        url = reverse('profile:profile')
-        request = self.factory.get(url)
-        request.user = user
+        request = self.factory.get(self.url)
+        request.user = self.user
         resp = profile(request)
 
         self.assertEquals(resp.status_code, 200)
+
+    def test_profile_requires_signed_data_privacy(self):
+        mommy.make(DataPrivacyPolicy)
+        request = self.factory.get(self.url)
+        request.user = self.user
+        resp = profile(request)
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn(reverse('profile:data_privacy_review'), resp.url)
 
 
 class DataPrivacyPolicyModelTests(TestCase):
@@ -193,6 +205,31 @@ class CookiePolicyModelTests(TestCase):
         self.assertEqual(
             str(dp), 'Cookie Policy - Version {}'.format(dp.version)
         )
+
+
+class SignedDataPrivacyModelTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        DataPrivacyPolicy.objects.create(content='Foo')
+
+    def setUp(self):
+        self.user = mommy.make(User)
+
+    def test_cached_on_save(self):
+        make_data_privacy_agreement(self.user)
+        self.assertTrue(cache.get(active_data_privacy_cache_key(self.user)))
+
+        cache.clear()
+        DataPrivacyPolicy.objects.create(content='New Foo')
+        self.assertFalse(has_active_data_privacy_agreement(self.user))
+
+    def test_delete(self):
+        make_data_privacy_agreement(self.user)
+        self.assertTrue(cache.get(active_data_privacy_cache_key(self.user)))
+
+        SignedDataPrivacy.objects.get(user=self.user).delete()
+        self.assertIsNone(cache.get(active_data_privacy_cache_key(self.user)))
 
 
 class DataPrivacyViewTests(TestCase):
