@@ -220,7 +220,6 @@ class SignedDataPrivacyModelTests(TestCase):
         make_data_privacy_agreement(self.user)
         self.assertTrue(cache.get(active_data_privacy_cache_key(self.user)))
 
-        cache.clear()
         DataPrivacyPolicy.objects.create(content='New Foo')
         self.assertFalse(has_active_data_privacy_agreement(self.user))
 
@@ -271,16 +270,14 @@ class SignedDataPrivacyCreateViewTests(TestCase):
         self.assertEqual(resp.url, reverse('website:home'))
 
         # make new policy
-        cache.clear()
-        mommy.make(DataPrivacyPolicy, version=None)
+        mommy.make(DataPrivacyPolicy)
         self.assertFalse(has_active_data_privacy_agreement(self.user))
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 200)
 
     def test_create_new_agreement(self):
         # make new policy
-        cache.clear()
-        mommy.make(DataPrivacyPolicy, version=None)
+        mommy.make(DataPrivacyPolicy)
         self.assertFalse(has_active_data_privacy_agreement(self.user))
 
         self.client.post(self.url, data={'confirm': True})
