@@ -88,7 +88,7 @@ def page(request, page_name):
                 has_active_data_privacy_agreement(request.user)
         ):
             return HttpResponseRedirect(
-                reverse('accounts:data_privacy_review') + '?next=' + request.path
+                reverse('profile:data_privacy_review') + '?next=' + request.path
             )
 
     template = TEMPLATES['no-img']
