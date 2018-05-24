@@ -1,6 +1,7 @@
 {% load staticfiles %}
 {% load socialaccount %}
 {% load commontags %}
+{% load cookielaw_tags %}
 
 <!DOCTYPE html>
 <html lang="en-gb">
@@ -162,6 +163,8 @@
     </div>
     </header><!--/header-->
 
+    {% cookielaw_banner %}
+
     {% block messages %}
     {% if messages %}
           <div class="row">
@@ -217,7 +220,8 @@
                     </div>
                     <div class="footer-credit">Site developed by <a href="https://twitter.com/rebkwok" target="_blank">Becky Smith</a></div>
                     <div class="footer-credit">Design by Zanna Oletsik</div>
-                    <div class="footer-credit"><a href="{% url 'website:privacy_policy' %}">Data Privacy Statement</a></div>
+                    <div class="footer-credit"><a href="{% url 'data_privacy_policy' %}">Data Privacy Policy</a></div>
+{#                    <div class="footer-credit"><a href="{% url 'website:privacy_policy' %}">Data Privacy Statement</a></div>#}
                 </div>
             </div>
         </div>
@@ -240,6 +244,7 @@
     <script src="{% static 'common/js/jquery.tablesorter.min.js' %}"></script>
     <script src="{% static 'common/js/jquery.are-you-sure.js' %}"></script>
     <script src="{% static 'common/js/custom.js' %}"></script>
+    <script src="{% static 'cookielaw/js/cookielaw.js' %}"></script>
 {% block extra_scripts %}{% endblock %}
 </body>
 </html>

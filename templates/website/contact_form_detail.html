@@ -10,8 +10,8 @@
                     <label class="control-label col-sm-3">
                         {% if field.field.required %}<span class="required">*{{ field.label }}</span>{% else %}{{ field.label }}{% endif %}
                     </label>
-                    <div class="col-sm-9 {% if field.name == 'cc' %}cbox{% endif %} {% if field.errors %}form-error{% endif %}">
-                        {{ field }}{% if field.name == 'cc' %}<label for='cc_id'></label>{% endif %}
+                    <div class="col-sm-9 {% if field.name == 'cc' or field.name == 'data_privacy_accepted' %}cbox{% endif %} {% if field.errors %}form-error{% endif %}">
+                        {{ field }}<label for='{{ field.name }}_id'></label>
                         {% if field.errors %}
                             <span class="form-error">
                                 {{ field.errors }}
