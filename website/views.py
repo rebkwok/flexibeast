@@ -29,6 +29,11 @@ TEMPLATES = {
 
 
 def home(request):
+    if DataPrivacyPolicy.current_version() > 0 and request.user.is_authenticated \
+            and not has_active_data_privacy_agreement(request.user):
+        return HttpResponseRedirect(
+            reverse('profile:data_privacy_review') + '?next=' + request.path
+        )
     reviews = Review.objects.filter(selected=True).order_by('-submission_date')
     return TemplateResponse(
         request, 'website/index.html',
