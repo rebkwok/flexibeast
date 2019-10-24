@@ -2,7 +2,7 @@ import pytz
 
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
-from model_mommy import mommy
+from model_bakery import baker
 
 from django.urls import reverse
 from django.core import mail
@@ -28,8 +28,8 @@ class TestPermissionMixin(object):
         set_up_fb()
         self.client = Client()
         self.factory = RequestFactory()
-        self.user = mommy.make_recipe('common.user')
-        self.staff_user = mommy.make_recipe('common.user')
+        self.user = baker.make_recipe('common.user')
+        self.staff_user = baker.make_recipe('common.user')
         self.staff_user.is_staff = True
         self.staff_user.save()
 
@@ -73,7 +73,7 @@ class UserListViewTests(TestPermissionMixin, TestCase):
         self.assertEquals(resp.status_code, 200)
 
     def test_all_users_are_displayed(self):
-        mommy.make_recipe('common.user', _quantity=6)
+        baker.make_recipe('common.user', _quantity=6)
         # 8 users total, incl self.user and self.staff_user
         self.assertEqual(User.objects.count(), 8)
         resp = self._get_response(self.staff_user)
@@ -82,8 +82,8 @@ class UserListViewTests(TestPermissionMixin, TestCase):
         )
 
     def test_display_restricted_users(self):
-        not_restr_student = mommy.make_recipe('common.user')
-        restr_student = mommy.make_recipe('common.user')
+        not_restr_student = baker.make_recipe('common.user')
+        restr_student = baker.make_recipe('common.user')
         perm = Permission.objects.get(codename='can_view_restricted')
         restr_student.user_permissions.add(perm)
         restr_student.save()
@@ -102,8 +102,8 @@ class UserListViewTests(TestPermissionMixin, TestCase):
         )
 
     def test_change_restricted_user(self):
-        not_restr_student = mommy.make_recipe('common.user')
-        restr_student = mommy.make_recipe('common.user')
+        not_restr_student = baker.make_recipe('common.user')
+        restr_student = baker.make_recipe('common.user')
         perm = Permission.objects.get(codename='can_view_restricted')
         restr_student.user_permissions.add(perm)
         restr_student.save()
@@ -288,23 +288,23 @@ class ActivityLogListViewTests(TestPermissionMixin, TestCase):
         # 2 for empty cron jobs
         # 3 with log messages to test search text
         # 2 with fixed dates to test search date
-        mommy.make(
+        baker.make(
             ActivityLog,
             log='email_warnings job run; no unpaid booking warnings to send'
         )
-        mommy.make(
+        baker.make(
             ActivityLog,
             log='cancel_unpaid_bookings job run; no bookings to cancel'
         )
-        mommy.make(ActivityLog, log='Test log message')
-        mommy.make(ActivityLog, log='Test log message1 One')
-        mommy.make(ActivityLog, log='Test log message2 Two')
-        mommy.make(
+        baker.make(ActivityLog, log='Test log message')
+        baker.make(ActivityLog, log='Test log message1 One')
+        baker.make(ActivityLog, log='Test log message2 Two')
+        baker.make(
             ActivityLog,
             timestamp=datetime(2015, 1, 1, 16, 0, tzinfo=timezone.utc),
             log='Log with test date'
         )
-        mommy.make(
+        baker.make(
             ActivityLog,
             timestamp=datetime(2015, 1, 1, 4, 0, tzinfo=timezone.utc),
             log='Log with test date for search'

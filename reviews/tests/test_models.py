@@ -1,19 +1,19 @@
 from django.test import TestCase
 
-from model_mommy import mommy
+from model_bakery import baker
 
 from reviews.models import Review
 
 class ReviewModelTests(TestCase):
 
     def setUp(self):
-        self.user = mommy.make_recipe('common.user', first_name='Fred')
+        self.user = baker.make_recipe('common.user', first_name='Fred')
 
     def test_new_review(self):
         """
         A new review is unpublished and has no previous values
         """
-        review = mommy.make(Review, user=self.user)
+        review = baker.make(Review, user=self.user)
         self.assertFalse(review.reviewed)
         self.assertFalse(review.published)
         self.assertEqual(review.rating, 5)
@@ -28,7 +28,7 @@ class ReviewModelTests(TestCase):
         # user_display_name is populated from user's first name if none given
         self.assertEqual(review.user_display_name, 'Fred')
 
-        review1 = mommy.make(
+        review1 = baker.make(
             Review, user=self.user, user_display_name="Not Fred"
         )
         self.assertEqual(review1.user_display_name, 'Not Fred')
@@ -38,7 +38,7 @@ class ReviewModelTests(TestCase):
         Approve sets an unpublished review to published and sets an edited
         review to update_published
         """
-        review = mommy.make(Review, user=self.user)
+        review = baker.make(Review, user=self.user)
         self.assertFalse(review.reviewed)
         self.assertFalse(review.published)
 
@@ -51,7 +51,7 @@ class ReviewModelTests(TestCase):
         Approve sets an unpublished review to published and sets an edited
         review to update_published
         """
-        review = mommy.make(Review, user=self.user, published=True)
+        review = baker.make(Review, user=self.user, published=True)
         self.assertFalse(review.update_published)
 
         review.approve()
@@ -65,7 +65,7 @@ class ReviewModelTests(TestCase):
         For an already published review but not edited review, set published to False
         For an already published edited review, set update_published to False
         """
-        review = mommy.make(Review, user=self.user)
+        review = baker.make(Review, user=self.user)
         self.assertFalse(review.reviewed)
         self.assertFalse(review.published)
 
@@ -80,7 +80,7 @@ class ReviewModelTests(TestCase):
         For an already published review but not edited review, set published to False
         For an already published edited review, set update_published to False
         """
-        review = mommy.make(Review, user=self.user, published=True, edited=False)
+        review = baker.make(Review, user=self.user, published=True, edited=False)
         self.assertTrue(review.published)
         self.assertFalse(review.update_published)
 
@@ -96,7 +96,7 @@ class ReviewModelTests(TestCase):
         For an already published review but not edited review, set published to False
         For an already published edited review, set update_published to False
         """
-        review = mommy.make(
+        review = baker.make(
             Review, user=self.user, published=True, edited=True
         )
         self.assertTrue(review.published)
@@ -114,7 +114,7 @@ class ReviewModelTests(TestCase):
         For an already published review but not edited review, set published to False
         For an already published edited review, set update_published to False
         """
-        review = mommy.make(
+        review = baker.make(
             Review, user=self.user, published=True, edited=True,
             update_published=True
         )
@@ -131,7 +131,7 @@ class ReviewModelTests(TestCase):
         Updating user_display_name, review, rating or title sets the previous
         values for these fields and sets edited to True and reviewed to False
         """
-        review = mommy.make(Review, reviewed=True, published=True)
+        review = baker.make(Review, reviewed=True, published=True)
         orig_rating = review.rating
         orig_title = review.title
         orig_review = review.review
@@ -157,7 +157,7 @@ class ReviewModelTests(TestCase):
         self.assertFalse(review.reviewed)
 
     def test_str(self):
-        review = mommy.make(Review, user=self.user)
+        review = baker.make(Review, user=self.user)
         self.assertEqual(
             str(review),
             "Fred - {}".format(review.submission_date.strftime('%d-%b-%y'))

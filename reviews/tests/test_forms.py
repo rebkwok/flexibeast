@@ -1,4 +1,4 @@
-from model_mommy import mommy
+from model_bakery import baker
 
 from django.test import TestCase
 
@@ -62,7 +62,7 @@ class ReviewFormTests(TestCase):
 class ReviewFormSetTests(TestCase):
 
     def setUp(self):
-        self.review = mommy.make(Review)
+        self.review = baker.make(Review)
 
     def test_formset_valid(self):
 

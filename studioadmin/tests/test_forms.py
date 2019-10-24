@@ -1,6 +1,6 @@
 import os
 
-from model_mommy import mommy
+from model_bakery import baker
 from tempfile import NamedTemporaryFile
 
 from django.conf import settings
@@ -24,7 +24,7 @@ from website.models import Page
 class TimetableWeeklySessionFormSetTests(TestCase):
 
     def setUp(self):
-        self.session = mommy.make(WeeklySession)
+        self.session = baker.make(WeeklySession)
         self.formset_data = {
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 1,
@@ -43,7 +43,7 @@ class TimetableWeeklySessionFormSetTests(TestCase):
         self.assertEquals(form.full_id, 'full_0')
 
     def test_can_delete(self):
-        session_to_delete = mommy.make(WeeklySession)
+        session_to_delete = baker.make(WeeklySession)
         fset_data = self.formset_data.copy()
         fset_data.update(
             {
@@ -65,7 +65,7 @@ class WeeklySessionEditFormTests(TestCase):
 
     def setUp(self):
 
-        location = mommy.make(Location)
+        location = baker.make(Location)
         self.form_data = {
             'name': 'test_event',
             'day': '01MON',
@@ -89,7 +89,7 @@ class WeeklySessionEditFormTests(TestCase):
 class ChooseUsersFormSetTests(TestCase):
 
     def setUp(self):
-        self.user = mommy.make_recipe('common.user')
+        self.user = baker.make_recipe('common.user')
 
     def formset_data(self, extra_data={}):
 
@@ -154,7 +154,7 @@ class EmailUsersFormTests(TestCase):
 class PagesFormSetTests(TestCase):
 
     def setUp(self):
-        self.page = mommy.make(Page)
+        self.page = baker.make(Page)
 
     def formset_data(self, extra_data={}):
         data = {
@@ -176,7 +176,7 @@ class PagesFormSetTests(TestCase):
 class PageFormTests(TestCase):
 
     def setUp(self):
-        self.page = mommy.make(Page)
+        self.page = baker.make(Page)
 
     def form_data(self, extra_data={}):
         data = {
@@ -235,7 +235,7 @@ class PageFormTests(TestCase):
 class PictureFormsetTests(TestCase):
 
     def test_form_valid(self):
-        page = mommy.make(Page)
+        page = baker.make(Page)
         pic_file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
 
         form_data = {
@@ -249,7 +249,7 @@ class PictureFormsetTests(TestCase):
         os.unlink(pic_file.name)
 
     def test_main_ticked_for_more_than_one_picture(self):
-        page = mommy.make(Page)
+        page = baker.make(Page)
         pic_file = NamedTemporaryFile(suffix='.txt', dir='/tmp')
         pic_file1 = NamedTemporaryFile(suffix='.txt', dir='/tmp')
 

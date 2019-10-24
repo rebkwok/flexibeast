@@ -1,4 +1,4 @@
-from model_mommy import mommy
+from model_bakery import baker
 
 from datetime import time
 
@@ -35,8 +35,8 @@ class TimetableViewsTests(TestMixin, TestCase):
         cls.url = reverse('timetable:timetable')
 
     def setUp(self):
-        self.full_session = mommy.make(WeeklySession, full=True)
-        self.spaces_session = mommy.make(WeeklySession, full=False)
+        self.full_session = baker.make(WeeklySession, full=True)
+        self.spaces_session = baker.make(WeeklySession, full=False)
 
     def test_sessions_displayed(self):
         resp = self.client.get(self.url)
@@ -93,7 +93,7 @@ class TimetableViewsTests(TestMixin, TestCase):
 class TimeTableModelTests(TestCase):
 
     def test_weekly_session_str(self):
-        wsession = mommy.make(
+        wsession = baker.make(
             WeeklySession, name="Test", day=WeeklySession.MON, time=time(19, 0)
         )
         self.assertEqual(
@@ -101,7 +101,7 @@ class TimeTableModelTests(TestCase):
         )
 
     def test_location_str(self):
-        location = mommy.make(
+        location = baker.make(
             Location, short_name="test", full_name="a test location"
         )
         self.assertEqual(str(location), 'test')

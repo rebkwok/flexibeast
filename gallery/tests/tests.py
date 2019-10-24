@@ -1,6 +1,6 @@
 import os
 
-from model_mommy import mommy
+from model_bakery import baker
 
 from tempfile import NamedTemporaryFile
 
@@ -99,8 +99,8 @@ class GalleryMainViewTests(TestCase):
     def setUp(self):
         set_up_fb()
         self.factory = RequestFactory()
-        self.user = mommy.make(User)
-        self.staff_user = mommy.make(User)
+        self.user = baker.make(User)
+        self.staff_user = baker.make(User)
         self.staff_user.is_staff = True
         self.staff_user.save()
 
@@ -278,7 +278,7 @@ class CategoryDetailViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         set_up_fb()
-        cls.category = mommy.make(Category, name="Test Cat Name")
+        cls.category = baker.make(Category, name="Test Cat Name")
 
     def test_can_get_category_page(self):
         url = reverse('gallery:category', args=[self.category.slug])
@@ -290,7 +290,7 @@ class CategoryDetailViewTests(TestCase):
     def test_get_category_page_with_images(self):
         url = reverse('gallery:category', args=[self.category.slug])
         file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
-        image = mommy.make(Image, photo=file.name, category=self.category)
+        image = baker.make(Image, photo=file.name, category=self.category)
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn('Test Cat Name', resp.rendered_content)
@@ -305,7 +305,7 @@ class CategoryListViewTests(TestCase):
         set_up_fb()
         self.client = Client()
         self.factory = RequestFactory()
-        self.user = mommy.make(User)
+        self.user = baker.make(User)
         self.staff_user = User.objects.create_user(
             username='test', email='staff@test.com', password='test'
         )
@@ -388,7 +388,7 @@ class CategoryListViewTests(TestCase):
         self.assertEqual(Category.objects.first().description, 'description')
 
     def test_submit_with_no_changes(self):
-        category = mommy.make(Category, name='test', description='test')
+        category = baker.make(Category, name='test', description='test')
         formset_data = {
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 1,
@@ -437,7 +437,7 @@ class CategoryListViewTests(TestCase):
         self.assertEqual(Category.objects.first().name, 'test')
 
     def test_update_category(self):
-        category = mommy.make(Category)
+        category = baker.make(Category)
         formset_data = {
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 1,
@@ -455,7 +455,7 @@ class CategoryListViewTests(TestCase):
         self.assertEqual(category.description, 'description')
 
     def test_add_additional_category(self):
-        category = mommy.make(Category)
+        category = baker.make(Category)
         formset_data = {
             'form-TOTAL_FORMS': 2,
             'form-INITIAL_FORMS': 1,
@@ -474,7 +474,7 @@ class CategoryListViewTests(TestCase):
         self.assertEqual(Category.objects.last().description, 'new description')
 
     def test_delete_category(self):
-        category = mommy.make(Category)
+        category = baker.make(Category)
         formset_data = {
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 1,
@@ -488,7 +488,7 @@ class CategoryListViewTests(TestCase):
         self.assertFalse(Category.objects.exists())
 
     def test_get_category_with_images(self):
-        category = mommy.make(Category, name='category')
+        category = baker.make(Category, name='category')
         file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
         testimg = create_image(file.name, 'category')
 
@@ -510,7 +510,7 @@ class CategoryListViewTests(TestCase):
         os.unlink(file.name)
 
     def test_delete_category_with_images(self):
-        category = mommy.make(Category, name='category')
+        category = baker.make(Category, name='category')
         file = NamedTemporaryFile(suffix='.jpg', dir='/tmp')
         testimg = create_image(file.name, 'category')
 
@@ -547,8 +547,8 @@ class CategoryListViewTests(TestCase):
         self.assertEqual(Category.objects.count(), 2)
 
     def test_update_multiple_categories(self):
-        category1 = mommy.make(Category, name='category1')
-        category2 = mommy.make(Category, name='category2')
+        category1 = baker.make(Category, name='category1')
+        category2 = baker.make(Category, name='category2')
 
         formset_data = {
             'form-TOTAL_FORMS': 2,
@@ -576,8 +576,8 @@ class CategoryListViewTests(TestCase):
         self.assertEqual(category2.description, 'description2')
 
     def test_delete_multiple_categories(self):
-        category1 = mommy.make(Category, name='category1')
-        category2 = mommy.make(Category, name='category2')
+        category1 = baker.make(Category, name='category1')
+        category2 = baker.make(Category, name='category2')
 
         formset_data = {
             'form-TOTAL_FORMS': 2,
@@ -603,13 +603,13 @@ class CategoryUpdateViewTests(TestCase):
     def setUp(self):
         set_up_fb()
         self.factory = RequestFactory()
-        self.user = mommy.make(User)
+        self.user = baker.make(User)
         self.staff_user = User.objects.create_user(
             username='test', email='staff@test.com', password='test'
         )
         self.staff_user.is_staff = True
         self.staff_user.save()
-        self.category = mommy.make(Category, name='category')
+        self.category = baker.make(Category, name='category')
 
     def _get_response(self, user, category_id):
         url = reverse('gallery:edit_category', args=[category_id])
@@ -750,7 +750,7 @@ class CategoryUpdateViewTests(TestCase):
                 file.name, content=file.read()
             )
 
-        testimg = mommy.make(Image, category=self.category, photo=photo)
+        testimg = baker.make(Image, category=self.category, photo=photo)
         self.assertTrue(os.path.exists(copied_filepath))
 
         formset_data = {

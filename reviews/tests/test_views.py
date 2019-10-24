@@ -1,4 +1,4 @@
-from model_mommy import mommy
+from model_bakery import baker
 
 from django.conf import settings
 from django.contrib.messages.storage.fallback import FallbackStorage
@@ -17,8 +17,8 @@ class ReviewTestMixin(object):
         set_up_fb()
         self.client = Client()
         self.factory = RequestFactory()
-        self.user = mommy.make_recipe('common.user')
-        self.staff_user = mommy.make_recipe('common.user')
+        self.user = baker.make_recipe('common.user')
+        self.staff_user = baker.make_recipe('common.user')
         self.staff_user.is_staff = True
         self.staff_user.save()
 
@@ -27,9 +27,9 @@ class ReviewListViewTests(ReviewTestMixin, TestCase):
 
     def setUp(self):
         super(ReviewListViewTests, self).setUp()
-        self.user_review = mommy.make(Review, user=self.user, published=True)
-        mommy.make(Review, published=True, _quantity=4)
-        mommy.make(Review, published=False, _quantity=2)
+        self.user_review = baker.make(Review, user=self.user, published=True)
+        baker.make(Review, published=True, _quantity=4)
+        baker.make(Review, published=False, _quantity=2)
 
     def _get_response(self, user, data={}):
         url = reverse('reviews:reviews')
@@ -58,7 +58,7 @@ class ReviewListViewTests(ReviewTestMixin, TestCase):
         resp = self._get_response(self.user)
         self.assertEqual(resp.rendered_content.count('Edit'), 1)
 
-        mommy.make(Review, user=self.user, published=True)
+        baker.make(Review, user=self.user, published=True)
         resp = self._get_response(self.user)
         self.assertEqual(resp.rendered_content.count('Edit'), 2)
 
@@ -123,7 +123,7 @@ class ReviewListViewTests(ReviewTestMixin, TestCase):
         )
 
     def test_latest_published_edit_shown(self):
-        review = mommy.make(Review, review='first review', published=True)
+        review = baker.make(Review, review='first review', published=True)
         resp = self.client.get(reverse('reviews:reviews'))
         self.assertIn('first review', resp.rendered_content)
 
@@ -217,7 +217,7 @@ class ReviewUpdateViewTests(ReviewTestMixin, TestCase):
         return view(request, slug=review_slug)
 
     def test_login_required(self):
-        review = mommy.make(Review, user=self.user)
+        review = baker.make(Review, user=self.user)
         resp = self.client.get(
                 reverse('reviews:edit_review', kwargs={'slug': review.slug})
         )
@@ -233,14 +233,14 @@ class ReviewUpdateViewTests(ReviewTestMixin, TestCase):
         self.assertEqual(resp.status_code, 200)
 
     def test_cannot_get_another_users_review(self):
-        review = mommy.make(Review)
+        review = baker.make(Review)
         self.assertNotEqual(review.user, self.user)
         resp = self._get_response(self.user, review.slug)
         self.assertEqual(resp.status_code, 302)
         self.assertIn(resp.url, settings.PERMISSION_DENIED_URL)
 
     def test_can_update_review(self):
-        review = mommy.make(Review, user=self.user)
+        review = baker.make(Review, user=self.user)
         resp = self._post_response(
                 self.user, review.slug,
                 {
@@ -254,7 +254,7 @@ class ReviewUpdateViewTests(ReviewTestMixin, TestCase):
         self.assertEqual(review.title, 'new title')
 
     def test_updated_review_marked_not_reviewed_or_published(self):
-        review = mommy.make(Review, user=self.user)
+        review = baker.make(Review, user=self.user)
         review.approve()
         resp = self._post_response(
                 self.user, review.slug,
@@ -285,21 +285,21 @@ class StaffReviewListViewTests(ReviewTestMixin, TestCase):
         # 1 updated and reviewed and accepted/published
         # 1 updated and reviewed and rejected
 
-        self.review_pending = mommy.make(Review)
-        self.review_published = mommy.make(Review)
+        self.review_pending = baker.make(Review)
+        self.review_published = baker.make(Review)
         self.review_published.approve()
-        self.review_rejected = mommy.make(Review)
+        self.review_rejected = baker.make(Review)
         self.review_rejected.reject()
-        self.review_update_pending = mommy.make(Review)
+        self.review_update_pending = baker.make(Review)
         self.review_update_pending.approve()
         self.review_update_pending.title = "updated title"
         self.review_update_pending.save()
-        self.review_update_published = mommy.make(Review)
+        self.review_update_published = baker.make(Review)
         self.review_update_published.approve()
         self.review_update_published.title = "updated title"
         self.review_update_published.save()
         self.review_update_published.approve()
-        self.review_update_rejected = mommy.make(Review)
+        self.review_update_rejected = baker.make(Review)
         self.review_update_rejected.approve()
         self.review_update_rejected.title = "updated title"
         self.review_update_rejected.save()
