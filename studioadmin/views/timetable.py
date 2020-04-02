@@ -2,9 +2,8 @@ import logging
 
 from django.contrib import messages
 from django.urls import reverse
-from django.template.response import TemplateResponse
 from django.shortcuts import HttpResponse, HttpResponseRedirect, \
-    get_object_or_404, render_to_response
+    get_object_or_404, render
 from django.views.generic import CreateView, ListView, UpdateView
 from braces.views import LoginRequiredMixin
 
@@ -209,8 +208,8 @@ class WeeklySessionEditView(LoginRequiredMixin, StaffUserMixin, UpdateView):
             form.save()
         else:
             messages.success(self.request, 'No changes made')
-        return render_to_response(
-                'studioadmin/includes/weekly-session-edit-success.html'
+        return render(
+            self.request, 'studioadmin/includes/weekly-session-edit-success.html'
             )
 
 
@@ -235,6 +234,6 @@ class EventEditView(LoginRequiredMixin, StaffUserMixin, UpdateView):
             form.save()
         else:
             messages.success(self.request, 'No changes made')
-        return render_to_response(
-                'studioadmin/includes/event-edit-success.html'
+        return render(
+                self.request, 'studioadmin/includes/event-edit-success.html'
             )

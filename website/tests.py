@@ -145,7 +145,7 @@ class PageViewsTests(TestMixin, TestCase):
     def setUpTestData(cls):
         super(PageViewsTests, cls).setUpTestData()
         cls.restricted_page = baker.make(
-            Page, active=True, name="testname", restricted=True
+            Page, active=True, name="test/name", restricted=True
         )
         cls.restricted_page_url = reverse(
             'website:page', kwargs={'page_name': cls.restricted_page.name}
@@ -479,7 +479,7 @@ class ContactViewsTests(TestMixin, TestCase):
 
         self.assertIn(
             "Thank you for your enquiry! Your email has been sent and "
-            "we&#39;ll get back to you as soon as possible.",
+            "we&#x27;ll get back to you as soon as possible.",
             resp.rendered_content
         )
 

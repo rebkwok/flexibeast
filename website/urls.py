@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from website.views import about, classes, contact, home, page, \
     privacy_policy, restricted_page_not_logged_in, retreats, \
@@ -20,7 +20,7 @@ urlpatterns = [
     path('workshops/', workshops, name='workshops'),
     path('retreats/', retreats, name='retreats'),
     path('privacy-policy/', privacy_policy, name='privacy_policy'),
-    path('<str:page_name>/', page, name='page'),
+    re_path(r'^(?P<page_name>[\w\d//-]+)/$', page, name='page'),
     # path('', page, {'page_name': 'about'}, name='about'),
     path('', home, name='home'),
 ]

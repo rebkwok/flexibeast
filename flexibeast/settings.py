@@ -47,7 +47,7 @@ if not DEBUG:
 # Application definition
 
 INSTALLED_APPS = (
-    'suit',
+    # 'suit',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,7 +62,6 @@ INSTALLED_APPS = (
     'allauth.socialaccount.providers.facebook',
     'django_extensions',
     'crispy_forms',
-    'floppyforms',
     'debug_toolbar',
     'imagekit',
     'ckeditor',
@@ -263,7 +262,7 @@ if not HEROKU and not TRAVIS and not TESTING:
         },
     }
 
-ADMINS = [SUPPORT_EMAIL]
+ADMINS = [(SUPPORT_EMAIL, "Becky Smith")]
 
 # ####HEROKU#######
 
@@ -272,71 +271,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
-
-# DJANGO-SUIT
-SUIT_CONFIG = {
-    'ADMIN_NAME': "Flexibeast",
-    'MENU': (
-        {
-            'app': 'website',
-            'label': 'General Site Content',
-
-        },
-        {
-            'label': 'Events and Classes',
-            'app' : 'flex_bookings',
-            'icon': 'icon-star',
-            'models': ('event', 'eventtype')
-        },
-        # {
-        #     'label': 'Bookings',
-        #     'app': 'flex_bookings',
-        #     'icon': 'icon-heart',
-        #     'models': ('booking', 'block')
-        # },
-        {
-            'app': 'timetable',
-            'label': 'Weekly timetable',
-            'icon': 'icon-calendar',
-        },
-        {
-            'app': 'gallery'
-        },
-        {
-            'app': 'reviews'
-        },
-        {
-            'label': 'Accounts',
-            'models': (
-                'auth.user',
-                'account.emailaddress',
-                'account.emailconfirmation',
-                'socialaccount.socialaccount',
-                'accounts.cookiepolicy',
-                'accounts.dataprivacypolicy',
-                'accounts.signeddataprivacy',
-            ),
-            'icon': 'icon-user',
-        },
-        # {
-        #     'label': 'Payments',
-        #     'models': ('payments.paypalbookingtransaction',
-        #                'payments.paypalblocktransaction',
-        #                'ipn.paypalipn'),
-        #     'icon': 'icon-asterisk',
-        # },
-        {
-            'label': 'Activity Log',
-            'app': 'activitylog',
-            'icon': 'icon-asterisk',
-        },
-        {
-            'label': 'Go to main booking site',
-            'url': '/',
-            'icon': 'icon-map-marker',
-        },
-    )
-}
 
 # CKEDITOR
 CKEDITOR_UPLOAD_PATH = "uploads/"

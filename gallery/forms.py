@@ -1,8 +1,7 @@
 from django import forms
 from django.forms.models import modelformset_factory, BaseModelFormSet, \
     inlineformset_factory, formset_factory, BaseFormSet, BaseInlineFormSet
-
-from floppyforms import ClearableFileInput
+from django.forms.widgets import ClearableFileInput
 
 from gallery.models import Category, Image
 

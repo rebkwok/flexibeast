@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.views.generic import ListView
 
 from timetable.models import Event, WeeklySession
@@ -55,6 +55,6 @@ def toggle_spaces(request, session_id):
     session = WeeklySession.objects.get(id=session_id)
     session.full = not session.full
     session.save()
-    return render_to_response(
-        'timetable/includes/spaces.txt', {'session': session}
+    return render(
+        request, 'timetable/includes/spaces.txt', {'session': session}
     )

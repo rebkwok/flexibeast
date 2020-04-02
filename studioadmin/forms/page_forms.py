@@ -4,15 +4,15 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.forms.models import modelformset_factory, BaseModelFormSet, \
     inlineformset_factory, formset_factory, BaseFormSet, BaseInlineFormSet
+from django.forms.widgets import ClearableFileInput
 
 from ckeditor.widgets import CKEditorWidget
 from website.models import Page, Picture
 
-from floppyforms import ClearableFileInput
 
 
 class ImageThumbnailFileInput(ClearableFileInput):
-    template_name = 'floppyforms/image_thumbnail.html'
+    template_name = 'gallery/image_thumbnail.html'
 
 
 class PagesBaseFormSet(BaseModelFormSet):

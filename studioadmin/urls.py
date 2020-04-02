@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views.generic import RedirectView
 
 from gallery.views import CategoryListView, CategoryUpdateView
@@ -42,8 +42,8 @@ urlpatterns = [
     path(
         'website-pages/new/', PageCreateView.as_view(), name='add_page'
     ),
-    path(
-        'website-pages/(<str:name>/',
+    re_path(
+        r'^website-pages/(?P<name>[\w\d//-]+)$',
         PageUpdateView.as_view(), name='edit_page'
     ),
     path(
