@@ -17,7 +17,8 @@ env = environ.Env(DEBUG=(bool, False),
                   USE_MAILCATCHER=(bool, False),
                   HEROKU=(bool, False),
                   TRAVIS=(bool, False),
-                  SHOW_DEBUG_TOOLBAR=(bool, False)
+                  SHOW_DEBUG_TOOLBAR=(bool, False),
+                  LOCAL=(bool, False)
                   )
 
 environ.Env.read_env(root('flexibeast/.env'))  # reading .env file
@@ -39,7 +40,9 @@ if str(DEBUG).lower() in ['true', 'on']:  # pragma: no cover
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.flexibeast.com']
+if env('LOCAL'):  # pragma: no cover
+    ALLOWED_HOSTS = ['*']
 
 if not DEBUG:
     SESSION_COOKIE_DOMAIN = ".flexibeast.com"
